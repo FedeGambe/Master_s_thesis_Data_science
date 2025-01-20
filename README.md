@@ -8,13 +8,13 @@ Le analisi statistiche sono contenute nell'appositca cartella. Comprendono anali
 (Per l'analisi cluster, è stata condotta sia su R che su Python, sia per confrontare le librerie per l'algoritmo K-Mode, su Python inoltre sono stati testati anche gli algoritmo K-Means e K-Prototype e la tecnicna di cluster Gerarchica).
 
 Contenuti della cartella:
-
-[![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+- [Analisi Univariata, Bivariata, Logistica e Cluster](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb),   link colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+- [Analisi Esplorative FAMD](Analisi_Statistiche/Analisi_Esplorative_FAMD.R)
+- [Analisi Esplorative MCA](Analisi_Statistiche/Analisi_Esplorative_MCA.R)
+- [Analisi Esplorative PCA](Analisi_Statistiche/Analisi_Esplorative_PCA.R)
+- [Analisi Esplorative CLUSTER](Analisi_Statistiche/Analisi_Esplorative_.R)
 
 
 **2. Analisi Predittive**
-La cartella analisi_predittive contiene gli script per le analisi predittive, inclusi i modelli di machine learning applicati sui dati.
+La cartella analisi_predittive contiene gli script per le analisi predittive, inclusi i modelli di machine e deep learning applicati sui dati.
 
-Contenuti della Cartella:
-
-modello_predittivo.py: Un file Python che implementa i modelli predittivi, come regressione, classificazione o forecasting.
