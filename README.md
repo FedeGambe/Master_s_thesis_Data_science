@@ -22,3 +22,4 @@ ____________
 **2. ANALISI PREDITTIVE**
 La cartella analisi_predittive contiene gli script per le analisi predittive, inclusi i modelli di machine e deep learning applicati sui dati.
 
+IN PROGRESS...
