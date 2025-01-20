@@ -6,6 +6,7 @@ Questa repository contiene il codice e i materiali relativi alla tesi magistrale
 ____________
 
 **1. ANALISI STATISTICHE**
+
 Le analisi statistiche sono contenute nell'appositca cartella. Comprendono analisi univariata delle variabili, analisi bivariate con la variabile dipendente, Analisi VIF, Analisi di regressione logistica e Analisi Cluster, queste analisi sono contenute nello stesso notebook/file/link colab. Le restanti analisi esplorative, FAMD, MCA, PCA e Cluster sono state condotte su R, di conseguenza sono presenti i file di R per ogniune delle 4 analisi. 
 (Per l'analisi cluster, è stata condotta sia su R che su Python, sia per confrontare le librerie per l'algoritmo K-Mode, su Python inoltre sono stati testati anche gli algoritmo K-Means e K-Prototype e la tecnicna di cluster Gerarchica).
 
