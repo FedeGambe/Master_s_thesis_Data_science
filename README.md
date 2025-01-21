@@ -86,19 +86,30 @@ La cartella **Analisi_Predittive** contiene gli script per le analisi predittive
 Descrizione della preparazione dei dati per le analisi predittive.
 
 - [Cap. 1 Caricamento e preparazione dataset, Notebook: Python](Analisi_Predittive)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SKsOTTO9Qr5IiBJH7yZtxcduQfKndnmc?usp=sharing)
 
 #### 2. Preparazione per le Analisi Predittive ML
 Descrizione delle tecniche utilizzate per preparare i dati per l'analisi predittiva.
 
+- [Cap. 2 Preparazione per le Analisi Predittive, Notebook: Python](Analisi_Predittive)
+- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SKsOTTO9Qr5IiBJH7yZtxcduQfKndnmc?usp=sharing)
+
 #### 3. Analisi dei Modelli ML
 Applicazione dei modelli di machine learning per predire i comportamenti degli utilizzatori di auto elettriche.
+
+- [Cap. 3 Modelli ML, Notebook: Python](Analisi_Predittive)
+- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SKsOTTO9Qr5IiBJH7yZtxcduQfKndnmc?usp=sharing)
 
 #### 4. Migliore Modello e Migliori Features
 Analisi dei modelli migliori e selezione delle migliori features in base ai risultati.
 
+- [Cap. 4 Migliore Modello e Migliori Features, Notebook: Python](Analisi_Predittive)
+- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SKsOTTO9Qr5IiBJH7yZtxcduQfKndnmc?usp=sharing)
+
 #### 5. Artificial Neural Network
 
+- [Cap. 5 Reti Neurali, Notebook: Python](Analisi_Predittive)
+- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SKsOTTO9Qr5IiBJH7yZtxcduQfKndnmc?usp=sharing)
 
 In Progress...
 
