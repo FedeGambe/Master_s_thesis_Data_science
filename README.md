@@ -1,4 +1,5 @@
-Questa repository contiene il codice e i materiali relativi alla Tesi Magistrale incentrata sull'ambito della Data Science, svolta nell'ambito del corso di Laurea Magistrale in Management e Comunicazione d'Impresa (LM77) presso l'Università degli Studi di Modena e Reggio Emilia. Il lavoro si concentra sull'analisi statistica e predittiva per comprendere le caratteristiche degli utilizzatori di auto elettriche.
+# Progetto Tesi Magistrale in Data Science
+Questa repository contiene il codice e i materiali relativi alla **Tesi Magistrale** incentrata sull'ambito della _Data Science_, svolta nell'ambito del corso di Laurea Magistrale in Management e Comunicazione d'Impresa (LM77) presso l'Università degli Studi di Modena e Reggio Emilia. Il lavoro si concentra sull'analisi statistica e predittiva per comprendere le caratteristiche degli utilizzatori di auto elettriche.
 
 La repository è organizzata in due cartelle principali:
 
@@ -7,12 +8,12 @@ La repository è organizzata in due cartelle principali:
 
 ____________
 
-**1. ANALISI STATISTICHE**
+## **1. ANALISI STATISTICHE**
 
 Le analisi statistiche sono contenute nell'appositca cartella. Comprendono analisi univariata delle variabili, analisi bivariate con la variabile dipendente, Analisi VIF, Analisi di regressione logistica e Analisi Cluster, queste analisi sono contenute nello stesso notebook/file/link colab. Le restanti analisi esplorative, FAMD, MCA, PCA e Cluster sono state condotte su R, di conseguenza sono presenti i file di R per ogniune delle 4 analisi. 
 (Per l'analisi cluster, è stata condotta sia su R che su Python, sia per confrontare le librerie per l'algoritmo K-Mode, su Python inoltre sono stati testati anche gli algoritmo K-Means e K-Prototype e la tecnicna di cluster Gerarchica).
 
-Contenuti della cartella:
+### Contenuti della cartella:
 
 **1. Analisi Univariata**: Inizialmente sono state condotte analisi univariate per ciascuna delle variabili. Queste analisi hanno permesso di esplorare la distribuzione, la centralità e la dispersione delle variabili, fornendo una panoramica generale dei dati. 
 [CAP. 2. Analisi Univariata, Bivariata, Logistica e Cluster](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb), link colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
@@ -45,7 +46,7 @@ Contenuti della cartella:
 
 ____________
 
-**2. ANALISI PREDITTIVE**
+## **2. ANALISI PREDITTIVE**
 La cartella analisi_predittive contiene gli script per le analisi predittive, inclusi i modelli di machine e deep learning applicati sui dati.
 
 IN PROGRESS...
