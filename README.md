@@ -3,8 +3,8 @@ Questa repository contiene il codice e i materiali relativi alla **Tesi Magistra
 
 La repository è organizzata in due cartelle principali:
 
-- **[Analisi_Statistiche](Analisi_Statistiche)**: contiene i materiali e il codice per le analisi statistiche esplorative.
-- ****[Analisi_Predittive](Analisi_Predittive)****: contiene il codice per l'analisi predittiva.
+- **[Analisi_Statistiche](Analisi_Statistiche)**: contiene i materiali e il codice per le Analisi Statistiche ed Esplorative.
+- ****[Analisi_Predittive](Analisi_Predittive)****: contiene il codice per l'analisi predittiva tramite algoritmi di Machine e Deep Learning.
 
 ____________
 
