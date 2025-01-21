@@ -1,7 +1,9 @@
-Questa repository contiene il codice e i materiali relativi alla tesi magistrale, con focus sulle analisi statistiche e sulle analisi predittive. La repository è organizzata in due cartelle principali:
+Questa repository contiene il codice e i materiali relativi alla Tesi Magistrale incentrata sull'ambito della Data Science, svolta nell'ambito del corso di Laurea Magistrale in Management e Comunicazione d'Impresa (LM77) presso l'Università degli Studi di Modena e Reggio Emilia. Il lavoro si concentra sull'analisi statistica e predittiva per comprendere le caratteristiche degli utilizzatori di auto elettriche.
 
-- **analisi_statistiche**: contiene i materiali e il codice per le analisi statistiche esplorative.
-- **analisi_predittive**: contiene il codice per l'analisi predittiva.
+La repository è organizzata in due cartelle principali:
+
+- **[Analisi_Statistiche](Analisi_Statistiche)**: contiene i materiali e il codice per le analisi statistiche esplorative.
+- ****[Analisi_Predittive](Analisi_Predittive)****: contiene il codice per l'analisi predittiva.
 
 ____________
 
