@@ -19,43 +19,43 @@ Le analisi statistiche sono contenute nell'apposita cartella e includono diversi
 Caricamento e preparazione dei dataset utilizzati in per le future analisi statistiche.
 
 - [Cap. 1 Caricamento e preparazione dataset, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
 
 #### 2. Analisi Univariata
 Sono state condotte analisi univariate per ciascuna delle variabili. Queste analisi hanno permesso di esplorare la distribuzione, la centralità e la dispersione delle variabili.
 
 - [Cap. 2 Analisi Univariata, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
 
 #### 3. Analisi Bivariata
 È stata eseguita un'analisi bivariata per esaminare le relazioni tra ciascuna delle variabili indipendenti e la variabile dipendente.
 
 - [Cap. 3 Analisi Bivariata, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
-
+- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+- 
 #### 4. Formulazione delle Ipotesi di Ricerca
 Dopo le analisi bivariate, sono state redatte le 4 Ipotesi di Ricerca focalizzate sul tema della logistica.
 
 - [Cap. 4 Ipotesi di Ricerca, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
 
 #### 5. Analisi VIF e Correlazione
 Sono stati calcolati gli Indici di Inflazione della Varianza (VIF) per identificare potenziali problemi di multicollinearità tra le variabili indipendenti.
 
 - [Cap. 5.1, 5.2 Analisi VIF e Correlazione, Notebook: Python(Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
 
 #### 6. Analisi di Regressione Logistica
 L'analisi di regressione logistica è stata eseguita per testare le Ipotesi di Ricerca formulate, valutando l'influenza delle variabili indipendenti sulla probabilità della variabile dipendente.
 
 - [Cap. 5.3, 5.4 Regressione Logistica, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
 
 #### 7. Trasformazione delle Variabili
 Le variabili quantitative sono state trasformate in variabili ordinali per la successiva analisi tramite **Multiple Correspondence Analysis (MCA)**.
 
 - [Cap. 6 Trasformazione delle Variabili, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
 
 #### 8. Analisi Esplorative
 Sono state condotte le seguenti analisi esplorative utilizzando R:
@@ -72,7 +72,7 @@ Sono state condotte le seguenti analisi esplorative utilizzando R:
 - **Cluster Analysis**: Utilizzo di vari algoritmi di clustering (K-Means, K-Mode, K-Prototype, e Clustering Gerarchico) per raggruppare le osservazioni simili.
   - [File R: Cluster](Analisi_Statistiche/Analisi_Esplorative_CLUSTER.R)
   - [Cap. 7 Analisi Cluster, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-  - Link Colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+  - Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
 
 ---
 
