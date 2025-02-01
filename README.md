@@ -32,7 +32,7 @@ Sono state condotte analisi univariate per ciascuna delle variabili. Queste anal
 
 - [Cap. 3 Analisi Bivariata, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
 - Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
-- 
+  
 #### 4. Formulazione delle Ipotesi di Ricerca
 Dopo le analisi bivariate, sono state redatte le 4 Ipotesi di Ricerca focalizzate sul tema della logistica.
 
