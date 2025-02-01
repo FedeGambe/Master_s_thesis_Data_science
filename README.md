@@ -116,6 +116,6 @@ Creazione di modello più e meno complessi a base di reti neurali artificiali.
 Le dashboard di predizioni offrono uno strumento interattivo per testare i modelli di previsione, consentendo di inserire nuovi dati relativi a potenziali consumatori. Una volta inseriti, i modelli analizzano le caratteristiche del cliente e restituiscono una predizione sulla probabilità che quel consumatore possa acquisire una vettura elettrica in futuro.
 
 - [Dashboard di predizione: Python](Analisi_Predittive/Dashboard_di_Predizione.ipynb)
-- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SKsOTTO9Qr5IiBJH7yZtxcduQfKndnmc?usp=sharing)
+- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ktDmzqI_fqP5eIer3XNx8cboJ9y1z7wO?usp=sharing)
 
 
