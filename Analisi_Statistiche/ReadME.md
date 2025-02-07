@@ -5,7 +5,8 @@ Le analisi statistiche relative al progetto sono contenute nella cartella specif
 Fasi di Analisi:
 
 **1. Analisi Univariata**: Inizialmente sono state condotte analisi univariate per ciascuna delle variabili. Queste analisi hanno permesso di esplorare la distribuzione, la centralità e la dispersione delle variabili, fornendo una panoramica generale dei dati. 
-[CAP. 2. Analisi Univariata, Bivariata, Logistica e Cluster](Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb), link colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
+[CAP. 2. Analisi Univariata, Bivariata, Logistica e Cluster](Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb), 
+link colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
 
 **2. Analisi Bivariata:** Successivamente, è stata eseguita un'analisi bivariata per esaminare le relazioni tra ciascuna delle variabili indipendenti e la variabile dipendente. Questo passaggio ha permesso di identificare potenziali associazioni o pattern tra le variabili di interesse, contribuendo a formulare le ipotesi di Ricerca. 
 [CAP. 3. Analisi Univariata, Bivariata, Logistica e Cluster](Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb), link colab: ![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)
