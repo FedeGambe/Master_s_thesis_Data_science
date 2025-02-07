@@ -3,7 +3,7 @@
 
 La cartella **Apprendimento_Automatico_analisi_Predittive** contiene gli script per le analisi predittive, che includono la preparazione dei dati e l'applicazione di modelli di machine learning (ML) e deep learning.
 
-### **Contenuti della cartella Apprendimento_Automatico_analisi_Predittive*e:**
+### **Contenuti della cartella Apprendimento_Automatico_analisi_Predittive:**
 
 #### 1. Raccolta ed Elaborazione dei Dati
 Descrizione della preparazione dei dati per le analisi predittive.
