@@ -1,4 +1,4 @@
-**1. ANALISI STATISTICHE**
+## **1. ANALISI STATISTICHE**
 
 Le analisi statistiche relative al progetto sono contenute nella cartella specificata e comprendono diverse fasi di esplorazione e modellizzazione dei dati. In particolare, sono state sviluppate e analizzate 4 Ipotesi di Ricerca focalizzate sulla logistica. Il processo analitico è stato strutturato come segue:
 
