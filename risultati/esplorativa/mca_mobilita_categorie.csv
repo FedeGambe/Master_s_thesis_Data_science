@@ -1,0 +1,19 @@
+,Dim1,Dim2,contributo_Dim1_%,contributo_Dim2_%
+VMT categoriale__VMT alto,-0.299412,1.20594,1.29334,27.1566
+VMT categoriale__VMT basso,0.161261,-0.741075,0.512807,14.0174
+VMT categoriale__VMT medio,-0.01149,-0.0607732,0.00200042,0.0724354
+VMT categoriale__VMT molto alto,0.752241,2.24381,0.04054,0.466863
+VMT categoriale__VMT molto basso,0.497102,-0.798754,0.626264,2.09286
+Viaggio lungo categoriale__Viaggio 175-350 mi,-0.346665,-0.187692,1.87477,0.71132
+Viaggio lungo categoriale__Viaggio 350-550 mi,-0.691584,-0.146736,7.87255,0.458717
+Viaggio lungo categoriale__Viaggio < 175 mi,1.62062,0.287635,34.8806,1.42217
+Viaggio lungo categoriale__Viaggio > 550 mi,-0.720814,0.232056,3.4106,0.457525
+Numero viaggi lunghi categoriale__1 viaggio lungo,-0.577276,-0.497036,8.52623,8.18111
+Numero viaggi lunghi categoriale__2 viaggi lunghi,-0.637658,-0.0339596,0.986791,0.00362261
+Numero viaggi lunghi categoriale__3+ viaggi lunghi,-0.784678,1.07138,5.13349,12.3868
+Numero viaggi lunghi categoriale__Nessun viaggio lungo,1.46956,0.24858,33.5932,1.24411
+Distanza casa-lavoro categoriale__Casa-lavoro 15-25 mi,-0.0477738,0.0566587,0.028308,0.0515359
+Distanza casa-lavoro categoriale__Casa-lavoro 25-45 mi,-0.217461,0.920889,0.4273,9.9182
+"Distanza casa-lavoro categoriale__Casa-lavoro 6,5-15 mi",0.100047,-0.454511,0.150231,4.0132
+"Distanza casa-lavoro categoriale__Casa-lavoro < 6,5 mi",0.152189,-0.544781,0.300548,4.98471
+Distanza casa-lavoro categoriale__Casa-lavoro > 45 mi,-0.370453,1.96209,0.340428,12.3608

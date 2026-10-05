@@ -1,0 +1,15 @@
+{
+  "righe": 10688,
+  "colonne": 18,
+  "valori_mancanti": 0,
+  "righe_duplicate": 0,
+  "quota_BEV_%": 54.23,
+  "n_BEV": 5796,
+  "n_non_BEV": 4892,
+  "tipologia_auto_attuale": {
+    "BEV": 5796,
+    "PHEV": 4568,
+    "FCEV": 287,
+    "HEV": 37
+  }
+}

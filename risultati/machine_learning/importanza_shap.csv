@@ -1,0 +1,19 @@
+variabile,shap_medio_assoluto
+Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,0.380327
+VMT annuo,0.253548
+Reddito familiare,0.20879
+Auto precedente: BEV,0.161842
+Importanza di ridurre le emissioni di gas serra,0.140445
+Classe d'età,0.0763513
+Numero di auto in famiglia,0.0678039
+Auto precedente: HEV,0.067803
+Viaggio più lungo negli ultimi 12 mesi,0.0629458
+Distanza casa-lavoro,0.0628134
+Auto precedente: ICE,0.0555474
+Genere,0.054085
+Livello di istruzione,0.0518578
+Auto precedente: PHEV,0.0342581
+Casa di proprietà,0.0202266
+Numero persone in famiglia,0.014459
+Casa Indipendente,0.0113005
+Auto precedente: GNC,0

@@ -1,0 +1,30 @@
+,coefficiente,errore_std,p_value,odds_ratio,OR_ic_2.5%,OR_ic_97.5%,significativo
+const,-0.834887,0.127275,5.39093e-11,0.433923,0.338124,0.556865,True
+Genere (Maschio),0.212662,0.0478097,8.6631e-06,1.23697,1.12632,1.35848,True
+Classe d'età: <25 vs 45-54,0.110842,0.501377,0.825034,1.11722,0.418182,2.98477,False
+Classe d'età: 25-34 vs 45-54,-0.073657,0.122102,0.546349,0.92899,0.73127,1.18017,False
+Classe d'età: 35-44 vs 45-54,0.12912,0.0624411,0.0386523,1.13783,1.00676,1.28596,True
+Classe d'età: 55-64 vs 45-54,-0.212502,0.0580248,0.000249992,0.808558,0.72164,0.905946,True
+Classe d'età: 65-74 vs 45-54,-0.31064,0.0685585,5.86989e-06,0.732978,0.640817,0.838393,True
+Classe d'età: 75-79 vs 45-54,-0.0419663,0.0973665,0.666459,0.958902,0.792311,1.16052,False
+Classe d'età: >80 vs 45-54,-0.652348,0.254333,0.0103195,0.520821,0.316373,0.857388,True
+Classe Reddito Familiare: Bassa vs Media,-0.32673,0.131243,0.0127925,0.721279,0.557684,0.932863,True
+Classe Reddito Familiare: Alta vs Media,0.191357,0.0487381,8.62857e-05,1.21089,1.10057,1.33227,True
+Classe Reddito Familiare: Molto alta vs Media,0.467739,0.0623746,6.43721e-14,1.59638,1.41268,1.80397,True
+Classe Reddito Familiare: Estremamente alta vs Media,0.737909,0.0812878,1.10853e-19,2.09156,1.78352,2.4528,True
+Livello di istruzione: Licenza Media vs Laurea 2L o Dottorato,-0.909811,0.471816,0.0538156,0.402601,0.159685,1.01504,False
+Livello di istruzione: Diploma o Qualifica professionale vs Laurea 2L o Dottorato,-0.358153,0.066481,7.15245e-08,0.698966,0.613575,0.796242,True
+Livello di istruzione: Laurea 1L vs Laurea 2L o Dottorato,-0.119376,0.0443052,0.0070516,0.887474,0.81366,0.967984,True
+Tipologia di auto precedente: BEV vs PHEV,1.24236,0.0912501,3.26485e-42,3.46379,2.89654,4.14213,True
+Tipologia di auto precedente: HEV vs PHEV,-0.0229664,0.0741533,0.756778,0.977295,0.845097,1.13017,False
+Tipologia di auto precedente: ICE vs PHEV,0.411486,0.0654142,3.16509e-10,1.50906,1.32747,1.71548,True
+Tipologia di auto precedente: GNC vs PHEV,0.370506,0.305409,0.225074,1.44847,0.796057,2.63556,False
+Casa di proprietà,0.17623,0.0688859,0.010519,1.19271,1.04208,1.36512,True
+Casa Indipendente,0.110182,0.0642031,0.0861349,1.11648,0.984468,1.2662,False
+Numero persone in famiglia,0.0284553,0.0200263,0.155347,1.02886,0.989263,1.07005,False
+Numero di auto in famiglia,0.119646,0.0258797,3.77948e-06,1.1271,1.07135,1.18574,True
+Importanza di ridurre le emissioni di gas serra,0.100552,0.0128369,4.76066e-15,1.10578,1.07831,1.13396,True
+Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,-0.0348788,0.00456204,2.0823e-14,0.965722,0.957126,0.974396,True
+Viaggio più lungo negli ultimi 12 mesi (per 100 mi),0.00414492,0.00584245,0.478046,1.00415,0.992721,1.01572,False
+Distanza casa-lavoro (per 10 mi),-0.0188574,0.00951037,0.0473872,0.981319,0.963197,0.999783,True
+VMT annuo (per 1.000 mi),-0.0151817,0.00193683,4.56243e-15,0.984933,0.981201,0.988679,True

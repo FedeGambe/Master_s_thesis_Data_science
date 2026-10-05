@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tesi-bev"
+version = "2.0.0"
+description = "Tesi magistrale in Data Science: analisi statistica e predittiva dei possessori di auto elettriche (BEV)"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Federico Gamberini" }]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

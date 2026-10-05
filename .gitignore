@@ -1,0 +1,13 @@
+# Ambienti e cache
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.DS_Store
+.Rhistory
+.RData
+
+# Dataset intermedi: si rigenerano con scripts/01_prepara_dati.py e scripts/03_esplorativa.py
+dati/elaborati/
+

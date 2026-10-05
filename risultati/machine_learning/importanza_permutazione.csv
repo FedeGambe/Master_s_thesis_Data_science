@@ -1,0 +1,19 @@
+variabile,importanza,dev_std
+Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,0.0758933,0.00608258
+VMT annuo,0.0464961,0.00558297
+Auto precedente: BEV,0.031215,0.00398006
+Reddito familiare,0.0289478,0.00359847
+Numero di auto in famiglia,0.0122943,0.00179414
+Classe d'età,0.00854916,0.00114022
+Viaggio più lungo negli ultimi 12 mesi,0.00689122,0.000841522
+Importanza di ridurre le emissioni di gas serra,0.00464315,0.00241361
+Auto precedente: HEV,0.00397449,0.00144509
+Auto precedente: PHEV,0.00330777,0.000803927
+Auto precedente: ICE,0.00304223,0.000943764
+Distanza casa-lavoro,0.00193573,0.00150831
+Genere,0.00136534,0.000752359
+Livello di istruzione,0.00104058,0.00103152
+Numero persone in famiglia,0.000769481,0.000439784
+Casa di proprietà,0.000679057,0.000365418
+Casa Indipendente,0.000393862,0.000111421
+Auto precedente: GNC,0,0

@@ -1,0 +1,936 @@
+<title>Adozione dei veicoli elettrici</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3CclipPath id=%22q%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path=%22url%28%23q%29%22%3E%3Crect width=%2232%22 height=%2264%22 fill=%22%230d0d0d%22/%3E%3Crect x=%2232%22 width=%2232%22 height=%2264%22 fill=%22%235aa4bb%22/%3E%3Cpath d=%22M32 13a19 19 0 0 0 0 38z%22 fill=%22%23e2462a%22/%3E%3Cpath d=%22M32 13a19 19 0 0 1 0 38z%22 fill=%22%23ddd8c4%22/%3E%3C/g%3E%3C/svg%3E">
+<meta name="description" content="Analisi data-driven per l'adozione di veicoli elettrici: analisi statistiche, esplorative, cluster, machine learning e deep learning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: identità della presentazione di laurea (titoli neri pesanti, triangolo davanti ai titoli,
+   parte I statistica in teal / parte II predittiva in arancio); indice fisso a sinistra sopra i 1180px,
+   altrimenti in testa; testo, note e figure occupano tutta la larghezza della colonna. */
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#111111; --ink-2:#45484c; --ink-3:#74777b; --line:#e4e0d6;
+  --teal:#3f93aa; --teal-ink:#2a7a90; --navy:#263a5a; --rosso:#b0272c; --arancio:#e2462a; --arancio-ink:#c8361c; --sabbia:#ddd4c1;
+  --accent:var(--teal-ink); --accent-soft:#e6f1f4; --arancio-soft:#fbe8e3;
+  --s1:#3f93aa; --s2:#e2462a; --s3:#263a5a; --s4:#a2a39e;
+  --ok:#1f7a4d; --ok-soft:#e1f2e8; --no:#b0272c; --no-soft:#f8e3e1; --nd:#6b6e72; --nd-soft:#eeece7;
+  --grigio:#6b6e72; --grigio-linea:#a2a39e; --copertina:#efe9dc;
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-data:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --navy:#3d5680; --rosso:#d6474b; --arancio:#ee6141; --arancio-ink:#f07a5e; --sabbia:#5d574b;
+  --accent:var(--teal-ink); --accent-soft:#18292e; --arancio-soft:#33201a;
+  --s1:#4fa6bd; --s2:#ee6141; --s3:#8ea6d0; --s4:#6f716d;
+  --ok:#5cc28d; --ok-soft:#173326; --no:#ef7a7c; --no-soft:#3a1d1e; --nd:#a3a39d; --nd-soft:#26282a;
+  --grigio:#a3a39d; --grigio-linea:#6f716d; --copertina:#1f2123;
+  color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --navy:#3d5680; --rosso:#d6474b; --arancio:#ee6141; --arancio-ink:#f07a5e; --sabbia:#5d574b;
+  --accent:var(--teal-ink); --accent-soft:#18292e; --arancio-soft:#33201a;
+  --s1:#4fa6bd; --s2:#ee6141; --s3:#8ea6d0; --s4:#6f716d;
+  --ok:#5cc28d; --ok-soft:#173326; --no:#ef7a7c; --no-soft:#3a1d1e; --nd:#a3a39d; --nd-soft:#26282a;
+  --grigio:#a3a39d; --grigio-linea:#6f716d; --copertina:#1f2123;
+  color-scheme:dark; }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:16px}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{background:var(--bg); color:var(--ink); font:16.5px/1.65 var(--f-body); margin:0}
+.impianto{max-width:1320px; margin:0 auto; padding-inline:20px; padding-block:28px 80px;
+  display:grid; grid-template-columns:minmax(0,1fr); gap:0 48px}
+@media (min-width:1180px){ .impianto{grid-template-columns:230px minmax(0,1fr)} }
+main{min-width:0; max-width:1020px}
+.testo{max-width:none}
+h1,h2,h3{font-family:var(--f-display); line-height:1.08; text-wrap:balance; margin:0; letter-spacing:-.01em}
+h1{font-size:clamp(2.1rem,5.4vw,3.6rem); font-weight:900; max-width:18ch}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem); font-weight:900; position:relative; padding-left:36px}
+h2::before{content:""; position:absolute; left:0; top:.06em; border-style:solid; border-width:.5em 0 .5em .62em;
+  border-color:transparent transparent transparent var(--sabbia)}
+.statistica h2::before{border-left-color:var(--teal)}
+.predittiva h2::before{border-left-color:var(--arancio)}
+.capitolo{margin-top:88px}
+.blocco{margin-top:56px}
+h3{font-size:1.3rem; font-weight:800; margin:0 0 6px}
+h3 .nr{color:var(--teal-ink); margin-right:8px; font-variant-numeric:tabular-nums}
+.predittiva h3 .nr{color:var(--arancio-ink)}
+p{margin:20px 0}
+h2 + .testo > p:first-child, h3 + .testo > p:first-child, h3 + p{margin-top:10px}
+strong{font-weight:600}
+.parte{display:block; font:600 .85rem/1 var(--f-body); color:var(--teal-ink); margin:0 0 12px 36px; letter-spacing:.02em}
+.predittiva .parte{color:var(--arancio-ink)}
+.num{font-family:var(--f-data); font-variant-numeric:tabular-nums; font-size:.94em}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* Indice */
+.indice{font-size:.9rem}
+.indice .titolo{font:800 .78rem/1 var(--f-display); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-bottom:12px}
+.indice ol{list-style:none; margin:0; padding:0}
+.indice > ol > li{margin:0 0 10px}
+.indice a{color:var(--ink); text-decoration:none; display:block; padding:2px 0 2px 10px; border-left:2px solid transparent}
+.indice a:hover{color:var(--teal-ink)}
+.indice a.attivo{border-left-color:var(--teal); color:var(--teal-ink); font-weight:600}
+.indice .predittiva-link:hover{color:var(--arancio-ink)}
+.indice .predittiva-link.attivo{border-left-color:var(--arancio); color:var(--arancio-ink)}
+/* Introduzione e conclusioni: grigio, come i loro triangoli */
+.indice .gruppo-grigio a:hover{color:var(--grigio)}
+.indice .gruppo-grigio a.attivo{border-left-color:var(--grigio-linea); color:var(--grigio)}
+.indice > ol > li > a{font-weight:700; font-family:var(--f-display)}
+.indice ol ol{margin:4px 0 0 10px}
+.indice ol ol a{font-size:.84rem; color:var(--ink-2)}
+.indice .sez{display:block; font:600 .72rem/1 var(--f-body); color:var(--ink-3); text-transform:uppercase; letter-spacing:.1em; margin:18px 0 8px 12px}
+@media (min-width:1180px){
+  .indice{position:sticky; top:calc(20px + env(safe-area-inset-top,0px)); align-self:start; max-height:calc(100vh - 40px); overflow:auto; padding-top:8px}
+}
+@media (max-width:1179px){
+  .indice{order:2; margin-top:32px; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 20px}
+  main{display:contents}
+  .indice ol ol{display:none}
+  .indice > ol{columns:2; column-gap:24px}
+  .indice .sez{display:none}
+}
+@media (max-width:560px){ .indice > ol{columns:1} }
+
+/* Copertina, come la prima slide: riquadro con titolo, banda nera e azzurra, semicerchio rosso e sabbia al centro */
+.slide{border:1px solid var(--line); border-radius:6px; overflow:hidden}
+.slide-testa{background:var(--copertina); padding:clamp(28px,5vw,64px) clamp(20px,5.5vw,72px) clamp(28px,5vw,60px)}
+.slide-testa h1{max-width:22ch; letter-spacing:-.02em}
+.copertina .sottotitolo{font-size:clamp(1.05rem,1.8vw,1.35rem); color:var(--ink); margin:12px 0 0}
+.banda{position:relative; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; min-height:clamp(230px,30vw,330px);
+  background:linear-gradient(90deg, #0d0d0d 50%, #5aa4bb 50%)}
+.banda > div{position:relative; z-index:1; padding:clamp(22px,3.4vw,40px) clamp(20px,5.5vw,72px) 28px; min-width:0}
+.banda .sx{color:#f4f2ec; font-size:.9rem; line-height:1.45}
+.banda .dx{color:#0d0d0d; text-align:right; font-size:1rem; padding-left:20px}
+.banda b{font-family:var(--f-display); font-weight:800; font-size:1.2rem}
+.banda .sx hr{border:0; border-top:1px solid #ffffff59; margin:14px 0; width:min(60%,260px)}
+.banda .semicerchio{position:absolute; z-index:0; left:25%; bottom:0; width:50%; aspect-ratio:1; border-radius:50%;
+  background:linear-gradient(90deg, #e2462a 50%, #ddd8c4 50%); transform:translateY(80%); pointer-events:none}
+@media (max-width:700px){ .banda{grid-template-columns:1fr; background:none} .banda .sx{background:#0d0d0d} .banda .dx{background:#5aa4bb; text-align:left; padding-left:clamp(20px,5.5vw,72px)} .banda .semicerchio{display:none} }
+
+.cifre{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-top:28px}
+.cifra{background:var(--surface); padding:18px 18px 16px; min-width:0}
+.cifra b{display:block; font:900 2rem/1 var(--f-display); font-variant-numeric:tabular-nums}
+.cifra span{display:block; font-size:.85rem; line-height:1.4; color:var(--ink-2); margin-top:8px}
+@media (max-width:760px){ .cifre{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+.tre{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:20px}
+.tre div{min-width:0}
+.tre h4,.metodo h4{margin:0 0 6px; font:800 1rem/1.3 var(--f-display)}
+.tre ul,.metodo ul{margin:0; padding-left:18px; font-size:.93rem; color:var(--ink-2)}
+@media (max-width:760px){ .tre{grid-template-columns:1fr} }
+
+.gruppi{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; margin-top:24px}
+.gruppo{min-width:0}
+.gruppo .cerchio{width:min(118px,100%); aspect-ratio:1; border-radius:50%; display:grid; place-items:center; text-align:center;
+  color:#fff; font:800 .9rem/1.15 var(--f-display); padding:10px; margin:0 auto 10px}
+.gruppo ul{margin:0; padding-left:18px; font-size:.86rem; color:var(--ink-2)}
+@media (max-width:820px){ .gruppi{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+.metodo{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px}
+.metodo div{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:16px 18px; min-width:0}
+.metodo h4{color:var(--teal-ink)} .metodo div + div h4{color:var(--arancio-ink)}
+@media (max-width:700px){ .metodo{grid-template-columns:1fr} }
+
+/* Figure e tabelle */
+figure{margin:20px 0 8px; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 18px 12px; min-width:0}
+figcaption{font-size:.84rem; line-height:1.5; color:var(--ink-2); margin-top:10px}
+.titolo-fig{font:800 1rem/1.3 var(--f-display); margin-bottom:6px}
+.grafico{width:100%; min-width:0}
+.grafico svg{display:block; max-width:100%; height:auto; font-family:var(--f-body); overflow:visible}
+.affiancate{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
+.affiancate figure{margin-top:20px}
+@media (max-width:820px){ .affiancate{grid-template-columns:1fr} }
+.legenda{display:flex; flex-wrap:wrap; gap:6px 18px; font-size:.82rem; color:var(--ink-2); margin:6px 0 2px}
+.legenda i{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:-1px}
+.legenda i.linea{width:16px; height:3px; border-radius:2px; vertical-align:3px}
+
+.tabella{overflow-x:auto; margin:16px 0; border:1px solid var(--line); border-radius:6px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:.86rem; line-height:1.4}
+th,td{padding:8px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-weight:600; color:var(--ink-2); background:var(--bg); font-size:.74rem; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap}
+tbody tr:hover td{background:color-mix(in srgb, var(--accent-soft) 55%, transparent)}
+figure .tabella{border:0; border-radius:0}
+/* Ipotesi: una sola cornice per gruppo di righe */
+tr.nel-gruppo td{border-top:0}
+tr.inizio-gruppo td{border-top:1px solid var(--line)}
+tbody tr.inizio-gruppo:first-child td{border-top:0}
+#t-ipotesi td{border-bottom:0}
+table.compatta th, table.compatta td{padding:8px 7px}
+table.compatta th{letter-spacing:.02em}
+table.compatta th:first-child, table.compatta td:first-child{padding-left:12px}
+#t-profilo td:first-child, #t-profilo-senza td:first-child, #t-kmode-medie td:first-child{white-space:nowrap}
+/* Sugli schermi stretti le tabelle larghe scorrono in orizzontale con la prima colonna ferma */
+@media (max-width:760px){
+  table.larga{min-width:640px}
+  table.larga th:first-child, table.larga td:first-child{position:sticky; left:0; z-index:1; background:var(--surface); box-shadow:1px 0 0 var(--line)}
+  table.larga th:first-child{background:var(--bg)}
+  table.larga td:first-child{min-width:104px; max-width:140px; white-space:normal}
+  /* Nelle ipotesi la prima colonna è un testo lungo: scorre insieme alle altre */
+  #t-ipotesi{min-width:700px}
+  #t-ipotesi th:first-child, #t-ipotesi td:first-child{position:static; box-shadow:none; min-width:210px; max-width:230px}
+}
+td.n,th.n{text-align:right; font-family:var(--f-data); font-variant-numeric:tabular-nums; white-space:nowrap}
+td.debole{color:var(--ink-3)}
+tr.evidenza td{background:var(--accent-soft)}
+.predittiva tr.evidenza td{background:var(--arancio-soft)}
+.esito{display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:.78rem; padding:3px 9px; border-radius:999px; white-space:nowrap}
+.esito.ok{background:var(--ok-soft); color:var(--ok)} .esito.no{background:var(--no-soft); color:var(--no)} .esito.nd{background:var(--nd-soft); color:var(--nd)}
+.esito.info{background:var(--accent-soft); color:var(--teal-ink)} .esito.info::before{content:"●"; font-size:.6em}
+.esito.ok::before{content:"✓"} .esito.no::before{content:"✕"} .esito.nd::before{content:"–"}
+
+.confusione{display:grid; grid-template-columns:auto 1fr 1fr; gap:4px; max-width:420px; font-size:.85rem; margin-top:8px}
+.confusione div{padding:12px; border-radius:4px; text-align:center}
+.confusione .et{color:var(--ink-2); padding:6px; display:flex; align-items:center; justify-content:center}
+.confusione .giusto{background:var(--accent-soft); color:var(--ink)}
+.confusione .errato{background:var(--arancio-soft); color:var(--ink)}
+.confusione b{display:block; font:800 1.5rem/1.1 var(--f-display); font-variant-numeric:tabular-nums}
+
+.nota{border-left:4px solid var(--teal); background:var(--accent-soft); padding:14px 18px; border-radius:0 6px 6px 0; margin:20px 0}
+.nota p{margin:10px 0} .nota p:first-child{margin-top:0} .nota p:last-child{margin-bottom:0} .nota ul{margin:10px 0; padding-left:20px}
+.predittiva .nota{border-left-color:var(--arancio); background:var(--arancio-soft)}
+.elenco{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:18px}
+.elenco div{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:14px 16px; min-width:0}
+.elenco h4{margin:0 0 4px; font:800 .98rem/1.3 var(--f-display)}
+.elenco p{margin:0; font-size:.9rem; line-height:1.5; color:var(--ink-2)}
+@media (max-width:760px){ .elenco{grid-template-columns:1fr} }
+
+#suggerimento{position:fixed; pointer-events:none; background:var(--ink); color:var(--bg); font-size:.8rem; line-height:1.4;
+  padding:6px 9px; border-radius:4px; max-width:300px; z-index:10}
+.tema{position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; font-size:.8rem; background:var(--surface);
+  color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer}
+.vai-indice{position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:5; display:none;
+  font:700 .85rem/1 var(--f-display); color:var(--bg); background:var(--ink); text-decoration:none; padding:11px 16px; border-radius:999px;
+  box-shadow:0 4px 14px #0004; opacity:0; transform:translateY(8px); transition:opacity .2s, transform .2s; pointer-events:none}
+.vai-indice.visibile{opacity:1; transform:none; pointer-events:auto}
+@media (max-width:1179px){ .vai-indice{display:block} }
+@media (prefers-reduced-motion: reduce){ .vai-indice{transition:none} }
+footer{margin-top:80px; padding-top:18px; border-top:1px solid var(--line); font-size:.82rem; line-height:1.6; color:var(--ink-3)}
+@media (max-width:1179px){ .copertina{order:1} .contenuto{order:3} }
+.copertina,.contenuto,.indice{min-width:0}
+@media (max-width:700px){ .copertina{padding-top:30px} }
+
+/* Pannello delle distribuzioni (1.1) */
+.pulsante{display:inline-flex; align-items:center; gap:8px; font:700 .9rem/1 var(--f-display); color:var(--teal-ink);
+  background:var(--surface); border:1.5px solid var(--teal); border-radius:999px; padding:10px 16px; cursor:pointer}
+.pulsante:hover{background:var(--accent-soft)}
+.pulsante::before{content:""; border-style:solid; border-width:.35em 0 .35em .5em; border-color:transparent transparent transparent currentColor; transition:transform .15s}
+.pulsante[aria-expanded="true"]::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion: reduce){ .pulsante::before{transition:none} }
+.distribuzioni{margin-top:16px}
+.scelte{display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; margin:4px 0 10px}
+.scelte .gruppo-scelte{font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); width:100%; margin-top:6px}
+.scelta{font:.82rem/1 var(--f-body); color:var(--ink-2); background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer}
+.scelta:hover{border-color:var(--teal)}
+.scelta[aria-pressed="true"]{background:var(--teal); border-color:var(--teal); color:#fff}
+.mediane{font-size:.86rem; color:var(--ink-2); margin:2px 0 0}
+</style>
+
+<button class="tema" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+<div id="suggerimento" hidden></div>
+<a class="vai-indice" id="vai-indice" href="#indice">Indice</a>
+
+<div class="impianto">
+<nav class="indice" id="indice" aria-label="Indice">
+  <div class="titolo">Indice</div>
+  <ol>
+    <li class="gruppo-grigio"><a href="#introduzione">Introduzione</a>
+      <ol><li><a href="#contesto">Motivazione e contesto</a></li><li><a href="#dataset">Il dataset</a></li><li><a href="#metodologia">Metodologia</a></li></ol></li>
+    <li><span class="sez">I. Analisi statistiche</span><a href="#statistica">1. Analisi statistica</a>
+      <ol><li><a href="#descrittive">1.1 Descrittive</a></li><li><a href="#bivariata">1.2 Bivariata</a></li><li><a href="#logistica">1.3 Regressione logistica</a></li><li><a href="#ipotesi">1.4 Ipotesi di ricerca</a></li></ol></li>
+    <li><a href="#esplorativa">2. Analisi esplorativa</a>
+      <ol><li><a href="#pca">2.1 PCA</a></li><li><a href="#mca">2.2 MCA</a></li><li><a href="#famd">2.3 FAMD</a></li></ol></li>
+    <li><a href="#cluster">3. Cluster</a>
+      <ol><li><a href="#kmode">3.1 K-Mode</a></li><li><a href="#kmeans">3.2 Verifica con K-Means</a></li><li><a href="#senza-auto">3.3 Senza auto precedente</a></li><li><a href="#gerarchico">3.4 Gerarchico</a></li></ol></li>
+    <li><span class="sez">II. Analisi predittive</span><a class="predittiva-link" href="#ml">4. Machine learning</a>
+      <ol><li><a class="predittiva-link" href="#screening">4.1 Screening</a></li><li><a class="predittiva-link" href="#ottimizzazione">4.2 Ottimizzazione</a></li><li><a class="predittiva-link" href="#test">4.3 Risultati sul test</a></li><li><a class="predittiva-link" href="#roc">4.4 ROC e calibrazione</a></li><li><a class="predittiva-link" href="#feature">4.5 Le migliori feature</a></li></ol></li>
+    <li><a class="predittiva-link" href="#dl">5. Deep learning</a>
+      <ol><li><a class="predittiva-link" href="#architetture">5.1 Architetture</a></li><li><a class="predittiva-link" href="#addestramento">5.2 Addestramento</a></li><li><a class="predittiva-link" href="#confronto-dl">5.3 Confronto</a></li></ol></li>
+    <li class="gruppo-grigio"><a href="#conclusioni">Limiti e conclusioni</a></li>
+  </ol>
+</nav>
+
+<main>
+  <header class="copertina" id="introduzione">
+    <div class="slide">
+      <div class="slide-testa">
+        <h1>Analisi data-driven per l'adozione di veicoli elettrici</h1>
+        <p class="sottotitolo">Analisi statistiche e predittive sugli acquirenti di auto elettriche</p>
+      </div>
+      <div class="banda">
+        <div class="sx"><div>Laureando<br><b>Gamberini Federico</b><br><i>mat. 178147</i></div><hr>
+          <div><b style="font-size:.95rem">Università degli Studi di Modena e Reggio Emilia</b><br><i>Dipartimento di Comunicazione ed Economia</i></div><hr>
+          <div>Corso di Laurea Magistrale in Management<br>e Comunicazione d'Impresa<br>A.A. 2023/2024</div></div>
+        <div class="dx"><div>Relatore:<br>Prof. <b>Cavicchioli Roberto</b></div></div>
+        <div class="semicerchio" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div class="cifre" id="cifre"></div>
+  </header>
+
+  <div class="contenuto">
+  <section class="blocco" id="contesto">
+    <h2>Motivazione e contesto</h2>
+    <div class="tre">
+      <div><h4>Contesto di riferimento</h4><ul><li>Transizione del settore automotive verso la riduzione delle emissioni</li><li>Normative ambientali e incentivi in aumento</li></ul></div>
+      <div><h4>Obiettivo della ricerca</h4><ul><li>Fattori socio-demografici che influenzano l'acquisto di veicoli elettrici</li><li>Variabili chiave nelle decisioni di acquisto</li></ul></div>
+      <div><h4>Implicazioni</h4><ul><li>Strategie di marketing per la mobilità elettrica</li><li>Politiche pubbliche a favore della sostenibilità</li></ul></div>
+    </div>
+  </section>
+
+  <section class="blocco" id="dataset">
+    <h2>Il dataset</h2>
+    <div class="testo">
+      <p>Fonte: <em>Sociodemographic data for BEV owning households in California</em> dell'UC Davis, derivato dalla ricerca <em>Understanding the Early Adopters of Fuel Cell Vehicles</em> di Scott Hardman. Dai 27.021 casi e 27 variabili originali, con molti valori mancanti, la pulizia (OpenRefine e Python) ha portato a <strong><span data-v="n"></span> casi e 16 variabili</strong>, divise in 5 gruppi.</p>
+      <p>Tutti i rispondenti guidano già un veicolo a basse emissioni: il <span class="num" data-v="pct_bev"></span> un BEV, gli altri soprattutto PHEV. La variabile dipendente (<em>BEV dummy</em>) distingue quindi chi è passato all'elettrico puro da chi ha scelto un'alimentazione intermedia.</p>
+    </div>
+    <div class="gruppi">
+      <div class="gruppo"><div class="cerchio" style="background:#3f93aa">Socio-demografiche</div><ul><li>Genere</li><li>Classe d'età</li><li>Classe di reddito</li><li>Livello di istruzione</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#263a5a">Abitative</div><ul><li>Casa di proprietà</li><li>Casa indipendente</li><li>Persone in famiglia</li><li>Auto in famiglia</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#1d1d1d">Sensibilità ambientale</div><ul><li>Importanza di ridurre le emissioni di gas serra</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#b0272c">Classe veicolare</div><ul><li>Tipologia di auto attuale</li><li>Tipologia di auto precedente</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#e2462a">Mobilità e percorrenza</div><ul><li>Viaggio più lungo (12 mesi)</li><li>Viaggi oltre 200 miglia</li><li>Distanza casa-lavoro</li><li>VMT annuo</li></ul></div>
+    </div>
+  </section>
+
+  <section class="blocco" id="metodologia">
+    <h2>Metodologia</h2>
+    <div class="testo"><p>L'analisi si articola in due parti: le analisi statistiche, per comprendere i dati e le relazioni tra le variabili, e le analisi predittive, per identificare il profilo del consumatore di un veicolo elettrico.</p></div>
+    <div class="metodo">
+      <div><h4>I. Analisi statistiche</h4><ul><li>Statistiche descrittive e analisi bivariata</li><li>Regressione logistica e ipotesi di ricerca</li><li>Analisi esplorative: PCA, MCA, FAMD</li><li>Cluster: K-Mode, verificato con K-Means e gerarchico</li></ul></div>
+      <div><h4>II. Analisi predittive</h4><ul><li>Machine learning: 15 algoritmi, ottimizzazione degli iperparametri</li><li>Interpretabilità con SHAP</li><li>Deep learning: reti neurali artificiali</li><li>Dashboard di predizione</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 1. STATISTICA -->
+  <section class="capitolo statistica" id="statistica">
+    <span class="parte">I. Analisi statistiche</span>
+    <h2>1. Analisi statistica</h2>
+
+    <div class="blocco" id="descrittive">
+      <h3><span class="nr">1.1</span>Statistiche descrittive</h3>
+      <div class="testo"><p>Le variabili di percorrenza sono molto asimmetriche: pochi rispondenti percorrono distanze molto superiori alla mediana. Per questo nei confronti tra gruppi si usano test non parametrici.</p></div>
+      <div class="tabella"><table id="t-descrittive"></table></div>
+      <button class="pulsante" id="apri-distribuzioni" type="button" aria-expanded="false" aria-controls="pannello-distribuzioni">Mostra i grafici delle distribuzioni</button>
+      <div class="distribuzioni" id="pannello-distribuzioni" hidden>
+        <figure>
+          <div class="scelte" id="scelte-distribuzioni" role="group" aria-label="Variabile da visualizzare"></div>
+          <div class="titolo-fig" id="titolo-distribuzione"></div>
+          <p class="mediane" id="mediane-distribuzione"></p>
+          <div class="grafico" id="g-distribuzione"></div>
+          <div class="legenda"><span><i style="background:var(--s1)"></i>possessori di BEV</span><span><i style="background:var(--s2)"></i>altri veicoli (PHEV, HEV, FCEV)</span></div>
+          <figcaption id="nota-distribuzione"></figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="bivariata">
+      <h3><span class="nr">1.2</span>Analisi bivariata</h3>
+      <div class="testo"><p>Quota di possessori di BEV nelle diverse categorie. Il reddito ha il gradiente più netto; l'auto precedente separa nettamente chi aveva già un BEV.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Per classe di reddito</div><div class="grafico" id="g-q-reddito"></div></figure>
+        <figure><div class="titolo-fig">Per auto precedente</div><div class="grafico" id="g-q-auto"></div></figure>
+        <figure><div class="titolo-fig">Per classe d'età</div><div class="grafico" id="g-q-eta"></div></figure>
+        <figure><div class="titolo-fig">Per livello di istruzione</div><div class="grafico" id="g-q-istruzione"></div></figure>
+      </div>
+      <p class="testo" style="font-size:.84rem;color:var(--ink-2)">La linea tratteggiata è la quota media del campione (<span class="num" data-v="pct_bev"></span>).</p>
+      <figure><div class="titolo-fig">Forza dell'associazione con il possesso di un BEV</div>
+        <div class="grafico" id="g-effetti"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>categoriale (V di Cramér)</span><span><i style="background:var(--s3)"></i>numerica (r rank-biserial, valore assoluto)</span></div>
+        <figcaption>Chi-quadro per le variabili categoriali, Mann-Whitney per le numeriche: tutte le associazioni sono significative, ma deboli (sotto 0,2).</figcaption></figure>
+    </div>
+
+    <div class="blocco" id="logistica">
+      <h3><span class="nr">1.3</span>Regressione logistica</h3>
+      <div class="testo">
+        <p>Il modello include tutte le variabili, con le categorie di riferimento indicate tra parentesi. Il VIF massimo è <span class="num" data-v="vif_max"></span>, quindi non c'è multicollinearità rilevante. Lo pseudo-R² di McFadden è <span class="num" data-v="r2"></span>: le variabili spiegano solo una parte della scelta.</p>
+      </div>
+      <figure><div class="titolo-fig">Odds ratio con intervallo di confidenza al 95%</div>
+        <div class="grafico" id="g-forest"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>significativo (p &lt; 0,05)</span><span><i style="background:var(--s4)"></i>non significativo</span></div>
+        <figcaption>Scala logaritmica: a destra di 1 la caratteristica aumenta le probabilità di possedere un BEV, a sinistra le riduce.</figcaption></figure>
+      <div class="testo"><p>Gli <strong>effetti marginali medi</strong> traducono gli odds ratio in punti percentuali di probabilità: ad esempio, a parità di altre caratteristiche, chi aveva già un BEV ha una probabilità di possederne un altro più alta di circa <span class="num" id="ame-bev"></span> punti rispetto a chi aveva una PHEV.</p></div>
+      <figure><div class="titolo-fig">Effetti marginali medi (punti percentuali)</div>
+        <div class="grafico" id="g-ame"></div>
+        <figcaption>Variazione media della probabilità di possedere un BEV, con IC 95%. Sono mostrati solo gli effetti significativi.</figcaption></figure>
+    </div>
+
+    <div class="blocco" id="ipotesi">
+      <h3><span class="nr">1.4</span>Ipotesi di ricerca</h3>
+      <div class="tabella"><table id="t-ipotesi"></table></div>
+      <div class="nota testo"><strong>H2.1 non è supportata.</strong> Si ipotizzava che la PHEV facesse da "ponte" verso l'elettrico puro. A parità di altre caratteristiche, chi aveva una PHEV ha invece odds di possedere un BEV <span class="num" data-v="or_phev_ice"></span> volte quelle di chi aveva un'auto tradizionale (ICE).<br><strong>H2.2</strong> è esplorativa: non c'è una direzione attesa. Rispetto alla PHEV, aver avuto un'auto ICE aumenta le odds di BEV (<span class="num" data-v="or_ice"></span> volte); HEV e GNC non hanno un effetto significativo.</div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 2. ESPLORATIVA -->
+  <section class="capitolo statistica" id="esplorativa">
+    <span class="parte">I. Analisi statistiche</span>
+    <h2>2. Analisi esplorativa</h2>
+    <div class="testo"><p>Le analisi multivariate sono svolte sui <span class="num" data-v="n_bev"></span> possessori di BEV, per sintetizzare le loro caratteristiche in pochi indici da usare nel clustering. Sono state eseguite sia in R (FactoMineR) sia in Python, con risultati coincidenti.</p></div>
+
+    <div class="blocco" id="pca">
+      <h3><span class="nr">2.1</span>PCA sulle variabili di mobilità</h3>
+      <div class="testo"><p>Le prime due componenti spiegano il <span class="num" data-v="pca_cum2"></span>% della varianza. PC1 cresce con tutte le percorrenze (indice <em>Viaggi PCA</em>); PC2 oppone i viaggi lunghi agli spostamenti quotidiani (<em>Mobilità quotidiana PCA</em>). L'alpha di Cronbach (<span class="num" data-v="alpha"></span>) indica che le quattro variabili misurano aspetti diversi della mobilità.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Varianza spiegata</div><div class="grafico" id="g-pca-scree"></div>
+          <div class="legenda"><span><i style="background:var(--s1)"></i>per componente</span><span><i class="linea" style="background:var(--s2)"></i>cumulata</span></div></figure>
+        <figure><div class="titolo-fig">Loadings</div><div class="tabella" style="margin:6px 0 0"><table id="t-loadings"></table></div></figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="mca">
+      <h3><span class="nr">2.2</span>MCA tematiche</h3>
+      <div class="testo"><p>Tre analisi delle corrispondenze multiple, una per gruppo di variabili categoriali. Le prime due dimensioni di ciascuna diventano indici sintetici. I grafici mostrano le categorie che contribuiscono di più a ogni dimensione.</p></div>
+      <div id="mca-gruppi"></div>
+    </div>
+
+    <div class="blocco" id="famd">
+      <h3><span class="nr">2.3</span>FAMD</h3>
+      <div class="testo"><p>L'analisi fattoriale per dati misti considera insieme variabili quantitative e categoriali. La varianza è molto distribuita: le prime due dimensioni ne spiegano solo il <span class="num" data-v="famd_cum2"></span>%.</p></div>
+      <figure><div class="titolo-fig">Varianza spiegata dalle prime 10 dimensioni</div><div class="grafico" id="g-famd-scree"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>per dimensione</span><span><i class="linea" style="background:var(--s2)"></i>cumulata</span></div></figure>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Contributi alla dimensione 1 (%)</div><div class="grafico" id="g-famd-1"></div></figure>
+        <figure><div class="titolo-fig">Contributi alla dimensione 2 (%)</div><div class="grafico" id="g-famd-2"></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 3. CLUSTER -->
+  <section class="capitolo statistica" id="cluster">
+    <span class="parte">I. Analisi statistiche</span>
+    <h2>3. Cluster</h2>
+    <div class="testo"><p>Il clustering cerca gruppi omogenei di possessori di BEV. Come nella tesi, la segmentazione finale usa il <strong>K-Mode</strong> sulle variabili categoriali; il K-Means sugli indici compositi e il clustering gerarchico servono da verifica.</p></div>
+
+    <div class="blocco" id="kmode">
+      <h3><span class="nr">3.1</span>K-Mode: la segmentazione finale</h3>
+      <div class="testo"><p>Il K-Mode raggruppa i rispondenti in base alla distanza di Hamming (il numero di caratteristiche diverse) e rappresenta ogni cluster con la modalità più frequente di ciascuna variabile. Con k = 4 emergono quattro profili, tutti dominati da uomini laureati, proprietari di casa indipendente, che arrivano da un'auto tradizionale e hanno una sensibilità ambientale molto alta: si distinguono per <strong>composizione familiare, reddito, età e mobilità</strong>.</p></div>
+      <div class="elenco" id="profili-kmode"></div>
+      <div class="tabella"><table id="t-kmode-medie"></table></div>
+      <figure><div class="titolo-fig">Modalità più frequenti per cluster (k = 4)</div><div class="tabella" style="margin:6px 0 0"><table id="t-kmode"></table></div></figure>
+      <div class="nota"><p><strong>Profili descrittivi, non gruppi naturali.</strong> Molte partizioni hanno un costo quasi uguale (qui <span class="num" data-v="kmode_costo"></span>): ripetendo il K-Mode con semi diversi i gruppi cambiano (ARI medio <span class="num" data-v="kmode_stab"></span>, dove 1 indica partizioni identiche). Per questo si tiene la soluzione a costo minimo su 50 inizializzazioni, e i profili vanno letti come segmenti di mercato tipici. </p></div>
+      <div class="nota"><p><strong>Confronto R / Python.</strong> Questa instabilità spiega le differenze tra R e Python già notate nella tesi. Con le stesse 14 variabili:</p>
+        <ul>
+          <li><strong>R</strong> (klaR, migliore di 20 avvii): costo <span class="num" data-v="kmode_r_costo"></span>, cluster di <span class="num" data-v="kmode_r_dim"></span> persone;</li>
+          <li><strong>Python</strong> (kmodes, 50 inizializzazioni): costo <span class="num" data-v="kmode_costo"></span>, cluster di <span class="num" data-v="kmode_dim"></span>;</li>
+          <li><strong>tesi</strong>: cluster di <span class="num">1.438 / 1.270 / 1.473 / 1.615</span>.</li>
+        </ul>
+        <p>Costi quasi uguali, gruppi diversi. Alcuni tratti però tornano sia in R sia in Python: un gruppo di <strong>coppie con VMT basso</strong> e uno di <strong>famiglie con 2 figli, 3 auto e pendolarismo lungo</strong>. Cambia invece la suddivisione per reddito, età e numero di viaggi.</p></div>
+      <figure><div class="titolo-fig">K-Mode: costo per numero di cluster</div><div class="grafico" id="g-kmode"></div></figure>
+      <p class="testo">Il costo cala in modo regolare, senza un gomito evidente: k = 4 è stato scelto, come nella tesi, per avere profili ancora interpretabili.</p>
+    </div>
+
+    <div class="blocco" id="kmeans">
+      <h3><span class="nr">3.2</span>Verifica con il K-Means</h3>
+      <div class="testo"><p>Il K-Means lavora su età, indici compositi (stile di vita, dimensione familiare, mobilità) e tipo di auto precedente. Il gomito si colloca a k = 4, dove la silhouette supera 0,40.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Metodo del gomito (WSS)</div><div class="grafico" id="g-wss"></div></figure>
+        <figure><div class="titolo-fig">Silhouette media</div><div class="grafico" id="g-sil"></div></figure>
+      </div>
+      <div class="testo"><p>Silhouette <span class="num" data-v="sil_tesi"></span> e stabilità molto alta (ARI medio su campioni bootstrap <span class="num" data-v="stab_tesi"></span>). La composizione mostra però che i cluster <strong>coincidono quasi perfettamente con il tipo di auto precedente</strong> (Adjusted Rand Index <span class="num" data-v="ari_tesi"></span>, dove 1 è coincidenza totale): le variabili binarie sull'auto precedente dominano la distanza. È il motivo per cui nella tesi il K-Means è stato scartato a favore del K-Mode, con cui non ha nulla in comune (ARI <span class="num" data-v="ari_kmeans_kmode"></span>).</p></div>
+      <figure><div class="titolo-fig">Composizione dei cluster per auto precedente</div>
+        <div class="grafico" id="g-cluster"></div><div class="legenda" id="l-cluster"></div></figure>
+      <div class="tabella"><table id="t-profilo"></table></div>
+    </div>
+
+    <div class="blocco" id="senza-auto">
+      <h3><span class="nr">3.3</span>K-Means senza l'auto precedente</h3>
+      <div class="testo"><p>Ripetendo il K-Means senza le variabili sull'auto precedente, aggiungendo status socioeconomico e sensibilità ambientale, la silhouette scende a <span class="num" data-v="sil_senza"></span> (stabilità <span class="num" data-v="stab_senza"></span>). Anche così non emerge una struttura a gruppi netta, coerentemente con quanto mostra il K-Mode.</p></div>
+      <div class="tabella"><table id="t-profilo-senza"></table></div>
+    </div>
+
+    <div class="blocco" id="gerarchico">
+      <h3><span class="nr">3.4</span>Clustering gerarchico</h3>
+      <div class="testo"><p>Il clustering gerarchico (metodo di Ward) sulle variabili del K-Means conferma la stessa partizione (ARI con il K-Means <span class="num" data-v="ari_ward"></span>, correlazione cofenetica <span class="num" data-v="cofenetica"></span>).</p></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 4. MACHINE LEARNING -->
+  <section class="capitolo predittiva" id="ml">
+    <span class="parte">II. Analisi predittive</span>
+    <h2>4. Machine learning</h2>
+    <div class="testo"><p>Obiettivo: prevedere se il veicolo di un rispondente è un BEV. I dati sono divisi una sola volta in training (<span class="num" data-v="n_train"></span>) e test (<span class="num" data-v="n_test"></span>), con la stessa quota di BEV. Ogni modello è una pipeline (standardizzazione + algoritmo) addestrata solo sul training; il test è usato una sola volta, alla fine.</p></div>
+
+    <div class="blocco" id="screening">
+      <h3><span class="nr">4.1</span>Screening degli algoritmi</h3>
+      <div class="testo"><p>15 algoritmi con iperparametri di default, valutati in cross-validation a 10 fold sul training. Gli ensemble ad alberi sono in testa.</p></div>
+      <figure><div class="titolo-fig">ROC-AUC media in cross-validation (± 1 deviazione standard)</div>
+        <div class="grafico" id="g-screening"></div></figure>
+    </div>
+
+    <div class="blocco" id="ottimizzazione">
+      <h3><span class="nr">4.2</span>Ottimizzazione degli iperparametri</h3>
+      <div class="testo"><p>I modelli migliori sono ottimizzati con una ricerca casuale degli iperparametri (RandomizedSearchCV, 5 fold, metrica ROC-AUC). Una variante del Gradient Boosting sceglie anche il numero di variabili (ne tiene <span class="num" data-v="n_feature_sel"></span>). Il Voting Classifier combina i tre modelli migliori.</p></div>
+      <div class="tabella"><table id="t-parametri"></table></div>
+    </div>
+
+    <div class="blocco" id="test">
+      <h3><span class="nr">4.3</span>Risultati sul test set</h3>
+      <div class="testo"><p>Il migliore è <strong><span data-v="migliore"></span></strong>, con ROC-AUC <span class="num" data-v="auc_best"></span> (IC 95% <span class="num" data-v="auc_ic"></span>) e accuracy <span class="num" data-v="acc_best"></span>. Gli intervalli dei primi sei modelli si sovrappongono e il test di McNemar non trova differenze significative tra loro: sono di fatto equivalenti. La regressione logistica è nettamente inferiore.</p></div>
+      <figure><div class="titolo-fig">ROC-AUC sul test set con IC 95%</div>
+        <div class="grafico" id="g-modelli"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>ensemble ad alberi</span><span><i style="background:var(--s2)"></i>altri modelli</span></div>
+        <figcaption>Intervalli bootstrap con 1.000 ricampionamenti del test set.</figcaption></figure>
+      <div class="tabella"><table id="t-test"></table></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Matrice di confusione: <span data-v="migliore"></span></div><div id="confusione"></div>
+          <figcaption>Soglia 0,5. Il modello riconosce bene i BEV (recall alta) ma confonde una parte dei non BEV.</figcaption></figure>
+        <figure><div class="titolo-fig">Test di McNemar rispetto al migliore</div><div class="tabella" style="margin:6px 0 0"><table id="t-mcnemar"></table></div></figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="roc">
+      <h3><span class="nr">4.4</span>Curve ROC e calibrazione</h3>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Curve ROC</div><div class="grafico" id="g-roc"></div><div class="legenda" id="l-roc"></div></figure>
+        <figure><div class="titolo-fig">Calibrazione delle probabilità</div><div class="grafico" id="g-cal"></div><div class="legenda" id="l-cal"></div>
+          <figcaption>Punti vicini alla diagonale indicano probabilità affidabili.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="feature">
+      <h3><span class="nr">4.5</span>Le migliori feature</h3>
+      <div class="testo"><p>Il <strong>numero di viaggi oltre 200 miglia</strong> è la variabile più importante, seguita da miglia annue, reddito, esperienza precedente con un BEV e sensibilità ambientale: un quadro coerente con le ipotesi H1, H2.3, H3 e H4. Due misure diverse (SHAP e permutation importance) danno un ordine simile.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">SHAP (<span data-v="modello_shap"></span>)</div><div class="grafico" id="g-shap"></div>
+          <figcaption>Contributo assoluto medio alla predizione, in log-odds.</figcaption></figure>
+        <figure><div class="titolo-fig">Permutation importance (<span data-v="migliore"></span>)</div><div class="grafico" id="g-perm"></div>
+          <figcaption>Calo di ROC-AUC sul test quando la variabile viene rimescolata.</figcaption></figure>
+      </div>
+      <div class="nota testo">Togliendo la variabile "auto precedente BEV" la ROC-AUC passa da <span class="num" data-v="abl_con"></span> a <span class="num" data-v="abl_senza"></span>: il modello non si limita a riconoscere chi ricompra un BEV.</div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 5. DEEP LEARNING -->
+  <section class="capitolo predittiva" id="dl">
+    <span class="parte">II. Analisi predittive</span>
+    <h2>5. Deep learning</h2>
+    <div class="testo"><p>Reti neurali artificiali (Keras) addestrate sullo stesso split dei modelli di machine learning. L'addestramento si ferma quando la metrica su un set di validazione, estratto dal training, smette di migliorare (early stopping), e il learning rate si riduce quando la loss si stabilizza (ReduceLROnPlateau).</p>
+      <p>La <strong>ANN avanzata</strong> riproduce il modello finale della tesi: <span class="num" data-v="n_poly"></span> feature polinomiali di grado 2, attivazione LeakyReLU, regolarizzazione L1 + L2 (ElasticNet), BatchNormalization sull'ultimo strato nascosto e ottimizzatore AdamW. Nella tesi il set di validazione coincideva con il test set; qui è estratto dal training, quindi le metriche sul test sono una stima corretta: accuracy <span class="num" data-v="acc_dl_avanzata"></span>, ROC-AUC <span class="num" data-v="auc_dl_avanzata"></span>.</p></div>
+
+    <div class="blocco" id="architetture">
+      <h3><span class="nr">5.1</span>Architetture</h3>
+      <div class="tabella"><table id="t-architetture"></table></div>
+    </div>
+
+    <div class="blocco" id="addestramento">
+      <h3><span class="nr">5.2</span>Addestramento</h3>
+      <div id="storie" class="affiancate"></div>
+      <div class="legenda"><span><i class="linea" style="background:var(--s1)"></i>training</span><span><i class="linea" style="background:var(--s2)"></i>validazione (tratteggiata)</span></div>
+    </div>
+
+    <div class="blocco" id="confronto-dl">
+      <h3><span class="nr">5.3</span>Confronto con il machine learning</h3>
+      <div class="testo"><p>La rete migliore raggiunge una ROC-AUC di <span class="num" data-v="auc_dl"></span>, sotto gli ensemble ad alberi (<span class="num" data-v="auc_best"></span>). Su dati tabellari di questa dimensione le reti neurali non portano vantaggi: la rete avanzata, con quasi 30 volte i parametri della rete regolarizzata, non migliora la ROC-AUC. Le feature polinomiali aumentano la complessità senza aggiungere informazione.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Curve ROC</div><div class="grafico" id="g-roc-dl"></div><div class="legenda" id="l-roc-dl"></div></figure>
+        <figure><div class="titolo-fig">Metriche sul test set</div><div class="tabella" style="margin:6px 0 0"><table id="t-dl"></table></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== CONCLUSIONI -->
+  <section class="capitolo" id="conclusioni">
+    <h2>Limiti e conclusioni</h2>
+    <h3 style="margin-top:24px">Limiti della ricerca</h3>
+    <div class="elenco">
+      <div><h4>Contesto geografico</h4><p>Il campione riguarda solo la California e solo chi possiede già un veicolo a basse emissioni.</p></div>
+      <div><h4>Capacità esplicativa contenuta</h4><p>Pseudo-R² di McFadden <span class="num" data-v="r2"></span> e ROC-AUC massima <span class="num" data-v="auc_best"></span>: le variabili disponibili spiegano solo una parte della scelta.</p></div>
+      <div><h4>Variabili mancanti</h4><p>Mancano variabili psicologiche e culturali e misure concrete dell'attitudine verso la sostenibilità.</p></div>
+      <div><h4>Segmentazione debole</h4><p>I profili del K-Mode cambiano con il seed e il K-Means, senza l'auto precedente, non trova gruppi netti: i segmenti sono descrittivi. Anche gli indici di mobilità hanno bassa coerenza interna.</p></div>
+    </div>
+    <h3 style="margin-top:36px">Conclusioni</h3>
+    <div class="elenco">
+      <div><h4>Fattori influenti</h4><p>Reddito, miglia percorse in un anno e numero di viaggi lunghi influenzano in modo significativo la scelta di un BEV; conta anche la sensibilità ambientale.</p></div>
+      <div><h4>Il passaggio non è graduale</h4><p>Chi arriva da un'auto tradizionale sceglie il BEV più spesso di chi aveva una PHEV: l'ibrido plug-in non fa da ponte.</p></div>
+      <div><h4>Transizione culturale, non solo tecnologica</h4><p>L'autonomia pesa (i viaggi lunghi frenano il BEV), ma l'adozione richiede anche un cambiamento culturale sostenuto da politiche mirate.</p></div>
+      <div><h4>Dashboard predittiva</h4><p>Uno strumento pratico per stimare la propensione al BEV di un profilo e spiegare quali caratteristiche la spostano.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Codice, notebook (eseguibili anche su Google Colab), dashboard e dati: <a href="https://github.com/FedeGambe/Master_s_thesis_Data_science">github.com/FedeGambe/Master_s_thesis_Data_science</a>.
+  </footer>
+  </div>
+</main>
+</div>
+
+<script>
+const DATI = /*DATI*/null;
+
+// --- Utilità --------------------------------------------------------------------------------
+const fmt = (v, d = 3) => v == null ? "–" : Number(v).toLocaleString("it-IT", {minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always"});
+const pct = (v, d = 1) => fmt(v, d) + "%";
+const pv = p => p < 0.001 ? "< 0,001" : fmt(p, 3);
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attr = {}, t) => { const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attr)) e.setAttribute(k, v); if (t != null) e.textContent = t; return e; };
+const nuovoSvg = (w, h) => el("svg", {viewBox: `0 0 ${w} ${h}`, width: w, height: h, role: "img"});
+const scrivi = (s, x, y, t, a = {}) => s.append(el("text", {x, y, "font-size": 12, fill: "var(--ink-2)", ...a}, t));
+const $ = id => document.getElementById(id);
+
+const tip = $("suggerimento");
+function conTooltip(nodo, t) {
+  nodo.addEventListener("pointermove", e => { tip.hidden = false; tip.textContent = t;
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - 310) + "px"; tip.style.top = (e.clientY + 14) + "px"; });
+  nodo.addEventListener("pointerleave", () => tip.hidden = true);
+  // Al tocco il suggerimento compare e sparisce da solo
+  nodo.addEventListener("pointerdown", e => { if (e.pointerType === "mouse") return;
+    tip.hidden = false; tip.textContent = t; tip.style.left = Math.max(8, Math.min(e.clientX - 140, innerWidth - 310)) + "px";
+    tip.style.top = Math.max(8, e.clientY - 56) + "px"; clearTimeout(tip.timer); tip.timer = setTimeout(() => tip.hidden = true, 2500); });
+}
+
+// Ogni grafico è disegnato alla larghezza reale del contenitore, così il testo resta a 11-12 px su ogni schermo;
+// il registro permette di ridisegnarli quando cambia la larghezza della finestra.
+const registro = new Map();
+const grafico = disegna => (id, ...arg) => { registro.set(id, () => disegna(id, ...arg)); disegna(id, ...arg); };
+const larghezza = (id, ripiego = 520) => Math.round($(id).clientWidth) || ripiego;
+const STRETTO = 600;   // sotto questa larghezza le etichette lunghe vanno sopra la barra
+const tronca = (t, max) => t.length > max ? t.slice(0, Math.max(1, max - 1)) + "…" : t;
+
+// Barre verticali (quote per categoria)
+const barreVerticali = grafico(function (id, righe, {media = null, max = 100} = {}) {
+  // Etichette lunghe: prima si prova ad andare a capo, se non basta si ruotano
+  const W = larghezza(id), bw = (W - 50) / righe.length, entra = t => t.length * 6.4 <= bw - 4;
+  const aCapo = t => { const i = t.indexOf(" ", Math.floor(t.length / 2) - 3); return i > 0 ? [t.slice(0, i), t.slice(i + 1)] : [t]; };
+  const ruota = righe.some(r => !aCapo(r.etichetta).every(entra)), due = !ruota && righe.some(r => !entra(r.etichetta));
+  const H = ruota ? 290 : due ? 272 : 260, m = {l: 40, r: 10, t: 22, b: ruota ? 70 : due ? 52 : 40};
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, ih = H - m.t - m.b, y = v => m.t + ih * (1 - v / max), passo = iw / righe.length;
+  for (const t of [0, 25, 50, 75, 100]) {
+    s.append(el("line", {x1: m.l, x2: W - m.r, y1: y(t), y2: y(t), stroke: "var(--line)"}));
+    scrivi(s, m.l - 6, y(t) + 4, t + "%", {"text-anchor": "end", "font-size": 11, fill: "var(--ink-3)"});
+  }
+  righe.forEach((r, i) => {
+    const w = Math.min(passo * 0.62, 56), x = m.l + i * passo + (passo - w) / 2, cx = x + w / 2;
+    const b = el("path", {d: `M${x},${y(0)} V${y(r.valore) + 4} q0,-4 4,-4 H${x + w - 4} q4,0 4,4 V${y(0)} Z`, fill: "var(--s1)"});
+    conTooltip(b, `${r.etichetta}: ${pct(r.valore)} BEV su ${fmt(r.n, 0)} rispondenti`); s.append(b);
+    scrivi(s, cx, y(r.valore) - 6, pct(r.valore, 0), {"text-anchor": "middle", "font-weight": 600, fill: "var(--ink)", "font-size": passo < 40 ? 10.5 : 12,
+      stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke", "stroke-linejoin": "round"});
+    if (ruota) scrivi(s, cx, H - m.b + 16, r.etichetta, {"text-anchor": "end", "font-size": 11, transform: `rotate(-35 ${cx} ${H - m.b + 16})`});
+    else (entra(r.etichetta) ? [r.etichetta] : aCapo(r.etichetta)).forEach((riga, k) =>
+      scrivi(s, cx, H - m.b + 16 + k * 14, riga, {"text-anchor": "middle", "font-size": 11.5}));
+  });
+  if (media != null) s.querySelector("path").before(el("line", {x1: m.l, x2: W - m.r, y1: y(media), y2: y(media), stroke: "var(--ink-2)", "stroke-dasharray": "5 4"}));
+  $(id).replaceChildren(s);
+});
+
+// Barre orizzontali: etichetta a sinistra, oppure sopra la barra sugli schermi stretti
+const barreOrizzontali = grafico(function (id, righe, {formato = v => fmt(v), etichetta = 210, colore = () => "var(--s1)"} = {}) {
+  const W = larghezza(id), stretto = W < STRETTO, lab = stretto ? 0 : Math.min(etichetta, W * 0.42);
+  const riga = stretto ? 40 : 26, m = {l: stretto ? 0 : lab, r: 58, t: 4, b: 4}, H = m.t + m.b + riga * righe.length;
+  const s = nuovoSvg(W, H), max = Math.max(...righe.map(r => r.v)) * 1.02, x = v => m.l + (W - m.l - m.r) * v / max;
+  righe.forEach((r, i) => {
+    const y = m.t + i * riga + (stretto ? 20 : 5), h = stretto ? 14 : riga - 10, w = Math.max(x(r.v) - m.l, 1), k = Math.min(4, w);
+    if (stretto) scrivi(s, 0, y - 6, r.nome, {fill: "var(--ink)"});
+    else { const t = scrivi(s, m.l - 10, y + h / 2 + 4, tronca(r.nome, Math.floor((lab - 14) / 6.2)), {"text-anchor": "end", fill: "var(--ink)"}); }
+    const b = el("path", {d: `M${m.l},${y} H${m.l + w - k} q${k},0 ${k},4 V${y + h - 4} q0,4 -${k},4 H${m.l} Z`, fill: colore(r)});
+    conTooltip(b, `${r.nome}: ${formato(r.v)}`); s.append(b);
+    scrivi(s, m.l + w + 6, y + h / 2 + 4, formato(r.v), {"font-family": "var(--f-data)", "font-size": 11.5});
+  });
+  $(id).replaceChildren(s);
+});
+
+// Intervalli orizzontali (forest plot, modelli)
+const intervalli = grafico(function (id, righe, {min, max, log = false, rif = null, ticks, etichetta = 250, formato = v => fmt(v)}) {
+  const W = larghezza(id, 900), stretto = W < STRETTO, lab = Math.min(etichetta, W * 0.4);
+  const riga = stretto ? 44 : 28, m = {l: stretto ? 8 : lab, r: stretto ? 54 : 70, t: 8, b: 32}, H = m.t + m.b + riga * righe.length;
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r;
+  const tr = v => log ? Math.log(v) : v, x = v => m.l + iw * (tr(Math.min(Math.max(v, min), max)) - tr(min)) / (tr(max) - tr(min));
+  for (const t of ticks) {
+    s.append(el("line", {x1: x(t), x2: x(t), y1: m.t, y2: H - m.b, stroke: "var(--line)"}));
+    scrivi(s, x(t), H - m.b + 18, formato(t), {"text-anchor": "middle", fill: "var(--ink-3)", "font-size": 11});
+  }
+  if (rif != null) s.append(el("line", {x1: x(rif), x2: x(rif), y1: m.t, y2: H - m.b, stroke: "var(--ink-2)", "stroke-dasharray": "4 4"}));
+  righe.forEach((r, i) => {
+    const top = m.t + riga * i, cy = stretto ? top + 30 : top + riga / 2;
+    const hit = el("rect", {x: 0, y: top, width: W, height: riga, fill: "transparent"}); conTooltip(hit, r.tooltip); s.append(hit);
+    const testo = {fill: "var(--ink)", "font-weight": r.forte ? 700 : 400, "pointer-events": "none"};
+    if (stretto) scrivi(s, 0, top + 14, r.nome, {...testo, "font-size": 12, stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke", "stroke-linejoin": "round"});
+    else scrivi(s, m.l - 12, cy + 4, tronca(r.nome, Math.floor((lab - 14) / 6.4)), {...testo, "text-anchor": "end", "font-size": 12.5});
+    s.append(el("line", {x1: x(r.basso), x2: x(r.alto), y1: cy, y2: cy, stroke: r.colore, "stroke-width": 2, "stroke-linecap": "round", "pointer-events": "none"}));
+    s.append(el("circle", {cx: x(r.v), cy, r: 5.5, fill: r.colore, stroke: "var(--surface)", "stroke-width": 2, "pointer-events": "none"}));
+    scrivi(s, W - m.r + 10, cy + 4, formato(r.v), {"font-family": "var(--f-data)", "font-size": 11.5, "pointer-events": "none"});
+  });
+  $(id).replaceChildren(s);
+});
+
+// Linee (scree, gomito, ROC, calibrazione, addestramento)
+const linee = grafico(function (id, serie, {xmin, xmax, ymin, ymax, ticksX, ticksY, fx = v => fmt(v, 0), fy = v => fmt(v, 2), titoloX = "", diagonale = false, barre = null, H = 280, legenda = null}) {
+  const W = larghezza(id), m = {l: 48, r: 14, t: 12, b: titoloX ? 46 : 30};
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const x = v => m.l + iw * (v - xmin) / (xmax - xmin), y = v => m.t + ih * (1 - (Math.min(Math.max(v, ymin), ymax) - ymin) / (ymax - ymin));
+  for (const t of ticksY) { s.append(el("line", {x1: m.l, x2: W - m.r, y1: y(t), y2: y(t), stroke: "var(--line)"}));
+    scrivi(s, m.l - 6, y(t) + 4, fy(t), {"text-anchor": "end", "font-size": 11, fill: "var(--ink-3)"}); }
+  // Su schermi stretti si mostra un'etichetta dell'asse x ogni due se non c'è spazio
+  const salto = iw / ticksX.length < 34 ? 2 : 1;
+  ticksX.forEach((t, i) => { if (i % salto === 0 || i === ticksX.length - 1) scrivi(s, x(t), H - m.b + 16, fx(t), {"text-anchor": "middle", "font-size": 11, fill: "var(--ink-3)"}); });
+  if (titoloX) scrivi(s, m.l + iw / 2, H - 8, titoloX, {"text-anchor": "middle", "font-size": 11.5});
+  if (diagonale) s.append(el("line", {x1: x(xmin), y1: y(ymin), x2: x(xmax), y2: y(ymax), stroke: "var(--ink-3)", "stroke-dasharray": "4 4"}));
+  if (barre) { const bw = Math.min(iw / (xmax - xmin) * 0.6, 64);
+    barre.forEach(b => { const r = el("rect", {x: x(b.x) - bw / 2, y: y(b.y), width: bw, height: y(ymin) - y(b.y), rx: 3, fill: "var(--s1)"});
+      conTooltip(r, b.t); s.append(r); }); }
+  serie.forEach(se => {
+    const d = se.x.map((v, i) => `${i ? "L" : "M"}${x(v).toFixed(1)},${y(se.y[i]).toFixed(1)}`).join(" ");
+    s.append(el("path", {d, fill: "none", stroke: se.colore, "stroke-width": 2, "stroke-dasharray": se.tratto || "", "stroke-linejoin": "round"}));
+    if (se.punti) se.x.forEach((v, i) => { const c = el("circle", {cx: x(v), cy: y(se.y[i]), r: 4.5, fill: se.colore, stroke: "var(--surface)", "stroke-width": 2});
+      conTooltip(c, `${se.nome}: ${se.tooltip ? se.tooltip(v, se.y[i]) : fy(se.y[i])}`); s.append(c); });
+  });
+  $(id).replaceChildren(s);
+  if (legenda) $(legenda).innerHTML = serie.map(se => `<span><i class="linea" style="background:${se.colore}"></i>${se.nome}</span>`).join("");
+});
+
+// Tabella da dati
+function tabella(id, colonne, righe, {evidenzia = () => false, classe = () => ""} = {}) {
+  $(id).classList.toggle("larga", colonne.length > 4);
+  $(id).classList.toggle("compatta", colonne.length > 8);
+  $(id).innerHTML = "<thead><tr>" + colonne.map(c => `<th class="${c.n ? "n" : ""}">${c.t}</th>`).join("") + "</tr></thead><tbody>" +
+    righe.map(r => `<tr class="${evidenzia(r) ? "evidenza" : ""} ${classe(r)}">` + colonne.map(c => {
+      const v = c.f ? c.f(r) : r[c.k]; return `<td class="${c.n ? "n" : ""} ${c.debole && c.debole(r) ? "debole" : ""}">${v}</td>`; }).join("") + "</tr>").join("") + "</tbody>";
+}
+const badge = (classe, t) => `<span class="esito ${classe}">${t}</span>`;
+const esito = e => badge(e === "Confermata" ? "ok" : e === "Contraria" ? "no" : e.startsWith("Aumenta") || e.startsWith("Riduce") ? "info" : "nd", e);
+
+// --- Contenuti ------------------------------------------------------------------------------
+const V = DATI.valori, ST = DATI.stat, ES = DATI.espl, CL = DATI.cluster, ML = DATI.ml, DL = DATI.dl;
+document.querySelectorAll("[data-v]").forEach(n => { n.textContent = V[n.dataset.v]; });
+$("cifre").innerHTML = DATI.cifre.map(c => `<div class="cifra"><b>${c.v}</b><span>${c.t}</span></div>`).join("");
+const SERIE = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
+
+// 1.1
+tabella("t-descrittive", [
+  {t: "Variabile", k: "variabile"}, {t: "Media", n: 1, f: r => fmt(r.media, 2)}, {t: "Dev. std", n: 1, f: r => fmt(r.dev_std, 2)},
+  {t: "Min", n: 1, f: r => fmt(r.min, 2)}, {t: "Q1", n: 1, f: r => fmt(r.q1, 2)}, {t: "Mediana", n: 1, f: r => fmt(r.mediana, 2)},
+  {t: "Q3", n: 1, f: r => fmt(r.q3, 2)}, {t: "Max", n: 1, f: r => fmt(r.max, 2)}, {t: "Asimmetria", n: 1, f: r => fmt(r.asimmetria, 2)}], ST.descrittive);
+
+
+// 1.1 distribuzioni (pannello apribile)
+const barreAffiancate = grafico(function (id, d) {
+  const W = larghezza(id, 900), H = 320, m = {l: 46, r: 10, t: 14, b: 58}, n = d.etichette.length;
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const max = Math.max(...d.bev, ...d.altro), passo = max > 40 ? 20 : max > 20 ? 10 : max > 8 ? 5 : 2, top = Math.ceil(max / passo) * passo;
+  const y = v => m.t + ih * (1 - v / top);
+  for (let t = 0; t <= top; t += passo) { s.append(el("line", {x1: m.l, x2: W - m.r, y1: y(t), y2: y(t), stroke: "var(--line)"}));
+    scrivi(s, m.l - 6, y(t) + 4, t + "%", {"text-anchor": "end", "font-size": 11, fill: "var(--ink-3)"}); }
+  const gw = iw / n, bw = Math.max(Math.min((gw - 4) / 2, 36), 1), ogni = Math.ceil(n / Math.max(4, Math.floor(iw / 48)));
+  d.etichette.forEach((e, i) => {
+    const x0 = m.l + i * gw + (gw - 2 * bw - 2) / 2;
+    [[d.bev[i], "var(--s1)", "BEV"], [d.altro[i], "var(--s2)", "altri veicoli"]].forEach(([v, c, g], j) => {
+      const x = x0 + j * (bw + 2), h = Math.max(y(0) - y(v), v > 0 ? 1 : 0), r = Math.min(3, h, bw / 2);
+      const b = el("path", {d: `M${x},${y(0)} V${y(0) - h + r} q0,-${r} ${r},-${r} H${x + bw - r} q${r},0 ${r},${r} V${y(0)} Z`, fill: c});
+      conTooltip(b, `${d.nome} ${e}: ${pct(v)} dei ${g}`); s.append(b);
+    });
+    const ruota = n > 10 || gw < 70;
+    if (i % ogni === 0 || i === n - 1) scrivi(s, m.l + i * gw + gw / 2, H - m.b + 16, e, {"text-anchor": ruota ? "end" : "middle", "font-size": 11,
+      transform: ruota ? `rotate(-35 ${m.l + i * gw + gw / 2} ${H - m.b + 16})` : ""});
+  });
+  $(id).replaceChildren(s);
+});
+function mostraDistribuzione(i) {
+  const d = ST.distribuzioni[i];
+  document.querySelectorAll("#scelte-distribuzioni .scelta").forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
+  $("titolo-distribuzione").textContent = d.nome;
+  $("mediane-distribuzione").innerHTML = d.tipo === "quantitativa"
+    ? `Mediana: BEV <span class="num">${fmt(d.mediana_bev, d.mediana_bev % 1 ? 2 : 0)}</span> · altri veicoli <span class="num">${fmt(d.mediana_altro, d.mediana_altro % 1 ? 2 : 0)}</span>` : "";
+  $("nota-distribuzione").textContent = (d.nota ? d.nota + " " : "") + "Percentuali calcolate separatamente su ciascun gruppo.";
+  barreAffiancate("g-distribuzione", d);
+}
+(function () {
+  const scelte = ST.distribuzioni.map((d, i) => `${i === 0 || d.tipo !== ST.distribuzioni[i - 1].tipo
+      ? `<span class="gruppo-scelte">${d.tipo === "quantitativa" ? "Variabili quantitative" : "Variabili categoriali"}</span>` : ""}` +
+    `<button class="scelta" type="button" aria-pressed="false" data-i="${i}">${d.nome}</button>`).join("");
+  $("scelte-distribuzioni").innerHTML = scelte;
+  $("scelte-distribuzioni").addEventListener("click", e => { const b = e.target.closest(".scelta"); if (b) mostraDistribuzione(+b.dataset.i); });
+  const pulsante = $("apri-distribuzioni"), pannello = $("pannello-distribuzioni");
+  pulsante.addEventListener("click", () => {
+    const aperto = pannello.hidden;
+    pannello.hidden = !aperto;
+    pulsante.setAttribute("aria-expanded", String(aperto));
+    pulsante.textContent = aperto ? "Nascondi i grafici delle distribuzioni" : "Mostra i grafici delle distribuzioni";
+    if (aperto) registro.get("g-distribuzione")?.();
+  });
+  mostraDistribuzione(0);
+})();
+
+// 1.2
+barreVerticali("g-q-reddito", ST.quote.reddito, {media: V.media_bev});
+barreVerticali("g-q-auto", ST.quote.auto, {media: V.media_bev});
+barreVerticali("g-q-eta", ST.quote.eta, {media: V.media_bev});
+barreVerticali("g-q-istruzione", ST.quote.istruzione, {media: V.media_bev});
+barreOrizzontali("g-effetti", ST.bivariati, {etichetta: 280, colore: r => r.tipo === "categoriale" ? "var(--s1)" : "var(--s3)", formato: v => fmt(v, 3)});
+
+// 1.3
+intervalli("g-forest", ST.logit.map(r => ({nome: r.nome, v: r.or, basso: r.basso, alto: r.alto, colore: r.sig ? "var(--s1)" : "var(--s4)",
+  tooltip: `${r.nome}: OR ${fmt(r.or)} (IC ${fmt(r.basso)}–${fmt(r.alto)}), p ${pv(r.p)}`})),
+  {min: 0.15, max: 5, log: true, rif: 1, ticks: [0.25, 0.5, 1, 2, 4], etichetta: 300, formato: v => fmt(v, 2)});
+const ameSig = ST.ame.filter(r => r.p < 0.05).sort((a, b) => b.v - a.v);
+$("ame-bev").textContent = fmt(ST.ame.find(r => r.nome.startsWith("Auto precedente BEV")).v, 0);
+intervalli("g-ame", ameSig.map(r => ({nome: r.nome, v: r.v, basso: r.basso, alto: r.alto, colore: r.v > 0 ? "var(--s1)" : "var(--s2)",
+  tooltip: `${r.nome}: ${fmt(r.v, 1)} punti (IC ${fmt(r.basso, 1)} / ${fmt(r.alto, 1)})`})),
+  {min: -30, max: 30, rif: 0, ticks: [-30, -20, -10, 0, 10, 20, 30], etichetta: 300, formato: v => (v > 0 ? "+" : "") + fmt(v, 1)});
+
+// 1.4
+tabella("t-ipotesi", [
+  {t: "Ipotesi", f: r => r.primo ? `<b>${r.codice}</b> ${r.descrizione}${r.esplorativa ? ' <em style="color:var(--ink-3)">(esplorativa)</em>' : ""}` : ""}, {t: "Variabile", k: "variabile"},
+  {t: "Odds ratio", n: 1, f: r => fmt(r.or)}, {t: "p-value", n: 1, f: r => pv(r.p)}, {t: "Esito", f: r => esito(r.esito)}],
+  ST.ipotesi.map((r, i, a) => ({...r, primo: !i || a[i - 1].codice !== r.codice})), {classe: r => r.primo ? "inizio-gruppo" : "nel-gruppo"});
+
+// 2.1
+linee("g-pca-scree", [{nome: "cumulata", x: [1, 2, 3, 4], y: ES.pca.varianza.map(r => r.cum), colore: "var(--s2)", punti: true, tooltip: (x, y) => pct(y)}],
+  {xmin: 0.4, xmax: 4.6, ymin: 0, ymax: 100, ticksX: [1, 2, 3, 4], ticksY: [0, 25, 50, 75, 100], fx: v => "PC" + v, fy: v => v + "%",
+   barre: ES.pca.varianza.map((r, i) => ({x: i + 1, y: r.var, t: `${r.c}: ${pct(r.var)}`}))});
+tabella("t-loadings", [{t: "Variabile", k: "variabile"}, ...["PC1", "PC2", "PC3", "PC4"].map(c => ({t: c, n: 1, f: r => fmt(r[c], 2), debole: r => Math.abs(r[c]) < 0.3}))], ES.pca.loadings);
+
+// 2.2
+$("mca-gruppi").innerHTML = Object.entries(ES.mca).map(([k, g]) => `
+  <h4 style="font:800 1.02rem/1.3 var(--f-display);margin:28px 0 0">MCA sulle ${g.titolo}</h4>
+  <p style="margin:4px 0 0;font-size:.9rem;color:var(--ink-2)">Dim 1 <span class="num">${pct(g.varianza[0])}</span> → indice <em>${g.dimensioni[0]}</em> · Dim 2 <span class="num">${pct(g.varianza[1])}</span> → indice <em>${g.dimensioni[1]}</em></p>
+  <div class="affiancate"><figure><div class="titolo-fig">Contributi a Dim 1 (%)</div><div class="grafico" id="g-mca-${k}-1"></div></figure>
+  <figure><div class="titolo-fig">Contributi a Dim 2 (%)</div><div class="grafico" id="g-mca-${k}-2"></div></figure></div>`).join("");
+for (const [k, g] of Object.entries(ES.mca)) {
+  barreOrizzontali(`g-mca-${k}-1`, g.dim1, {formato: v => fmt(v, 1), etichetta: 250});
+  barreOrizzontali(`g-mca-${k}-2`, g.dim2, {formato: v => fmt(v, 1), etichetta: 250, colore: () => "var(--s3)"});
+}
+
+// 2.3
+linee("g-famd-scree", [{nome: "cumulata", x: ES.famd.varianza.map((_, i) => i + 1), y: ES.famd.varianza.map(r => r.cum), colore: "var(--s2)", punti: true, tooltip: (x, y) => pct(y)}],
+  {xmin: 0.4, xmax: 10.6, ymin: 0, ymax: 50, ticksX: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ticksY: [0, 10, 20, 30, 40, 50], fy: v => v + "%", H: 260,
+   barre: ES.famd.varianza.map((r, i) => ({x: i + 1, y: r.var, t: `${r.c}: ${pct(r.var)}`}))});
+barreOrizzontali("g-famd-1", ES.famd.dim1, {formato: v => fmt(v, 1), etichetta: 250});
+barreOrizzontali("g-famd-2", ES.famd.dim2, {formato: v => fmt(v, 1), etichetta: 250, colore: () => "var(--s3)"});
+
+// 3.2
+const ks = CL.scelta_k.map(r => r.k);
+linee("g-wss", [{nome: "WSS", x: ks, y: CL.scelta_k.map(r => r.wss / 1000), colore: "var(--s1)", punti: true, tooltip: (x, y) => `k=${x}, ${fmt(y * 1000, 0)}`}],
+  {xmin: 1.6, xmax: 8.4, ymin: 15, ymax: 50, ticksX: ks, ticksY: [20, 30, 40, 50], fy: v => fmt(v, 0) + "k", titoloX: "numero di cluster (k)"});
+linee("g-sil", [{nome: "Silhouette", x: ks, y: CL.scelta_k.map(r => r.silhouette), colore: "var(--s1)", punti: true, tooltip: (x, y) => `k=${x}, ${fmt(y, 3)}`}],
+  {xmin: 1.6, xmax: 8.4, ymin: 0.2, ymax: 0.5, ticksX: ks, ticksY: [0.2, 0.3, 0.4, 0.5], titoloX: "numero di cluster (k)"});
+
+// 3.2 composizione
+grafico(function (id) {
+  const tipi = CL.composizione.tipi, colori = ["#3f93aa", "#ddd4c1", "#263a5a", "var(--ink)", "#e2462a"], testi = ["#0d0d0d", "#0d0d0d", "#fff", "var(--bg)", "#fff"];
+  $("l-cluster").innerHTML = tipi.map((t, i) => `<span><i style="background:${colori[i]}"></i>${t}</span>`).join("");
+  const W = larghezza(id, 900), stretto = W < STRETTO, riga = stretto ? 52 : 42;
+  const m = {l: stretto ? 0 : 150, r: stretto ? 4 : 20, t: 6, b: 26}, H = m.t + m.b + riga * CL.composizione.righe.length;
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, x = v => m.l + iw * v / 100;
+  for (const t of [0, 25, 50, 75, 100]) scrivi(s, Math.min(Math.max(x(t), 14), W - 18), H - 8, t + "%", {"text-anchor": "middle", fill: "var(--ink-3)", "font-size": 11});
+  CL.composizione.righe.forEach((r, i) => {
+    const y = m.t + i * riga + (stretto ? 20 : 7), h = stretto ? 24 : riga - 14; let acc = 0;
+    if (stretto) scrivi(s, 0, y - 6, `Cluster ${i + 1} · ${fmt(r.n, 0)}`, {fill: "var(--ink)"});
+    else scrivi(s, m.l - 12, y + h / 2 + 4, `Cluster ${i + 1} · ${fmt(r.n, 0)}`, {"text-anchor": "end", fill: "var(--ink)", "font-size": 12.5});
+    tipi.forEach((t, j) => { const v = r.quote[j]; if (v <= 0) return;
+      const rect = el("rect", {x: x(acc) + 1, y, width: Math.max(0, x(acc + v) - x(acc) - 2), height: h, rx: 3, fill: colori[j]});
+      conTooltip(rect, `Cluster ${i + 1}: ${pct(v)} ${t}`); s.append(rect);
+      if (v > 12) scrivi(s, x(acc + v / 2), y + h / 2 + 4, `${t} ${pct(v, 0)}`, {"text-anchor": "middle", "font-weight": 600, fill: testi[j], "pointer-events": "none"});
+      acc += v; });
+  });
+  $(id).replaceChildren(s);
+})("g-cluster");
+const colProfilo = [
+  {t: "Cluster", k: "cluster"}, {t: "n", n: 1, f: r => fmt(r.n, 0)}, {t: "%", n: 1, f: r => fmt(r.quota, 1)},
+  {t: "Età", n: 1, f: r => fmt(r.eta, 1)}, {t: "Reddito (USD)", n: 1, f: r => fmt(r.reddito, 0)}, {t: "Emissioni", n: 1, f: r => fmt(r.emissioni, 2)},
+  {t: "VMT", n: 1, f: r => fmt(r.vmt, 0)}, {t: "Viaggi lunghi", n: 1, f: r => fmt(r.viaggi, 1)},
+  {t: "Auto precedente", k: "auto_prec"}, {t: "Istruzione", k: "istruzione"}, {t: "Casa indip.", k: "casa"}];
+tabella("t-profilo", colProfilo, CL.profilo);
+tabella("t-profilo-senza", colProfilo, CL.profilo_senza);
+
+// 3.1 K-Mode
+$("profili-kmode").innerHTML = CL.kmode_profili.map(r => `<div><h4>${r.cluster} · ${fmt(r.n, 0)} (${pct(r.quota, 0)})</h4><p>${r.sintesi}</p></div>`).join("");
+tabella("t-kmode-medie", [{t: "Cluster", k: "cluster"}, {t: "n", n: 1, f: r => fmt(r.n, 0)}, {t: "Età", n: 1, f: r => fmt(r.eta, 1)},
+  {t: "Reddito (USD)", n: 1, f: r => fmt(r.reddito, 0)}, {t: "Persone", n: 1, f: r => fmt(r.persone, 1)}, {t: "Auto", n: 1, f: r => fmt(r.auto, 1)},
+  {t: "VMT", n: 1, f: r => fmt(r.vmt, 0)}, {t: "Viaggi > 200 mi", n: 1, f: r => fmt(r.viaggi, 1)}, {t: "Casa-lavoro (mi)", n: 1, f: r => fmt(r.distanza, 1)},
+  {t: "BEV precedente", n: 1, f: r => pct(r.bev_prec)}], CL.kmode_profili);
+const kk = CL.kmode_costo.map(r => r.k);
+linee("g-kmode", [{nome: "Costo", x: kk, y: CL.kmode_costo.map(r => r.costo / 1000), colore: "var(--s3)", punti: true, tooltip: (x, y) => `k=${x}, ${fmt(y * 1000, 0)}`}],
+  {xmin: 0.6, xmax: 8.4, ymin: 25, ymax: 40, ticksX: kk, ticksY: [25, 30, 35, 40], fy: v => fmt(v, 0) + "k", titoloX: "numero di cluster (k)"});
+tabella("t-kmode", [{t: "Variabile", k: "variabile"}, {t: "C1", k: "c1"}, {t: "C2", k: "c2"}, {t: "C3", k: "c3"}, {t: "C4", k: "c4"}], CL.kmode_centri);
+
+// 4.1
+intervalli("g-screening", ML.screening.map((r, i) => ({nome: r.nome, v: r.v, basso: r.basso, alto: r.alto, forte: i === 0, colore: i < 4 ? "var(--s1)" : "var(--s2)",
+  tooltip: `${r.nome}: ROC-AUC ${fmt(r.v)} ± ${fmt(r.alto - r.v)} · accuracy ${pct(r.acc * 100)} · F1 ${fmt(r.f1)}`})),
+  {min: 0.55, max: 0.76, ticks: [0.55, 0.6, 0.65, 0.7, 0.75], etichetta: 230});
+
+// 4.2
+tabella("t-parametri", [{t: "Modello", k: "modello"}, {t: "ROC-AUC CV", n: 1, f: r => fmt(r.auc_cv)}, {t: "Iperparametri scelti", k: "parametri"}], ML.parametri);
+
+// 4.3
+intervalli("g-modelli", ML.test.map((r, i) => ({nome: r.nome, v: r.roc_auc, basso: r.roc_auc_ic_basso, alto: r.roc_auc_ic_alto, forte: i === 0,
+  colore: r.gruppo === "alberi" ? "var(--s1)" : "var(--s2)", tooltip: `${r.nome}: ROC-AUC ${fmt(r.roc_auc)} (IC ${fmt(r.roc_auc_ic_basso)}–${fmt(r.roc_auc_ic_alto)})`})),
+  {min: 0.62, max: 0.76, ticks: [0.62, 0.66, 0.70, 0.74], etichetta: 290});
+tabella("t-test", [{t: "Modello", k: "nome"}, ...[["Accuracy", "accuracy"], ["Bal. acc.", "balanced_accuracy"], ["Precision", "precision"], ["Recall", "recall"],
+  ["F1", "f1"], ["ROC-AUC", "roc_auc"], ["Brier", "brier"]].map(([t, k]) => ({t, n: 1, f: r => fmt(r[k])}))], ML.test, {evidenzia: r => r.nome === ML.migliore});
+const cm = ML.confusione;
+$("confusione").innerHTML = `<div class="confusione"><div class="et"></div><div class="et">Predetto non BEV</div><div class="et">Predetto BEV</div>
+  <div class="et">Reale non BEV</div><div class="giusto"><b>${cm.tn}</b>corretti</div><div class="errato"><b>${cm.fp}</b>falsi positivi</div>
+  <div class="et">Reale BEV</div><div class="errato"><b>${cm.fn}</b>falsi negativi</div><div class="giusto"><b>${cm.tp}</b>corretti</div></div>`;
+tabella("t-mcnemar", [{t: "Modello", k: "modello"}, {t: "χ²", n: 1, f: r => fmt(r.chi2, 2)}, {t: "p-value", n: 1, f: r => pv(r.p)},
+  {t: "Differenza", f: r => r.p < 0.05 ? badge("no", "Significativa") : badge("nd", "Non significativa")}], ML.mcnemar);
+
+// 4.4
+const nomiRoc = Object.keys(ML.roc);
+linee("g-roc", nomiRoc.map((n, i) => ({nome: n, x: ML.roc[n].x, y: ML.roc[n].y, colore: SERIE[i]})),
+  {xmin: 0, xmax: 1, ymin: 0, ymax: 1, ticksX: [0, 0.25, 0.5, 0.75, 1], ticksY: [0, 0.25, 0.5, 0.75, 1], fx: v => fmt(v, 2), titoloX: "tasso di falsi positivi", diagonale: true, legenda: "l-roc"});
+const nomiCal = Object.keys(ML.calibrazione);
+linee("g-cal", nomiCal.map((n, i) => ({nome: n, x: ML.calibrazione[n].x, y: ML.calibrazione[n].y, colore: [SERIE[0], SERIE[1]][i], punti: true,
+  tooltip: (x, y) => `predetta ${fmt(x, 2)}, osservata ${fmt(y, 2)}`})),
+  {xmin: 0, xmax: 1, ymin: 0, ymax: 1, ticksX: [0, 0.25, 0.5, 0.75, 1], ticksY: [0, 0.25, 0.5, 0.75, 1], fx: v => fmt(v, 2), titoloX: "probabilità predetta", diagonale: true, legenda: "l-cal"});
+
+// 4.5
+barreOrizzontali("g-shap", ML.shap, {etichetta: 170});
+barreOrizzontali("g-perm", ML.permutazione, {etichetta: 170, colore: () => "var(--s2)"});
+
+// 5.1
+tabella("t-architetture", [{t: "Rete", k: "nome"}, {t: "Input", n: 1, k: "input"}, {t: "Neuroni per strato", k: "strati"}, {t: "Attivazione", k: "attivazione"},
+  {t: "Regolarizzazione", k: "regolarizzazione"}, {t: "BatchNorm", f: r => r.batch_norm ? "Sì" : "–"}, {t: "Dropout", n: 1, f: r => fmt(r.dropout, 1)},
+  {t: "Ottimizzatore", k: "ottimizzatore"}, {t: "Parametri", n: 1, f: r => fmt(r.parametri, 0)}, {t: "Epoche", n: 1, k: "epoche"}], DL.architetture);
+
+// 5.2
+$("storie").innerHTML = Object.keys(DL.storie).map((n, i) => `<figure><div class="titolo-fig">${n}: loss</div><div class="grafico" id="g-st-${i}-l"></div></figure>
+  <figure><div class="titolo-fig">${n}: ROC-AUC</div><div class="grafico" id="g-st-${i}-a"></div></figure>`).join("");
+Object.entries(DL.storie).forEach(([n, st], i) => {
+  const ep = st.loss.map((_, j) => j + 1), E = ep.length, tx = [1, Math.round(E / 2), E];
+  // Con la regolarizzazione L1 le prime epoche hanno una loss molto alta: l'asse è calcolato sul 90% finale delle epoche e i valori oltre vengono tagliati
+  const k0 = Math.max(2, Math.round(E / 10)), coda = [...st.loss.slice(k0), ...st.val_loss.slice(k0)], taglio = Math.max(...st.loss, ...st.val_loss) > 2 * Math.max(...coda);
+  const lo = Math.floor(Math.min(...coda) * 20) / 20, hi = Math.ceil(Math.max(...(taglio ? coda : [...st.loss, ...st.val_loss])) * 20) / 20;
+  const clip = v => Math.min(v, hi);
+  if (taglio) $(`g-st-${i}-l`).previousElementSibling.textContent += " (prime epoche fuori scala)";
+  linee(`g-st-${i}-l`, [{nome: "training", x: ep, y: st.loss.map(clip), colore: "var(--s1)"}, {nome: "validazione", x: ep, y: st.val_loss.map(clip), colore: "var(--s2)", tratto: "5 4"}],
+    {xmin: 1, xmax: E, ymin: lo, ymax: hi, ticksX: tx, ticksY: [lo, (lo + hi) / 2, hi], titoloX: "epoca", H: 240});
+  linee(`g-st-${i}-a`, [{nome: "training", x: ep, y: st.auc, colore: "var(--s1)"}, {nome: "validazione", x: ep, y: st.val_auc, colore: "var(--s2)", tratto: "5 4"}],
+    {xmin: 1, xmax: E, ymin: 0.5, ymax: 0.8, ticksX: tx, ticksY: [0.5, 0.6, 0.7, 0.8], titoloX: "epoca", H: 240});
+});
+
+// 5.3
+const nomiDl = Object.keys(DL.roc);
+linee("g-roc-dl", nomiDl.map((n, i) => ({nome: n, x: DL.roc[n].x, y: DL.roc[n].y, colore: SERIE[i]})),
+  {xmin: 0, xmax: 1, ymin: 0, ymax: 1, ticksX: [0, 0.25, 0.5, 0.75, 1], ticksY: [0, 0.25, 0.5, 0.75, 1], fx: v => fmt(v, 2), titoloX: "tasso di falsi positivi", diagonale: true, legenda: "l-roc-dl"});
+tabella("t-dl", [{t: "Modello", k: "nome"}, {t: "Accuracy", n: 1, f: r => fmt(r.accuracy)}, {t: "F1", n: 1, f: r => fmt(r.f1)}, {t: "ROC-AUC", n: 1, f: r => fmt(r.roc_auc)},
+  {t: "IC 95%", n: 1, f: r => `${fmt(r.roc_auc_ic_basso)}–${fmt(r.roc_auc_ic_alto)}`}], [ML.test[0], ...DL.test], {evidenzia: r => r.nome === ML.migliore});
+
+// --- Indice: voce attiva durante lo scorrimento ----------------------------------------------
+const voci = [...document.querySelectorAll(".indice a")];
+const osservatore = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) voci.forEach(a => a.classList.toggle("attivo", a.getAttribute("href") === "#" + e.target.id)); });
+}, {rootMargin: "0px 0px -75% 0px"});
+voci.map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean).forEach(b => osservatore.observe(b));
+
+// Ridisegno dei grafici quando cambia la larghezza (rotazione del telefono, finestra ridimensionata)
+let ultimaLarghezza = innerWidth, attesa;
+addEventListener("resize", () => { clearTimeout(attesa); attesa = setTimeout(() => {
+  if (innerWidth === ultimaLarghezza) return; ultimaLarghezza = innerWidth; registro.forEach(f => f()); }, 150); });
+
+// Pulsante "Indice" sugli schermi stretti: compare dopo la copertina
+const vaiIndice = $("vai-indice");
+new IntersectionObserver(([e]) => vaiIndice.classList.toggle("visibile", !e.isIntersecting && e.boundingClientRect.top < 0))
+  .observe($("indice"));
+
+// Tema
+$("tema").addEventListener("click", () => {
+  const r = document.documentElement, scuro = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = scuro ? "light" : "dark";
+});
+</script>

@@ -1,0 +1,936 @@
+<title>Adozione dei veicoli elettrici</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3CclipPath id=%22q%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path=%22url%28%23q%29%22%3E%3Crect width=%2232%22 height=%2264%22 fill=%22%230d0d0d%22/%3E%3Crect x=%2232%22 width=%2232%22 height=%2264%22 fill=%22%235aa4bb%22/%3E%3Cpath d=%22M32 13a19 19 0 0 0 0 38z%22 fill=%22%23e2462a%22/%3E%3Cpath d=%22M32 13a19 19 0 0 1 0 38z%22 fill=%22%23ddd8c4%22/%3E%3C/g%3E%3C/svg%3E">
+<meta name="description" content="Analisi data-driven per l'adozione di veicoli elettrici: analisi statistiche, esplorative, cluster, machine learning e deep learning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: identità della presentazione di laurea (titoli neri pesanti, triangolo davanti ai titoli,
+   parte I statistica in teal / parte II predittiva in arancio); indice fisso a sinistra sopra i 1180px,
+   altrimenti in testa; testo, note e figure occupano tutta la larghezza della colonna. */
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#111111; --ink-2:#45484c; --ink-3:#74777b; --line:#e4e0d6;
+  --teal:#3f93aa; --teal-ink:#2a7a90; --navy:#263a5a; --rosso:#b0272c; --arancio:#e2462a; --arancio-ink:#c8361c; --sabbia:#ddd4c1;
+  --accent:var(--teal-ink); --accent-soft:#e6f1f4; --arancio-soft:#fbe8e3;
+  --s1:#3f93aa; --s2:#e2462a; --s3:#263a5a; --s4:#a2a39e;
+  --ok:#1f7a4d; --ok-soft:#e1f2e8; --no:#b0272c; --no-soft:#f8e3e1; --nd:#6b6e72; --nd-soft:#eeece7;
+  --grigio:#6b6e72; --grigio-linea:#a2a39e; --copertina:#efe9dc;
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-data:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --navy:#3d5680; --rosso:#d6474b; --arancio:#ee6141; --arancio-ink:#f07a5e; --sabbia:#5d574b;
+  --accent:var(--teal-ink); --accent-soft:#18292e; --arancio-soft:#33201a;
+  --s1:#4fa6bd; --s2:#ee6141; --s3:#8ea6d0; --s4:#6f716d;
+  --ok:#5cc28d; --ok-soft:#173326; --no:#ef7a7c; --no-soft:#3a1d1e; --nd:#a3a39d; --nd-soft:#26282a;
+  --grigio:#a3a39d; --grigio-linea:#6f716d; --copertina:#1f2123;
+  color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --navy:#3d5680; --rosso:#d6474b; --arancio:#ee6141; --arancio-ink:#f07a5e; --sabbia:#5d574b;
+  --accent:var(--teal-ink); --accent-soft:#18292e; --arancio-soft:#33201a;
+  --s1:#4fa6bd; --s2:#ee6141; --s3:#8ea6d0; --s4:#6f716d;
+  --ok:#5cc28d; --ok-soft:#173326; --no:#ef7a7c; --no-soft:#3a1d1e; --nd:#a3a39d; --nd-soft:#26282a;
+  --grigio:#a3a39d; --grigio-linea:#6f716d; --copertina:#1f2123;
+  color-scheme:dark; }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:16px}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{background:var(--bg); color:var(--ink); font:16.5px/1.65 var(--f-body); margin:0}
+.impianto{max-width:1320px; margin:0 auto; padding-inline:20px; padding-block:28px 80px;
+  display:grid; grid-template-columns:minmax(0,1fr); gap:0 48px}
+@media (min-width:1180px){ .impianto{grid-template-columns:230px minmax(0,1fr)} }
+main{min-width:0; max-width:1020px}
+.testo{max-width:none}
+h1,h2,h3{font-family:var(--f-display); line-height:1.08; text-wrap:balance; margin:0; letter-spacing:-.01em}
+h1{font-size:clamp(2.1rem,5.4vw,3.6rem); font-weight:900; max-width:18ch}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem); font-weight:900; position:relative; padding-left:36px}
+h2::before{content:""; position:absolute; left:0; top:.06em; border-style:solid; border-width:.5em 0 .5em .62em;
+  border-color:transparent transparent transparent var(--sabbia)}
+.statistica h2::before{border-left-color:var(--teal)}
+.predittiva h2::before{border-left-color:var(--arancio)}
+.capitolo{margin-top:88px}
+.blocco{margin-top:56px}
+h3{font-size:1.3rem; font-weight:800; margin:0 0 6px}
+h3 .nr{color:var(--teal-ink); margin-right:8px; font-variant-numeric:tabular-nums}
+.predittiva h3 .nr{color:var(--arancio-ink)}
+p{margin:20px 0}
+h2 + .testo > p:first-child, h3 + .testo > p:first-child, h3 + p{margin-top:10px}
+strong{font-weight:600}
+.parte{display:block; font:600 .85rem/1 var(--f-body); color:var(--teal-ink); margin:0 0 12px 36px; letter-spacing:.02em}
+.predittiva .parte{color:var(--arancio-ink)}
+.num{font-family:var(--f-data); font-variant-numeric:tabular-nums; font-size:.94em}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* Indice */
+.indice{font-size:.9rem}
+.indice .titolo{font:800 .78rem/1 var(--f-display); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-bottom:12px}
+.indice ol{list-style:none; margin:0; padding:0}
+.indice > ol > li{margin:0 0 10px}
+.indice a{color:var(--ink); text-decoration:none; display:block; padding:2px 0 2px 10px; border-left:2px solid transparent}
+.indice a:hover{color:var(--teal-ink)}
+.indice a.attivo{border-left-color:var(--teal); color:var(--teal-ink); font-weight:600}
+.indice .predittiva-link:hover{color:var(--arancio-ink)}
+.indice .predittiva-link.attivo{border-left-color:var(--arancio); color:var(--arancio-ink)}
+/* Introduzione e conclusioni: grigio, come i loro triangoli */
+.indice .gruppo-grigio a:hover{color:var(--grigio)}
+.indice .gruppo-grigio a.attivo{border-left-color:var(--grigio-linea); color:var(--grigio)}
+.indice > ol > li > a{font-weight:700; font-family:var(--f-display)}
+.indice ol ol{margin:4px 0 0 10px}
+.indice ol ol a{font-size:.84rem; color:var(--ink-2)}
+.indice .sez{display:block; font:600 .72rem/1 var(--f-body); color:var(--ink-3); text-transform:uppercase; letter-spacing:.1em; margin:18px 0 8px 12px}
+@media (min-width:1180px){
+  .indice{position:sticky; top:calc(20px + env(safe-area-inset-top,0px)); align-self:start; max-height:calc(100vh - 40px); overflow:auto; padding-top:8px}
+}
+@media (max-width:1179px){
+  .indice{order:2; margin-top:32px; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 20px}
+  main{display:contents}
+  .indice ol ol{display:none}
+  .indice > ol{columns:2; column-gap:24px}
+  .indice .sez{display:none}
+}
+@media (max-width:560px){ .indice > ol{columns:1} }
+
+/* Copertina, come la prima slide: riquadro con titolo, banda nera e azzurra, semicerchio rosso e sabbia al centro */
+.slide{border:1px solid var(--line); border-radius:6px; overflow:hidden}
+.slide-testa{background:var(--copertina); padding:clamp(28px,5vw,64px) clamp(20px,5.5vw,72px) clamp(28px,5vw,60px)}
+.slide-testa h1{max-width:22ch; letter-spacing:-.02em}
+.copertina .sottotitolo{font-size:clamp(1.05rem,1.8vw,1.35rem); color:var(--ink); margin:12px 0 0}
+.banda{position:relative; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; min-height:clamp(230px,30vw,330px);
+  background:linear-gradient(90deg, #0d0d0d 50%, #5aa4bb 50%)}
+.banda > div{position:relative; z-index:1; padding:clamp(22px,3.4vw,40px) clamp(20px,5.5vw,72px) 28px; min-width:0}
+.banda .sx{color:#f4f2ec; font-size:.9rem; line-height:1.45}
+.banda .dx{color:#0d0d0d; text-align:right; font-size:1rem; padding-left:20px}
+.banda b{font-family:var(--f-display); font-weight:800; font-size:1.2rem}
+.banda .sx hr{border:0; border-top:1px solid #ffffff59; margin:14px 0; width:min(60%,260px)}
+.banda .semicerchio{position:absolute; z-index:0; left:25%; bottom:0; width:50%; aspect-ratio:1; border-radius:50%;
+  background:linear-gradient(90deg, #e2462a 50%, #ddd8c4 50%); transform:translateY(80%); pointer-events:none}
+@media (max-width:700px){ .banda{grid-template-columns:1fr; background:none} .banda .sx{background:#0d0d0d} .banda .dx{background:#5aa4bb; text-align:left; padding-left:clamp(20px,5.5vw,72px)} .banda .semicerchio{display:none} }
+
+.cifre{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-top:28px}
+.cifra{background:var(--surface); padding:18px 18px 16px; min-width:0}
+.cifra b{display:block; font:900 2rem/1 var(--f-display); font-variant-numeric:tabular-nums}
+.cifra span{display:block; font-size:.85rem; line-height:1.4; color:var(--ink-2); margin-top:8px}
+@media (max-width:760px){ .cifre{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+.tre{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:20px}
+.tre div{min-width:0}
+.tre h4,.metodo h4{margin:0 0 6px; font:800 1rem/1.3 var(--f-display)}
+.tre ul,.metodo ul{margin:0; padding-left:18px; font-size:.93rem; color:var(--ink-2)}
+@media (max-width:760px){ .tre{grid-template-columns:1fr} }
+
+.gruppi{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; margin-top:24px}
+.gruppo{min-width:0}
+.gruppo .cerchio{width:min(118px,100%); aspect-ratio:1; border-radius:50%; display:grid; place-items:center; text-align:center;
+  color:#fff; font:800 .9rem/1.15 var(--f-display); padding:10px; margin:0 auto 10px}
+.gruppo ul{margin:0; padding-left:18px; font-size:.86rem; color:var(--ink-2)}
+@media (max-width:820px){ .gruppi{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+.metodo{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px}
+.metodo div{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:16px 18px; min-width:0}
+.metodo h4{color:var(--teal-ink)} .metodo div + div h4{color:var(--arancio-ink)}
+@media (max-width:700px){ .metodo{grid-template-columns:1fr} }
+
+/* Figure e tabelle */
+figure{margin:20px 0 8px; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 18px 12px; min-width:0}
+figcaption{font-size:.84rem; line-height:1.5; color:var(--ink-2); margin-top:10px}
+.titolo-fig{font:800 1rem/1.3 var(--f-display); margin-bottom:6px}
+.grafico{width:100%; min-width:0}
+.grafico svg{display:block; max-width:100%; height:auto; font-family:var(--f-body); overflow:visible}
+.affiancate{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
+.affiancate figure{margin-top:20px}
+@media (max-width:820px){ .affiancate{grid-template-columns:1fr} }
+.legenda{display:flex; flex-wrap:wrap; gap:6px 18px; font-size:.82rem; color:var(--ink-2); margin:6px 0 2px}
+.legenda i{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:-1px}
+.legenda i.linea{width:16px; height:3px; border-radius:2px; vertical-align:3px}
+
+.tabella{overflow-x:auto; margin:16px 0; border:1px solid var(--line); border-radius:6px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:.86rem; line-height:1.4}
+th,td{padding:8px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-weight:600; color:var(--ink-2); background:var(--bg); font-size:.74rem; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap}
+tbody tr:hover td{background:color-mix(in srgb, var(--accent-soft) 55%, transparent)}
+figure .tabella{border:0; border-radius:0}
+/* Ipotesi: una sola cornice per gruppo di righe */
+tr.nel-gruppo td{border-top:0}
+tr.inizio-gruppo td{border-top:1px solid var(--line)}
+tbody tr.inizio-gruppo:first-child td{border-top:0}
+#t-ipotesi td{border-bottom:0}
+table.compatta th, table.compatta td{padding:8px 7px}
+table.compatta th{letter-spacing:.02em}
+table.compatta th:first-child, table.compatta td:first-child{padding-left:12px}
+#t-profilo td:first-child, #t-profilo-senza td:first-child, #t-kmode-medie td:first-child{white-space:nowrap}
+/* Sugli schermi stretti le tabelle larghe scorrono in orizzontale con la prima colonna ferma */
+@media (max-width:760px){
+  table.larga{min-width:640px}
+  table.larga th:first-child, table.larga td:first-child{position:sticky; left:0; z-index:1; background:var(--surface); box-shadow:1px 0 0 var(--line)}
+  table.larga th:first-child{background:var(--bg)}
+  table.larga td:first-child{min-width:104px; max-width:140px; white-space:normal}
+  /* Nelle ipotesi la prima colonna è un testo lungo: scorre insieme alle altre */
+  #t-ipotesi{min-width:700px}
+  #t-ipotesi th:first-child, #t-ipotesi td:first-child{position:static; box-shadow:none; min-width:210px; max-width:230px}
+}
+td.n,th.n{text-align:right; font-family:var(--f-data); font-variant-numeric:tabular-nums; white-space:nowrap}
+td.debole{color:var(--ink-3)}
+tr.evidenza td{background:var(--accent-soft)}
+.predittiva tr.evidenza td{background:var(--arancio-soft)}
+.esito{display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:.78rem; padding:3px 9px; border-radius:999px; white-space:nowrap}
+.esito.ok{background:var(--ok-soft); color:var(--ok)} .esito.no{background:var(--no-soft); color:var(--no)} .esito.nd{background:var(--nd-soft); color:var(--nd)}
+.esito.info{background:var(--accent-soft); color:var(--teal-ink)} .esito.info::before{content:"●"; font-size:.6em}
+.esito.ok::before{content:"✓"} .esito.no::before{content:"✕"} .esito.nd::before{content:"–"}
+
+.confusione{display:grid; grid-template-columns:auto 1fr 1fr; gap:4px; max-width:420px; font-size:.85rem; margin-top:8px}
+.confusione div{padding:12px; border-radius:4px; text-align:center}
+.confusione .et{color:var(--ink-2); padding:6px; display:flex; align-items:center; justify-content:center}
+.confusione .giusto{background:var(--accent-soft); color:var(--ink)}
+.confusione .errato{background:var(--arancio-soft); color:var(--ink)}
+.confusione b{display:block; font:800 1.5rem/1.1 var(--f-display); font-variant-numeric:tabular-nums}
+
+.nota{border-left:4px solid var(--teal); background:var(--accent-soft); padding:14px 18px; border-radius:0 6px 6px 0; margin:20px 0}
+.nota p{margin:10px 0} .nota p:first-child{margin-top:0} .nota p:last-child{margin-bottom:0} .nota ul{margin:10px 0; padding-left:20px}
+.predittiva .nota{border-left-color:var(--arancio); background:var(--arancio-soft)}
+.elenco{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:18px}
+.elenco div{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:14px 16px; min-width:0}
+.elenco h4{margin:0 0 4px; font:800 .98rem/1.3 var(--f-display)}
+.elenco p{margin:0; font-size:.9rem; line-height:1.5; color:var(--ink-2)}
+@media (max-width:760px){ .elenco{grid-template-columns:1fr} }
+
+#suggerimento{position:fixed; pointer-events:none; background:var(--ink); color:var(--bg); font-size:.8rem; line-height:1.4;
+  padding:6px 9px; border-radius:4px; max-width:300px; z-index:10}
+.tema{position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; font-size:.8rem; background:var(--surface);
+  color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer}
+.vai-indice{position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:5; display:none;
+  font:700 .85rem/1 var(--f-display); color:var(--bg); background:var(--ink); text-decoration:none; padding:11px 16px; border-radius:999px;
+  box-shadow:0 4px 14px #0004; opacity:0; transform:translateY(8px); transition:opacity .2s, transform .2s; pointer-events:none}
+.vai-indice.visibile{opacity:1; transform:none; pointer-events:auto}
+@media (max-width:1179px){ .vai-indice{display:block} }
+@media (prefers-reduced-motion: reduce){ .vai-indice{transition:none} }
+footer{margin-top:80px; padding-top:18px; border-top:1px solid var(--line); font-size:.82rem; line-height:1.6; color:var(--ink-3)}
+@media (max-width:1179px){ .copertina{order:1} .contenuto{order:3} }
+.copertina,.contenuto,.indice{min-width:0}
+@media (max-width:700px){ .copertina{padding-top:30px} }
+
+/* Pannello delle distribuzioni (1.1) */
+.pulsante{display:inline-flex; align-items:center; gap:8px; font:700 .9rem/1 var(--f-display); color:var(--teal-ink);
+  background:var(--surface); border:1.5px solid var(--teal); border-radius:999px; padding:10px 16px; cursor:pointer}
+.pulsante:hover{background:var(--accent-soft)}
+.pulsante::before{content:""; border-style:solid; border-width:.35em 0 .35em .5em; border-color:transparent transparent transparent currentColor; transition:transform .15s}
+.pulsante[aria-expanded="true"]::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion: reduce){ .pulsante::before{transition:none} }
+.distribuzioni{margin-top:16px}
+.scelte{display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; margin:4px 0 10px}
+.scelte .gruppo-scelte{font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); width:100%; margin-top:6px}
+.scelta{font:.82rem/1 var(--f-body); color:var(--ink-2); background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer}
+.scelta:hover{border-color:var(--teal)}
+.scelta[aria-pressed="true"]{background:var(--teal); border-color:var(--teal); color:#fff}
+.mediane{font-size:.86rem; color:var(--ink-2); margin:2px 0 0}
+</style>
+
+<button class="tema" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+<div id="suggerimento" hidden></div>
+<a class="vai-indice" id="vai-indice" href="#indice">Indice</a>
+
+<div class="impianto">
+<nav class="indice" id="indice" aria-label="Indice">
+  <div class="titolo">Indice</div>
+  <ol>
+    <li class="gruppo-grigio"><a href="#introduzione">Introduzione</a>
+      <ol><li><a href="#contesto">Motivazione e contesto</a></li><li><a href="#dataset">Il dataset</a></li><li><a href="#metodologia">Metodologia</a></li></ol></li>
+    <li><span class="sez">I. Analisi statistiche</span><a href="#statistica">1. Analisi statistica</a>
+      <ol><li><a href="#descrittive">1.1 Descrittive</a></li><li><a href="#bivariata">1.2 Bivariata</a></li><li><a href="#logistica">1.3 Regressione logistica</a></li><li><a href="#ipotesi">1.4 Ipotesi di ricerca</a></li></ol></li>
+    <li><a href="#esplorativa">2. Analisi esplorativa</a>
+      <ol><li><a href="#pca">2.1 PCA</a></li><li><a href="#mca">2.2 MCA</a></li><li><a href="#famd">2.3 FAMD</a></li></ol></li>
+    <li><a href="#cluster">3. Cluster</a>
+      <ol><li><a href="#kmode">3.1 K-Mode</a></li><li><a href="#kmeans">3.2 Verifica con K-Means</a></li><li><a href="#senza-auto">3.3 Senza auto precedente</a></li><li><a href="#gerarchico">3.4 Gerarchico</a></li></ol></li>
+    <li><span class="sez">II. Analisi predittive</span><a class="predittiva-link" href="#ml">4. Machine learning</a>
+      <ol><li><a class="predittiva-link" href="#screening">4.1 Screening</a></li><li><a class="predittiva-link" href="#ottimizzazione">4.2 Ottimizzazione</a></li><li><a class="predittiva-link" href="#test">4.3 Risultati sul test</a></li><li><a class="predittiva-link" href="#roc">4.4 ROC e calibrazione</a></li><li><a class="predittiva-link" href="#feature">4.5 Le migliori feature</a></li></ol></li>
+    <li><a class="predittiva-link" href="#dl">5. Deep learning</a>
+      <ol><li><a class="predittiva-link" href="#architetture">5.1 Architetture</a></li><li><a class="predittiva-link" href="#addestramento">5.2 Addestramento</a></li><li><a class="predittiva-link" href="#confronto-dl">5.3 Confronto</a></li></ol></li>
+    <li class="gruppo-grigio"><a href="#conclusioni">Limiti e conclusioni</a></li>
+  </ol>
+</nav>
+
+<main>
+  <header class="copertina" id="introduzione">
+    <div class="slide">
+      <div class="slide-testa">
+        <h1>Analisi data-driven per l'adozione di veicoli elettrici</h1>
+        <p class="sottotitolo">Analisi statistiche e predittive sugli acquirenti di auto elettriche</p>
+      </div>
+      <div class="banda">
+        <div class="sx"><div>Laureando<br><b>Gamberini Federico</b><br><i>mat. 178147</i></div><hr>
+          <div><b style="font-size:.95rem">Università degli Studi di Modena e Reggio Emilia</b><br><i>Dipartimento di Comunicazione ed Economia</i></div><hr>
+          <div>Corso di Laurea Magistrale in Management<br>e Comunicazione d'Impresa<br>A.A. 2023/2024</div></div>
+        <div class="dx"><div>Relatore:<br>Prof. <b>Cavicchioli Roberto</b></div></div>
+        <div class="semicerchio" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div class="cifre" id="cifre"></div>
+  </header>
+
+  <div class="contenuto">
+  <section class="blocco" id="contesto">
+    <h2>Motivazione e contesto</h2>
+    <div class="tre">
+      <div><h4>Contesto di riferimento</h4><ul><li>Transizione del settore automotive verso la riduzione delle emissioni</li><li>Normative ambientali e incentivi in aumento</li></ul></div>
+      <div><h4>Obiettivo della ricerca</h4><ul><li>Fattori socio-demografici che influenzano l'acquisto di veicoli elettrici</li><li>Variabili chiave nelle decisioni di acquisto</li></ul></div>
+      <div><h4>Implicazioni</h4><ul><li>Strategie di marketing per la mobilità elettrica</li><li>Politiche pubbliche a favore della sostenibilità</li></ul></div>
+    </div>
+  </section>
+
+  <section class="blocco" id="dataset">
+    <h2>Il dataset</h2>
+    <div class="testo">
+      <p>Fonte: <em>Sociodemographic data for BEV owning households in California</em> dell'UC Davis, derivato dalla ricerca <em>Understanding the Early Adopters of Fuel Cell Vehicles</em> di Scott Hardman. Dai 27.021 casi e 27 variabili originali, con molti valori mancanti, la pulizia (OpenRefine e Python) ha portato a <strong><span data-v="n"></span> casi e 16 variabili</strong>, divise in 5 gruppi.</p>
+      <p>Tutti i rispondenti guidano già un veicolo a basse emissioni: il <span class="num" data-v="pct_bev"></span> un BEV, gli altri soprattutto PHEV. La variabile dipendente (<em>BEV dummy</em>) distingue quindi chi è passato all'elettrico puro da chi ha scelto un'alimentazione intermedia.</p>
+    </div>
+    <div class="gruppi">
+      <div class="gruppo"><div class="cerchio" style="background:#3f93aa">Socio-demografiche</div><ul><li>Genere</li><li>Classe d'età</li><li>Classe di reddito</li><li>Livello di istruzione</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#263a5a">Abitative</div><ul><li>Casa di proprietà</li><li>Casa indipendente</li><li>Persone in famiglia</li><li>Auto in famiglia</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#1d1d1d">Sensibilità ambientale</div><ul><li>Importanza di ridurre le emissioni di gas serra</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#b0272c">Classe veicolare</div><ul><li>Tipologia di auto attuale</li><li>Tipologia di auto precedente</li></ul></div>
+      <div class="gruppo"><div class="cerchio" style="background:#e2462a">Mobilità e percorrenza</div><ul><li>Viaggio più lungo (12 mesi)</li><li>Viaggi oltre 200 miglia</li><li>Distanza casa-lavoro</li><li>VMT annuo</li></ul></div>
+    </div>
+  </section>
+
+  <section class="blocco" id="metodologia">
+    <h2>Metodologia</h2>
+    <div class="testo"><p>L'analisi si articola in due parti: le analisi statistiche, per comprendere i dati e le relazioni tra le variabili, e le analisi predittive, per identificare il profilo del consumatore di un veicolo elettrico.</p></div>
+    <div class="metodo">
+      <div><h4>I. Analisi statistiche</h4><ul><li>Statistiche descrittive e analisi bivariata</li><li>Regressione logistica e ipotesi di ricerca</li><li>Analisi esplorative: PCA, MCA, FAMD</li><li>Cluster: K-Mode, verificato con K-Means e gerarchico</li></ul></div>
+      <div><h4>II. Analisi predittive</h4><ul><li>Machine learning: 15 algoritmi, ottimizzazione degli iperparametri</li><li>Interpretabilità con SHAP</li><li>Deep learning: reti neurali artificiali</li><li>Dashboard di predizione</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 1. STATISTICA -->
+  <section class="capitolo statistica" id="statistica">
+    <span class="parte">I. Analisi statistiche</span>
+    <h2>1. Analisi statistica</h2>
+
+    <div class="blocco" id="descrittive">
+      <h3><span class="nr">1.1</span>Statistiche descrittive</h3>
+      <div class="testo"><p>Le variabili di percorrenza sono molto asimmetriche: pochi rispondenti percorrono distanze molto superiori alla mediana. Per questo nei confronti tra gruppi si usano test non parametrici.</p></div>
+      <div class="tabella"><table id="t-descrittive"></table></div>
+      <button class="pulsante" id="apri-distribuzioni" type="button" aria-expanded="false" aria-controls="pannello-distribuzioni">Mostra i grafici delle distribuzioni</button>
+      <div class="distribuzioni" id="pannello-distribuzioni" hidden>
+        <figure>
+          <div class="scelte" id="scelte-distribuzioni" role="group" aria-label="Variabile da visualizzare"></div>
+          <div class="titolo-fig" id="titolo-distribuzione"></div>
+          <p class="mediane" id="mediane-distribuzione"></p>
+          <div class="grafico" id="g-distribuzione"></div>
+          <div class="legenda"><span><i style="background:var(--s1)"></i>possessori di BEV</span><span><i style="background:var(--s2)"></i>altri veicoli (PHEV, HEV, FCEV)</span></div>
+          <figcaption id="nota-distribuzione"></figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="bivariata">
+      <h3><span class="nr">1.2</span>Analisi bivariata</h3>
+      <div class="testo"><p>Quota di possessori di BEV nelle diverse categorie. Il reddito ha il gradiente più netto; l'auto precedente separa nettamente chi aveva già un BEV.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Per classe di reddito</div><div class="grafico" id="g-q-reddito"></div></figure>
+        <figure><div class="titolo-fig">Per auto precedente</div><div class="grafico" id="g-q-auto"></div></figure>
+        <figure><div class="titolo-fig">Per classe d'età</div><div class="grafico" id="g-q-eta"></div></figure>
+        <figure><div class="titolo-fig">Per livello di istruzione</div><div class="grafico" id="g-q-istruzione"></div></figure>
+      </div>
+      <p class="testo" style="font-size:.84rem;color:var(--ink-2)">La linea tratteggiata è la quota media del campione (<span class="num" data-v="pct_bev"></span>).</p>
+      <figure><div class="titolo-fig">Forza dell'associazione con il possesso di un BEV</div>
+        <div class="grafico" id="g-effetti"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>categoriale (V di Cramér)</span><span><i style="background:var(--s3)"></i>numerica (r rank-biserial, valore assoluto)</span></div>
+        <figcaption>Chi-quadro per le variabili categoriali, Mann-Whitney per le numeriche: tutte le associazioni sono significative, ma deboli (sotto 0,2).</figcaption></figure>
+    </div>
+
+    <div class="blocco" id="logistica">
+      <h3><span class="nr">1.3</span>Regressione logistica</h3>
+      <div class="testo">
+        <p>Il modello include tutte le variabili, con le categorie di riferimento indicate tra parentesi. Il VIF massimo è <span class="num" data-v="vif_max"></span>, quindi non c'è multicollinearità rilevante. Lo pseudo-R² di McFadden è <span class="num" data-v="r2"></span>: le variabili spiegano solo una parte della scelta.</p>
+      </div>
+      <figure><div class="titolo-fig">Odds ratio con intervallo di confidenza al 95%</div>
+        <div class="grafico" id="g-forest"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>significativo (p &lt; 0,05)</span><span><i style="background:var(--s4)"></i>non significativo</span></div>
+        <figcaption>Scala logaritmica: a destra di 1 la caratteristica aumenta le probabilità di possedere un BEV, a sinistra le riduce.</figcaption></figure>
+      <div class="testo"><p>Gli <strong>effetti marginali medi</strong> traducono gli odds ratio in punti percentuali di probabilità: ad esempio, a parità di altre caratteristiche, chi aveva già un BEV ha una probabilità di possederne un altro più alta di circa <span class="num" id="ame-bev"></span> punti rispetto a chi aveva una PHEV.</p></div>
+      <figure><div class="titolo-fig">Effetti marginali medi (punti percentuali)</div>
+        <div class="grafico" id="g-ame"></div>
+        <figcaption>Variazione media della probabilità di possedere un BEV, con IC 95%. Sono mostrati solo gli effetti significativi.</figcaption></figure>
+    </div>
+
+    <div class="blocco" id="ipotesi">
+      <h3><span class="nr">1.4</span>Ipotesi di ricerca</h3>
+      <div class="tabella"><table id="t-ipotesi"></table></div>
+      <div class="nota testo"><strong>H2.1 non è supportata.</strong> Si ipotizzava che la PHEV facesse da "ponte" verso l'elettrico puro. A parità di altre caratteristiche, chi aveva una PHEV ha invece odds di possedere un BEV <span class="num" data-v="or_phev_ice"></span> volte quelle di chi aveva un'auto tradizionale (ICE).<br><strong>H2.2</strong> è esplorativa: non c'è una direzione attesa. Rispetto alla PHEV, aver avuto un'auto ICE aumenta le odds di BEV (<span class="num" data-v="or_ice"></span> volte); HEV e GNC non hanno un effetto significativo.</div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 2. ESPLORATIVA -->
+  <section class="capitolo statistica" id="esplorativa">
+    <span class="parte">I. Analisi statistiche</span>
+    <h2>2. Analisi esplorativa</h2>
+    <div class="testo"><p>Le analisi multivariate sono svolte sui <span class="num" data-v="n_bev"></span> possessori di BEV, per sintetizzare le loro caratteristiche in pochi indici da usare nel clustering. Sono state eseguite sia in R (FactoMineR) sia in Python, con risultati coincidenti.</p></div>
+
+    <div class="blocco" id="pca">
+      <h3><span class="nr">2.1</span>PCA sulle variabili di mobilità</h3>
+      <div class="testo"><p>Le prime due componenti spiegano il <span class="num" data-v="pca_cum2"></span>% della varianza. PC1 cresce con tutte le percorrenze (indice <em>Viaggi PCA</em>); PC2 oppone i viaggi lunghi agli spostamenti quotidiani (<em>Mobilità quotidiana PCA</em>). L'alpha di Cronbach (<span class="num" data-v="alpha"></span>) indica che le quattro variabili misurano aspetti diversi della mobilità.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Varianza spiegata</div><div class="grafico" id="g-pca-scree"></div>
+          <div class="legenda"><span><i style="background:var(--s1)"></i>per componente</span><span><i class="linea" style="background:var(--s2)"></i>cumulata</span></div></figure>
+        <figure><div class="titolo-fig">Loadings</div><div class="tabella" style="margin:6px 0 0"><table id="t-loadings"></table></div></figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="mca">
+      <h3><span class="nr">2.2</span>MCA tematiche</h3>
+      <div class="testo"><p>Tre analisi delle corrispondenze multiple, una per gruppo di variabili categoriali. Le prime due dimensioni di ciascuna diventano indici sintetici. I grafici mostrano le categorie che contribuiscono di più a ogni dimensione.</p></div>
+      <div id="mca-gruppi"></div>
+    </div>
+
+    <div class="blocco" id="famd">
+      <h3><span class="nr">2.3</span>FAMD</h3>
+      <div class="testo"><p>L'analisi fattoriale per dati misti considera insieme variabili quantitative e categoriali. La varianza è molto distribuita: le prime due dimensioni ne spiegano solo il <span class="num" data-v="famd_cum2"></span>%.</p></div>
+      <figure><div class="titolo-fig">Varianza spiegata dalle prime 10 dimensioni</div><div class="grafico" id="g-famd-scree"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>per dimensione</span><span><i class="linea" style="background:var(--s2)"></i>cumulata</span></div></figure>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Contributi alla dimensione 1 (%)</div><div class="grafico" id="g-famd-1"></div></figure>
+        <figure><div class="titolo-fig">Contributi alla dimensione 2 (%)</div><div class="grafico" id="g-famd-2"></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 3. CLUSTER -->
+  <section class="capitolo statistica" id="cluster">
+    <span class="parte">I. Analisi statistiche</span>
+    <h2>3. Cluster</h2>
+    <div class="testo"><p>Il clustering cerca gruppi omogenei di possessori di BEV. Come nella tesi, la segmentazione finale usa il <strong>K-Mode</strong> sulle variabili categoriali; il K-Means sugli indici compositi e il clustering gerarchico servono da verifica.</p></div>
+
+    <div class="blocco" id="kmode">
+      <h3><span class="nr">3.1</span>K-Mode: la segmentazione finale</h3>
+      <div class="testo"><p>Il K-Mode raggruppa i rispondenti in base alla distanza di Hamming (il numero di caratteristiche diverse) e rappresenta ogni cluster con la modalità più frequente di ciascuna variabile. Con k = 4 emergono quattro profili, tutti dominati da uomini laureati, proprietari di casa indipendente, che arrivano da un'auto tradizionale e hanno una sensibilità ambientale molto alta: si distinguono per <strong>composizione familiare, reddito, età e mobilità</strong>.</p></div>
+      <div class="elenco" id="profili-kmode"></div>
+      <div class="tabella"><table id="t-kmode-medie"></table></div>
+      <figure><div class="titolo-fig">Modalità più frequenti per cluster (k = 4)</div><div class="tabella" style="margin:6px 0 0"><table id="t-kmode"></table></div></figure>
+      <div class="nota"><p><strong>Profili descrittivi, non gruppi naturali.</strong> Molte partizioni hanno un costo quasi uguale (qui <span class="num" data-v="kmode_costo"></span>): ripetendo il K-Mode con semi diversi i gruppi cambiano (ARI medio <span class="num" data-v="kmode_stab"></span>, dove 1 indica partizioni identiche). Per questo si tiene la soluzione a costo minimo su 50 inizializzazioni, e i profili vanno letti come segmenti di mercato tipici. </p></div>
+      <div class="nota"><p><strong>Confronto R / Python.</strong> Questa instabilità spiega le differenze tra R e Python già notate nella tesi. Con le stesse 14 variabili:</p>
+        <ul>
+          <li><strong>R</strong> (klaR, migliore di 20 avvii): costo <span class="num" data-v="kmode_r_costo"></span>, cluster di <span class="num" data-v="kmode_r_dim"></span> persone;</li>
+          <li><strong>Python</strong> (kmodes, 50 inizializzazioni): costo <span class="num" data-v="kmode_costo"></span>, cluster di <span class="num" data-v="kmode_dim"></span>;</li>
+          <li><strong>tesi</strong>: cluster di <span class="num">1.438 / 1.270 / 1.473 / 1.615</span>.</li>
+        </ul>
+        <p>Costi quasi uguali, gruppi diversi. Alcuni tratti però tornano sia in R sia in Python: un gruppo di <strong>coppie con VMT basso</strong> e uno di <strong>famiglie con 2 figli, 3 auto e pendolarismo lungo</strong>. Cambia invece la suddivisione per reddito, età e numero di viaggi.</p></div>
+      <figure><div class="titolo-fig">K-Mode: costo per numero di cluster</div><div class="grafico" id="g-kmode"></div></figure>
+      <p class="testo">Il costo cala in modo regolare, senza un gomito evidente: k = 4 è stato scelto, come nella tesi, per avere profili ancora interpretabili.</p>
+    </div>
+
+    <div class="blocco" id="kmeans">
+      <h3><span class="nr">3.2</span>Verifica con il K-Means</h3>
+      <div class="testo"><p>Il K-Means lavora su età, indici compositi (stile di vita, dimensione familiare, mobilità) e tipo di auto precedente. Il gomito si colloca a k = 4, dove la silhouette supera 0,40.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Metodo del gomito (WSS)</div><div class="grafico" id="g-wss"></div></figure>
+        <figure><div class="titolo-fig">Silhouette media</div><div class="grafico" id="g-sil"></div></figure>
+      </div>
+      <div class="testo"><p>Silhouette <span class="num" data-v="sil_tesi"></span> e stabilità molto alta (ARI medio su campioni bootstrap <span class="num" data-v="stab_tesi"></span>). La composizione mostra però che i cluster <strong>coincidono quasi perfettamente con il tipo di auto precedente</strong> (Adjusted Rand Index <span class="num" data-v="ari_tesi"></span>, dove 1 è coincidenza totale): le variabili binarie sull'auto precedente dominano la distanza. È il motivo per cui nella tesi il K-Means è stato scartato a favore del K-Mode, con cui non ha nulla in comune (ARI <span class="num" data-v="ari_kmeans_kmode"></span>).</p></div>
+      <figure><div class="titolo-fig">Composizione dei cluster per auto precedente</div>
+        <div class="grafico" id="g-cluster"></div><div class="legenda" id="l-cluster"></div></figure>
+      <div class="tabella"><table id="t-profilo"></table></div>
+    </div>
+
+    <div class="blocco" id="senza-auto">
+      <h3><span class="nr">3.3</span>K-Means senza l'auto precedente</h3>
+      <div class="testo"><p>Ripetendo il K-Means senza le variabili sull'auto precedente, aggiungendo status socioeconomico e sensibilità ambientale, la silhouette scende a <span class="num" data-v="sil_senza"></span> (stabilità <span class="num" data-v="stab_senza"></span>). Anche così non emerge una struttura a gruppi netta, coerentemente con quanto mostra il K-Mode.</p></div>
+      <div class="tabella"><table id="t-profilo-senza"></table></div>
+    </div>
+
+    <div class="blocco" id="gerarchico">
+      <h3><span class="nr">3.4</span>Clustering gerarchico</h3>
+      <div class="testo"><p>Il clustering gerarchico (metodo di Ward) sulle variabili del K-Means conferma la stessa partizione (ARI con il K-Means <span class="num" data-v="ari_ward"></span>, correlazione cofenetica <span class="num" data-v="cofenetica"></span>).</p></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 4. MACHINE LEARNING -->
+  <section class="capitolo predittiva" id="ml">
+    <span class="parte">II. Analisi predittive</span>
+    <h2>4. Machine learning</h2>
+    <div class="testo"><p>Obiettivo: prevedere se il veicolo di un rispondente è un BEV. I dati sono divisi una sola volta in training (<span class="num" data-v="n_train"></span>) e test (<span class="num" data-v="n_test"></span>), con la stessa quota di BEV. Ogni modello è una pipeline (standardizzazione + algoritmo) addestrata solo sul training; il test è usato una sola volta, alla fine.</p></div>
+
+    <div class="blocco" id="screening">
+      <h3><span class="nr">4.1</span>Screening degli algoritmi</h3>
+      <div class="testo"><p>15 algoritmi con iperparametri di default, valutati in cross-validation a 10 fold sul training. Gli ensemble ad alberi sono in testa.</p></div>
+      <figure><div class="titolo-fig">ROC-AUC media in cross-validation (± 1 deviazione standard)</div>
+        <div class="grafico" id="g-screening"></div></figure>
+    </div>
+
+    <div class="blocco" id="ottimizzazione">
+      <h3><span class="nr">4.2</span>Ottimizzazione degli iperparametri</h3>
+      <div class="testo"><p>I modelli migliori sono ottimizzati con una ricerca casuale degli iperparametri (RandomizedSearchCV, 5 fold, metrica ROC-AUC). Una variante del Gradient Boosting sceglie anche il numero di variabili (ne tiene <span class="num" data-v="n_feature_sel"></span>). Il Voting Classifier combina i tre modelli migliori.</p></div>
+      <div class="tabella"><table id="t-parametri"></table></div>
+    </div>
+
+    <div class="blocco" id="test">
+      <h3><span class="nr">4.3</span>Risultati sul test set</h3>
+      <div class="testo"><p>Il migliore è <strong><span data-v="migliore"></span></strong>, con ROC-AUC <span class="num" data-v="auc_best"></span> (IC 95% <span class="num" data-v="auc_ic"></span>) e accuracy <span class="num" data-v="acc_best"></span>. Gli intervalli dei primi sei modelli si sovrappongono e il test di McNemar non trova differenze significative tra loro: sono di fatto equivalenti. La regressione logistica è nettamente inferiore.</p></div>
+      <figure><div class="titolo-fig">ROC-AUC sul test set con IC 95%</div>
+        <div class="grafico" id="g-modelli"></div>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>ensemble ad alberi</span><span><i style="background:var(--s2)"></i>altri modelli</span></div>
+        <figcaption>Intervalli bootstrap con 1.000 ricampionamenti del test set.</figcaption></figure>
+      <div class="tabella"><table id="t-test"></table></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Matrice di confusione: <span data-v="migliore"></span></div><div id="confusione"></div>
+          <figcaption>Soglia 0,5. Il modello riconosce bene i BEV (recall alta) ma confonde una parte dei non BEV.</figcaption></figure>
+        <figure><div class="titolo-fig">Test di McNemar rispetto al migliore</div><div class="tabella" style="margin:6px 0 0"><table id="t-mcnemar"></table></div></figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="roc">
+      <h3><span class="nr">4.4</span>Curve ROC e calibrazione</h3>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Curve ROC</div><div class="grafico" id="g-roc"></div><div class="legenda" id="l-roc"></div></figure>
+        <figure><div class="titolo-fig">Calibrazione delle probabilità</div><div class="grafico" id="g-cal"></div><div class="legenda" id="l-cal"></div>
+          <figcaption>Punti vicini alla diagonale indicano probabilità affidabili.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="blocco" id="feature">
+      <h3><span class="nr">4.5</span>Le migliori feature</h3>
+      <div class="testo"><p>Il <strong>numero di viaggi oltre 200 miglia</strong> è la variabile più importante, seguita da miglia annue, reddito, esperienza precedente con un BEV e sensibilità ambientale: un quadro coerente con le ipotesi H1, H2.3, H3 e H4. Due misure diverse (SHAP e permutation importance) danno un ordine simile.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">SHAP (<span data-v="modello_shap"></span>)</div><div class="grafico" id="g-shap"></div>
+          <figcaption>Contributo assoluto medio alla predizione, in log-odds.</figcaption></figure>
+        <figure><div class="titolo-fig">Permutation importance (<span data-v="migliore"></span>)</div><div class="grafico" id="g-perm"></div>
+          <figcaption>Calo di ROC-AUC sul test quando la variabile viene rimescolata.</figcaption></figure>
+      </div>
+      <div class="nota testo">Togliendo la variabile "auto precedente BEV" la ROC-AUC passa da <span class="num" data-v="abl_con"></span> a <span class="num" data-v="abl_senza"></span>: il modello non si limita a riconoscere chi ricompra un BEV.</div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 5. DEEP LEARNING -->
+  <section class="capitolo predittiva" id="dl">
+    <span class="parte">II. Analisi predittive</span>
+    <h2>5. Deep learning</h2>
+    <div class="testo"><p>Reti neurali artificiali (Keras) addestrate sullo stesso split dei modelli di machine learning. L'addestramento si ferma quando la metrica su un set di validazione, estratto dal training, smette di migliorare (early stopping), e il learning rate si riduce quando la loss si stabilizza (ReduceLROnPlateau).</p>
+      <p>La <strong>ANN avanzata</strong> riproduce il modello finale della tesi: <span class="num" data-v="n_poly"></span> feature polinomiali di grado 2, attivazione LeakyReLU, regolarizzazione L1 + L2 (ElasticNet), BatchNormalization sull'ultimo strato nascosto e ottimizzatore AdamW. Nella tesi il set di validazione coincideva con il test set; qui è estratto dal training, quindi le metriche sul test sono una stima corretta: accuracy <span class="num" data-v="acc_dl_avanzata"></span>, ROC-AUC <span class="num" data-v="auc_dl_avanzata"></span>.</p></div>
+
+    <div class="blocco" id="architetture">
+      <h3><span class="nr">5.1</span>Architetture</h3>
+      <div class="tabella"><table id="t-architetture"></table></div>
+    </div>
+
+    <div class="blocco" id="addestramento">
+      <h3><span class="nr">5.2</span>Addestramento</h3>
+      <div id="storie" class="affiancate"></div>
+      <div class="legenda"><span><i class="linea" style="background:var(--s1)"></i>training</span><span><i class="linea" style="background:var(--s2)"></i>validazione (tratteggiata)</span></div>
+    </div>
+
+    <div class="blocco" id="confronto-dl">
+      <h3><span class="nr">5.3</span>Confronto con il machine learning</h3>
+      <div class="testo"><p>La rete migliore raggiunge una ROC-AUC di <span class="num" data-v="auc_dl"></span>, sotto gli ensemble ad alberi (<span class="num" data-v="auc_best"></span>). Su dati tabellari di questa dimensione le reti neurali non portano vantaggi: la rete avanzata, con quasi 30 volte i parametri della rete regolarizzata, non migliora la ROC-AUC. Le feature polinomiali aumentano la complessità senza aggiungere informazione.</p></div>
+      <div class="affiancate">
+        <figure><div class="titolo-fig">Curve ROC</div><div class="grafico" id="g-roc-dl"></div><div class="legenda" id="l-roc-dl"></div></figure>
+        <figure><div class="titolo-fig">Metriche sul test set</div><div class="tabella" style="margin:6px 0 0"><table id="t-dl"></table></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== CONCLUSIONI -->
+  <section class="capitolo" id="conclusioni">
+    <h2>Limiti e conclusioni</h2>
+    <h3 style="margin-top:24px">Limiti della ricerca</h3>
+    <div class="elenco">
+      <div><h4>Contesto geografico</h4><p>Il campione riguarda solo la California e solo chi possiede già un veicolo a basse emissioni.</p></div>
+      <div><h4>Capacità esplicativa contenuta</h4><p>Pseudo-R² di McFadden <span class="num" data-v="r2"></span> e ROC-AUC massima <span class="num" data-v="auc_best"></span>: le variabili disponibili spiegano solo una parte della scelta.</p></div>
+      <div><h4>Variabili mancanti</h4><p>Mancano variabili psicologiche e culturali e misure concrete dell'attitudine verso la sostenibilità.</p></div>
+      <div><h4>Segmentazione debole</h4><p>I profili del K-Mode cambiano con il seed e il K-Means, senza l'auto precedente, non trova gruppi netti: i segmenti sono descrittivi. Anche gli indici di mobilità hanno bassa coerenza interna.</p></div>
+    </div>
+    <h3 style="margin-top:36px">Conclusioni</h3>
+    <div class="elenco">
+      <div><h4>Fattori influenti</h4><p>Reddito, miglia percorse in un anno e numero di viaggi lunghi influenzano in modo significativo la scelta di un BEV; conta anche la sensibilità ambientale.</p></div>
+      <div><h4>Il passaggio non è graduale</h4><p>Chi arriva da un'auto tradizionale sceglie il BEV più spesso di chi aveva una PHEV: l'ibrido plug-in non fa da ponte.</p></div>
+      <div><h4>Transizione culturale, non solo tecnologica</h4><p>L'autonomia pesa (i viaggi lunghi frenano il BEV), ma l'adozione richiede anche un cambiamento culturale sostenuto da politiche mirate.</p></div>
+      <div><h4>Dashboard predittiva</h4><p>Uno strumento pratico per stimare la propensione al BEV di un profilo e spiegare quali caratteristiche la spostano.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Codice, notebook (eseguibili anche su Google Colab), dashboard e dati: <a href="https://github.com/FedeGambe/Master_s_thesis_Data_science">github.com/FedeGambe/Master_s_thesis_Data_science</a>.
+  </footer>
+  </div>
+</main>
+</div>
+
+<script>
+const DATI = {"valori": {"n": "10.688", "pct_bev": "54,2%", "media_bev": 54.23, "n_bev": "5.796", "r2": "0,064", "or_ice": "1,51", "or_phev_ice": "0,66", "or_bev": "3,47", "or_reddito_top": "2,12", "vif_max": "2,62", "alpha": "0,33", "pca_cum2": "59,1", "famd_cum2": "12,9", "sil_tesi": "0,40", "ari_tesi": "0,997", "stab_tesi": "0,97", "kmode_stab": "0,13", "kmode_costo": "30.833", "kmode_ari_auto": "0,000", "ari_kmeans_kmode": "0,001", "kmode_dim": "1.911 / 1.783 / 1.219 / 883", "kmode_r_costo": "30.724", "kmode_r_dim": "1.555 / 1.554 / 1.462 / 1.225", "sil_senza": "0,21", "stab_senza": "0,88", "cofenetica": "0,54", "ari_ward": "0,92", "auc_best": "0,725", "acc_best": "66,2%", "migliore": "Voting (soft)", "auc_ic": "0,705–0,746", "n_train": "8.550", "n_test": "2.138", "modello_shap": "LightGBM", "n_feature_sel": 15, "abl_con": "0,725", "abl_senza": "0,719", "auc_dl": "0,694", "auc_dl_avanzata": "0,672", "acc_dl_avanzata": "64,6%", "n_poly": 189}, "cifre": [{"v": "10.688", "t": "possessori di veicoli a basse emissioni"}, {"v": "54,2%", "t": "possiede un BEV"}, {"v": "4 su 5", "t": "ipotesi confermate (almeno in parte), più una esplorativa"}, {"v": "0,725", "t": "ROC-AUC del modello migliore (Voting (soft))"}], "stat": {"descrittive": [{"variabile": "Reddito familiare (USD)", "media": 204117.0, "dev_std": 116606.0, "min": 50000.0, "q1": 125000.0, "mediana": 175000.0, "q3": 275000.0, "max": 500000.0, "asimmetria": 1.09981}, {"variabile": "Persone in famiglia", "media": 2.93731, "dev_std": 1.23765, "min": 1.0, "q1": 2.0, "mediana": 3.0, "q3": 4.0, "max": 13.0, "asimmetria": 0.71351}, {"variabile": "Auto in famiglia", "media": 2.51862, "dev_std": 0.921667, "min": 1.0, "q1": 2.0, "mediana": 2.0, "q3": 3.0, "max": 5.0, "asimmetria": 0.814238}, {"variabile": "Importanza ridurre emissioni (-3/+3)", "media": 1.61654, "dev_std": 1.63904, "min": -3.0, "q1": 0.98, "mediana": 2.51, "q3": 2.72, "max": 3.0, "asimmetria": -1.55375}, {"variabile": "Viaggio più lungo (miglia)", "media": 376.739, "dev_std": 356.538, "min": 0.21, "q1": 175.353, "mediana": 317.82, "q3": 434.353, "max": 4865.7, "asimmetria": 4.22978}, {"variabile": "Viaggi > 200 miglia (12 mesi)", "media": 2.46314, "dev_std": 5.2265, "min": 0.0, "q1": 0.0, "mediana": 1.0, "q3": 2.0, "max": 65.0, "asimmetria": 5.53389}, {"variabile": "Distanza casa-lavoro (miglia)", "media": 18.7765, "dev_std": 22.5438, "min": 0.0, "q1": 6.43, "mediana": 14.12, "q3": 24.52, "max": 488.96, "asimmetria": 8.26949}, {"variabile": "VMT annuo (miglia)", "media": 14279.6, "dev_std": 15965.6, "min": 7.0, "q1": 8395.5, "mediana": 11557.0, "q3": 15947.0, "max": 378000.0, "asimmetria": 9.80602}], "bivariati": [{"nome": "VMT annuo (miglia)", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.209192, "segno": -1.0, "p": 1.01482e-77, "tipo": "numerica"}, {"nome": "Auto precedente", "test": "Chi-quadro", "misura": "V di Cramér", "v": 0.171434, "segno": 1.0, "p": 9.75357e-67, "tipo": "categoriale"}, {"nome": "Reddito familiare (USD)", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.169406, "segno": 1.0, "p": 5.11307e-53, "tipo": "numerica"}, {"nome": "Viaggi > 200 miglia (12 mesi)", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.152481, "segno": -1.0, "p": 3.53324e-46, "tipo": "numerica"}, {"nome": "Classe di reddito", "test": "Chi-quadro", "misura": "V di Cramér", "v": 0.146752, "segno": 1.0, "p": 1.20868e-48, "tipo": "categoriale"}, {"nome": "Persone in famiglia", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.0951034, "segno": 1.0, "p": 9.23622e-19, "tipo": "numerica"}, {"nome": "Livello di istruzione", "test": "Chi-quadro", "misura": "V di Cramér", "v": 0.0893295, "segno": 1.0, "p": 2.25112e-18, "tipo": "categoriale"}, {"nome": "Importanza ridurre emissioni (-3/+3)", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.0831821, "segno": 1.0, "p": 1.15208e-13, "tipo": "numerica"}, {"nome": "Classe d'età", "test": "Chi-quadro", "misura": "V di Cramér", "v": 0.077234, "segno": 1.0, "p": 2.67444e-11, "tipo": "categoriale"}, {"nome": "Auto in famiglia", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.0749104, "segno": 1.0, "p": 4.09245e-13, "tipo": "numerica"}, {"nome": "Casa di proprietà", "test": "Chi-quadro", "misura": "V di Cramér", "v": 0.056852, "segno": 1.0, "p": 4.94341e-09, "tipo": "categoriale"}, {"nome": "Casa indipendente", "test": "Chi-quadro", "misura": "V di Cramér", "v": 0.0521924, "segno": 1.0, "p": 7.91029e-08, "tipo": "categoriale"}, {"nome": "Genere", "test": "Chi-quadro", "misura": "V di Cramér", "v": 0.0418129, "segno": 1.0, "p": 1.70559e-05, "tipo": "categoriale"}, {"nome": "Distanza casa-lavoro (miglia)", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.0362196, "segno": -1.0, "p": 0.00123339, "tipo": "numerica"}, {"nome": "Viaggio più lungo (miglia)", "test": "Mann-Whitney U", "misura": "r rank-biserial (BEV vs non BEV)", "v": 0.0140525, "segno": -1.0, "p": 0.209995, "tipo": "numerica"}], "quote": {"reddito": [{"etichetta": "Bassa", "valore": 38.46, "n": 286}, {"etichetta": "Media", "valore": 47.71, "n": 3888}, {"etichetta": "Alta", "valore": 54.44, "n": 3729}, {"etichetta": "Molto alta", "valore": 62.18, "n": 1798}, {"etichetta": "Estremamente alta", "valore": 69.2, "n": 987}], "eta": [{"etichetta": "<25", "valore": 61.11, "n": 18}, {"etichetta": "25-34", "valore": 44.75, "n": 362}, {"etichetta": "35-44", "valore": 56.95, "n": 2058}, {"etichetta": "45-54", "valore": 58.24, "n": 2907}, {"etichetta": "55-64", "valore": 52.81, "n": 2778}, {"etichetta": "65-74", "valore": 49.38, "n": 1845}, {"etichetta": "75-79", "valore": 54.18, "n": 646}, {"etichetta": ">80", "valore": 40.54, "n": 74}], "istruzione": [{"etichetta": "Licenza Media", "valore": 36.36, "n": 22}, {"etichetta": "Diploma", "valore": 44.39, "n": 1320}, {"etichetta": "Laurea 1L", "valore": 52.89, "n": 4171}, {"etichetta": "Laurea 2L", "valore": 57.89, "n": 5175}], "auto": [{"etichetta": "PHEV", "valore": 46.36, "n": 1223}, {"etichetta": "BEV", "valore": 75.49, "n": 1183}, {"etichetta": "HEV", "valore": 45.44, "n": 2159}, {"etichetta": "ICE", "valore": 54.77, "n": 6075}, {"etichetta": "GNC", "valore": 58.33, "n": 48}]}, "vif": [{"variabile": "Auto precedente ICE (vs PHEV)", "vif": 2.62095}, {"variabile": "Auto precedente HEV (vs PHEV)", "vif": 2.22254}, {"variabile": "Auto precedente BEV (vs PHEV)", "vif": 1.75896}, {"variabile": "Età 65-74 (vs 45-54)", "vif": 1.62911}, {"variabile": "Età 55-64 (vs 45-54)", "vif": 1.56252}, {"variabile": "Persone in famiglia", "vif": 1.47099}, {"variabile": "Età 35-44 (vs 45-54)", "vif": 1.45947}, {"variabile": "Casa di proprietà", "vif": 1.35962}, {"variabile": "Auto in famiglia (+1)", "vif": 1.35564}, {"variabile": "Reddito alto (vs medio)", "vif": 1.34579}, {"variabile": "Casa indipendente", "vif": 1.34522}, {"variabile": "Età 75-79 (vs 45-54)", "vif": 1.31201}, {"variabile": "Reddito molto alto (vs medio)", "vif": 1.31106}, {"variabile": "Reddito estremamente alto (vs medio)", "vif": 1.23368}, {"variabile": "Età 25-34 (vs 45-54)", "vif": 1.19136}, {"variabile": "Diploma o Qualifica professionale (vs Laurea 2L)", "vif": 1.16774}, {"variabile": "Laurea 1L (vs Laurea 2L)", "vif": 1.14051}, {"variabile": "Viaggi > 200 miglia (+1)", "vif": 1.07397}, {"variabile": "Importanza ridurre emissioni (+1 punto)", "vif": 1.0686}, {"variabile": "Reddito basso (vs medio)", "vif": 1.06768}, {"variabile": "Distanza casa-lavoro (+10 mi)", "vif": 1.0613}, {"variabile": "Viaggio più lungo (+100 mi)", "vif": 1.05365}, {"variabile": "Genere maschile", "vif": 1.051}, {"variabile": "VMT annuo (+1.000 mi)", "vif": 1.04618}, {"variabile": "Età >80 (vs 45-54)", "vif": 1.04473}, {"variabile": "Auto precedente GNC (vs PHEV)", "vif": 1.03829}, {"variabile": "Licenza Media (vs Laurea 2L)", "vif": 1.00895}, {"variabile": "Età <25 (vs 45-54)", "vif": 1.00827}], "logit": [{"nome": "Genere maschile", "or": 1.24546, "basso": 1.1347, "alto": 1.36704, "p": 3.85166e-06, "sig": true}, {"nome": "Età <25 (vs 45-54)", "or": 1.13727, "basso": 0.424887, "alto": 3.04405, "p": 0.797903, "sig": false}, {"nome": "Età 25-34 (vs 45-54)", "or": 0.893435, "basso": 0.704935, "alto": 1.13234, "p": 0.351343, "sig": false}, {"nome": "Età 35-44 (vs 45-54)", "or": 1.11549, "basso": 0.988165, "alto": 1.25921, "p": 0.0771572, "sig": false}, {"nome": "Età 55-64 (vs 45-54)", "or": 0.793909, "basso": 0.710474, "alto": 0.887143, "p": 4.62727e-05, "sig": true}, {"nome": "Età 65-74 (vs 45-54)", "or": 0.707782, "basso": 0.624528, "alto": 0.802135, "p": 6.19293e-08, "sig": true}, {"nome": "Età 75-79 (vs 45-54)", "or": 0.922104, "basso": 0.768145, "alto": 1.10692, "p": 0.38425, "sig": false}, {"nome": "Età >80 (vs 45-54)", "or": 0.503031, "basso": 0.306278, "alto": 0.826178, "p": 0.00664265, "sig": true}, {"nome": "Reddito basso (vs medio)", "or": 0.720233, "basso": 0.556979, "alto": 0.931338, "p": 0.0123372, "sig": true}, {"nome": "Reddito alto (vs medio)", "or": 1.21706, "basso": 1.10632, "alto": 1.33888, "p": 5.44199e-05, "sig": true}, {"nome": "Reddito molto alto (vs medio)", "or": 1.60825, "basso": 1.42345, "alto": 1.81705, "p": 2.36095e-14, "sig": true}, {"nome": "Reddito estremamente alto (vs medio)", "or": 2.11662, "basso": 1.80544, "alto": 2.48144, "p": 2.42256e-20, "sig": true}, {"nome": "Licenza Media (vs Laurea 2L)", "or": 0.411828, "basso": 0.162792, "alto": 1.04183, "p": 0.0610101, "sig": false}, {"nome": "Diploma o Qualifica professionale (vs Laurea 2L)", "or": 0.697392, "basso": 0.612243, "alto": 0.794383, "p": 5.8078e-08, "sig": true}, {"nome": "Laurea 1L (vs Laurea 2L)", "or": 0.885691, "basso": 0.812085, "alto": 0.965969, "p": 0.00610485, "sig": true}, {"nome": "Auto precedente BEV (vs PHEV)", "or": 3.4739, "basso": 2.90514, "alto": 4.15402, "p": 2.00037e-42, "sig": true}, {"nome": "Auto precedente HEV (vs PHEV)", "or": 0.979612, "basso": 0.84715, "alto": 1.13279, "p": 0.781088, "sig": false}, {"nome": "Auto precedente ICE (vs PHEV)", "or": 1.509, "basso": 1.32746, "alto": 1.71536, "p": 3.1437e-10, "sig": true}, {"nome": "Auto precedente GNC (vs PHEV)", "or": 1.45192, "basso": 0.797861, "alto": 2.64217, "p": 0.222197, "sig": false}, {"nome": "Casa di proprietà", "or": 1.25325, "basso": 1.10526, "alto": 1.42105, "p": 0.000429856, "sig": true}, {"nome": "Auto in famiglia (+1)", "or": 1.15048, "basso": 1.09793, "alto": 1.20555, "p": 4.19318e-09, "sig": true}, {"nome": "Importanza ridurre emissioni (+1 punto)", "or": 1.10543, "basso": 1.07798, "alto": 1.13359, "p": 5.66431e-15, "sig": true}, {"nome": "Viaggi > 200 miglia (+1)", "or": 0.965515, "basso": 0.956915, "alto": 0.974192, "p": 1.49768e-14, "sig": true}, {"nome": "Viaggio più lungo (+100 mi)", "or": 1.00427, "basso": 0.992837, "alto": 1.01584, "p": 0.465524, "sig": false}, {"nome": "Distanza casa-lavoro (+10 mi)", "or": 0.98133, "basso": 0.963197, "alto": 0.999805, "p": 0.0476495, "sig": true}, {"nome": "VMT annuo (+1.000 mi)", "or": 0.985027, "basso": 0.981306, "alto": 0.988763, "p": 5.64325e-15, "sig": true}], "ame": [{"nome": "Genere maschile", "v": 4.98948, "basso": 2.88041, "alto": 7.09854, "p": 3.53937e-06}, {"nome": "Età <25 (vs 45-54)", "v": 2.92379, "basso": -19.4554, "alto": 25.3029, "p": 0.797901}, {"nome": "Età 25-34 (vs 45-54)", "v": -2.56129, "basso": -7.94679, "alto": 2.82422, "p": 0.351265}, {"nome": "Età 35-44 (vs 45-54)", "v": 2.48419, "basso": -0.269107, "alto": 5.23748, "p": 0.0769945}, {"nome": "Età 55-64 (vs 45-54)", "v": -5.24585, "basso": -7.76237, "alto": -2.72933, "p": 4.39483e-05}, {"nome": "Età 65-74 (vs 45-54)", "v": -7.85604, "basso": -10.6858, "alto": -5.02629, "p": 5.28909e-08}, {"nome": "Età 75-79 (vs 45-54)", "v": -1.84338, "basso": -5.99522, "alto": 2.30847, "p": 0.384189}, {"nome": "Età >80 (vs 45-54)", "v": -15.6181, "basso": -26.8815, "alto": -4.35477, "p": 0.00657277}, {"nome": "Reddito basso (vs medio)", "v": -7.45967, "basso": -13.296, "alto": -1.62329, "p": 0.0122418}, {"nome": "Reddito alto (vs medio)", "v": 4.46503, "basso": 2.30301, "alto": 6.62705, "p": 5.17147e-05}, {"nome": "Reddito molto alto (vs medio)", "v": 10.8003, "basso": 8.0545, "alto": 13.546, "p": 1.26415e-14}, {"nome": "Reddito estremamente alto (vs medio)", "v": 17.0437, "basso": 13.4827, "alto": 20.6047, "p": 6.54702e-21}, {"nome": "Licenza Media (vs Laurea 2L)", "v": -20.1652, "basso": -41.2493, "alto": 0.91883, "p": 0.0608547}, {"nome": "Diploma o Qualifica professionale (vs Laurea 2L)", "v": -8.19221, "basso": -11.1366, "alto": -5.24786, "p": 4.9444e-08}, {"nome": "Laurea 1L (vs Laurea 2L)", "v": -2.75917, "basso": -4.72869, "alto": -0.789654, "p": 0.00603656}, {"nome": "Auto precedente BEV (vs PHEV)", "v": 28.3056, "basso": 24.3699, "alto": 32.2414, "p": 4.02141e-45}, {"nome": "Auto precedente HEV (vs PHEV)", "v": -0.46822, "basso": -3.77041, "alto": 2.83397, "p": 0.781085}, {"nome": "Auto precedente ICE (vs PHEV)", "v": 9.35232, "basso": 6.45964, "alto": 12.245, "p": 2.34663e-10}, {"nome": "Auto precedente GNC (vs PHEV)", "v": 8.47593, "basso": -5.12933, "alto": 22.0812, "p": 0.222072}, {"nome": "Casa di proprietà", "v": 5.13113, "basso": 2.28122, "alto": 7.98103, "p": 0.000417401}, {"nome": "Auto in famiglia (+1)", "v": 3.1863, "basso": 2.13003, "alto": 4.24256, "p": 3.37217e-09}, {"nome": "Importanza ridurre emissioni (+1 punto)", "v": 2.27843, "basso": 1.71297, "alto": 2.84389, "p": 2.84917e-15}, {"nome": "Viaggi > 200 miglia (+1)", "v": -0.7977, "basso": -0.999039, "alto": -0.59636, "p": 8.14447e-15}, {"nome": "Viaggio più lungo (+100 mi)", "v": 0.0969316, "basso": -0.163375, "alto": 0.357238, "p": 0.465487}, {"nome": "Distanza casa-lavoro (+10 mi)", "v": -0.428383, "basso": -0.852022, "alto": -0.00474415, "p": 0.047489}, {"nome": "VMT annuo (+1.000 mi)", "v": -0.342905, "basso": -0.428098, "alto": -0.257712, "p": 3.04699e-15}], "ipotesi": [{"codice": "H1", "descrizione": "Un reddito più alto aumenta la probabilità di possedere un BEV", "variabile": "Reddito basso (vs medio)", "or": 0.720233, "p": 0.0123372, "esito": "Confermata", "esplorativa": false}, {"codice": "H1", "descrizione": "Un reddito più alto aumenta la probabilità di possedere un BEV", "variabile": "Reddito alto (vs medio)", "or": 1.21706, "p": 5.44199e-05, "esito": "Confermata", "esplorativa": false}, {"codice": "H1", "descrizione": "Un reddito più alto aumenta la probabilità di possedere un BEV", "variabile": "Reddito molto alto (vs medio)", "or": 1.60825, "p": 2.36095e-14, "esito": "Confermata", "esplorativa": false}, {"codice": "H1", "descrizione": "Un reddito più alto aumenta la probabilità di possedere un BEV", "variabile": "Reddito estremamente alto (vs medio)", "or": 2.11662, "p": 2.42256e-20, "esito": "Confermata", "esplorativa": false}, {"codice": "H2.1", "descrizione": "Aver posseduto una PHEV favorisce il passaggio al BEV, rispetto a chi aveva un'auto tradizionale (ICE)", "variabile": "Auto precedente PHEV (vs ICE)", "or": 0.662691, "p": 3.1437e-10, "esito": "Contraria", "esplorativa": false}, {"codice": "H2.2", "descrizione": "Come cambia la probabilità di possedere un BEV per chi aveva un'auto ICE, HEV o GNC (rispetto a PHEV)", "variabile": "Auto precedente ICE (vs PHEV)", "or": 1.509, "p": 3.1437e-10, "esito": "Aumenta la probabilità", "esplorativa": true}, {"codice": "H2.2", "descrizione": "Come cambia la probabilità di possedere un BEV per chi aveva un'auto ICE, HEV o GNC (rispetto a PHEV)", "variabile": "Auto precedente HEV (vs PHEV)", "or": 0.979612, "p": 0.781088, "esito": "Non significativo", "esplorativa": true}, {"codice": "H2.2", "descrizione": "Come cambia la probabilità di possedere un BEV per chi aveva un'auto ICE, HEV o GNC (rispetto a PHEV)", "variabile": "Auto precedente GNC (vs PHEV)", "or": 1.45192, "p": 0.222197, "esito": "Non significativo", "esplorativa": true}, {"codice": "H2.3", "descrizione": "Chi ha già avuto un BEV tende a ricomprarlo", "variabile": "Auto precedente BEV (vs PHEV)", "or": 3.4739, "p": 2.00037e-42, "esito": "Confermata", "esplorativa": false}, {"codice": "H3", "descrizione": "Lunghe percorrenze riducono la probabilità di possedere un BEV", "variabile": "Viaggio più lungo (+100 mi)", "or": 1.00427, "p": 0.465524, "esito": "Non significativo", "esplorativa": false}, {"codice": "H3", "descrizione": "Lunghe percorrenze riducono la probabilità di possedere un BEV", "variabile": "Viaggi > 200 miglia (+1)", "or": 0.965515, "p": 1.49768e-14, "esito": "Confermata", "esplorativa": false}, {"codice": "H3", "descrizione": "Lunghe percorrenze riducono la probabilità di possedere un BEV", "variabile": "Distanza casa-lavoro (+10 mi)", "or": 0.98133, "p": 0.0476495, "esito": "Confermata", "esplorativa": false}, {"codice": "H3", "descrizione": "Lunghe percorrenze riducono la probabilità di possedere un BEV", "variabile": "VMT annuo (+1.000 mi)", "or": 0.985027, "p": 5.64325e-15, "esito": "Confermata", "esplorativa": false}, {"codice": "H4", "descrizione": "Chi dà importanza alla riduzione delle emissioni sceglie più spesso un BEV", "variabile": "Importanza ridurre emissioni (+1 punto)", "or": 1.10543, "p": 5.66431e-15, "esito": "Confermata", "esplorativa": false}], "bonta": {"completo": {"n": 10688, "pseudo_R2_McFadden": 0.0647129010391071, "log_likelihood": -6893.141502661952, "log_likelihood_nullo": -7370.080812961341, "LR_test_p_value": 8.046470100455253e-183, "AIC": 13844.283005323903, "BIC": 14055.31243530142}, "ridotto": {"n": 10688, "pseudo_R2_McFadden": 0.06432903489529074, "log_likelihood": -6895.970627163238, "log_likelihood_nullo": -7370.080812961341, "LR_test_p_value": 3.4505347661005313e-183, "AIC": 13845.941254326475, "BIC": 14042.41693051244}}, "distribuzioni": [{"nome": "Reddito familiare (USD)", "tipo": "quantitativa", "etichette": ["50.000", "75.000", "125.000", "175.000", "225.000", "275.000", "325.000", "375.000", "425.000", "475.000", "500.000"], "nota": "", "bev": [1.9, 11.16, 20.84, 20.1, 14.92, 10.13, 5.83, 3.33, 2.54, 1.67, 7.57], "altro": [3.6, 15.6, 25.96, 21.95, 12.78, 7.22, 4.52, 2.17, 1.72, 1.08, 3.41], "mediana_bev": 175000.0, "mediana_altro": 175000.0}, {"nome": "Persone in famiglia", "tipo": "quantitativa", "etichette": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"], "nota": "", "bev": [6.28, 36.34, 19.17, 28.24, 7.71, 1.52, 0.48, 0.19, 0.03, 0.0, 0.02, 0.02, 0.0], "altro": [10.02, 39.92, 18.68, 23.1, 6.03, 1.59, 0.35, 0.22, 0.04, 0.02, 0.0, 0.0, 0.02], "mediana_bev": 3.0, "mediana_altro": 3.0}, {"nome": "Auto in famiglia", "tipo": "quantitativa", "etichette": ["1", "2", "3", "4", "5"], "nota": "", "bev": [4.78, 51.5, 29.71, 9.61, 4.4], "altro": [11.53, 48.9, 26.25, 9.34, 3.99], "mediana_bev": 2.0, "mediana_altro": 2.0}, {"nome": "Importanza ridurre emissioni (-3/+3)", "tipo": "quantitativa", "etichette": ["-3,0", "-2,5", "-2,0", "-1,5", "-1,0", "-0,5", "0,0", "0,5", "1,0", "1,5", "2,0", "2,5"], "nota": "Scala da -3 (nessuna importanza) a +3 (massima importanza), barre da 0,5 punti.", "bev": [5.06, 0.98, 1.45, 1.02, 1.16, 0.64, 8.85, 3.5, 6.28, 6.57, 10.85, 53.64], "altro": [6.66, 1.49, 1.72, 1.37, 1.19, 1.12, 10.61, 3.72, 6.83, 7.03, 10.4, 47.85], "mediana_bev": 2.55, "mediana_altro": 2.44}, {"nome": "Viaggio più lungo (miglia)", "tipo": "quantitativa", "etichette": ["0", "100", "200", "300", "400", "500", "600", "700", "800", "900", "1.000", "1.100", "1.200", "1.300", "1.400", "1.500", "1.600", "1.700", "1.800", "1.900", "2.000", "2.100", "> 2.200"], "nota": "Barre da 100 mi; l'ultima raccoglie l'1% di valori più alti (oltre 2.200 mi).", "bev": [7.9, 22.07, 17.7, 21.03, 14.84, 5.56, 2.21, 1.78, 1.59, 1.29, 0.85, 0.6, 0.48, 0.26, 0.16, 0.14, 0.05, 0.14, 0.14, 0.03, 0.14, 0.16, 0.9], "altro": [6.5, 22.02, 18.46, 22.3, 13.92, 5.23, 2.15, 2.06, 1.84, 0.92, 0.94, 0.72, 0.59, 0.25, 0.22, 0.12, 0.2, 0.02, 0.22, 0.14, 0.12, 0.1, 0.94], "mediana_bev": 317.075, "mediana_altro": 318.83}, {"nome": "Viaggi > 200 miglia (12 mesi)", "tipo": "quantitativa", "etichette": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "> 25"], "nota": "L'ultima barra raccoglie i valori oltre 25 (1% delle osservazioni).", "bev": [29.97, 49.29, 4.68, 3.05, 2.67, 2.1, 1.74, 0.41, 0.86, 0.17, 1.6, 0.07, 0.85, 0.05, 0.17, 0.36, 0.03, 0.0, 0.09, 0.0, 0.59, 0.02, 0.02, 0.02, 0.12, 0.26, 0.79], "altro": [28.52, 29.48, 11.71, 6.28, 5.93, 4.23, 3.41, 0.84, 1.47, 0.27, 2.6, 0.14, 1.31, 0.08, 0.12, 0.8, 0.1, 0.0, 0.1, 0.04, 0.88, 0.02, 0.06, 0.0, 0.22, 0.14, 1.25], "mediana_bev": 1.0, "mediana_altro": 1.0}, {"nome": "Distanza casa-lavoro (miglia)", "tipo": "quantitativa", "etichette": ["0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "> 90"], "nota": "Barre da 5 mi; l'ultima raccoglie l'1% di valori più alti (oltre 90 mi).", "bev": [19.24, 18.12, 16.56, 14.34, 9.56, 7.76, 4.38, 3.05, 2.21, 1.28, 0.78, 0.5, 0.36, 0.33, 0.31, 0.26, 0.14, 0.09, 0.74], "altro": [20.3, 16.6, 14.41, 12.26, 9.59, 6.56, 5.4, 3.7, 3.23, 2.06, 1.35, 1.1, 0.61, 0.47, 0.43, 0.35, 0.16, 0.12, 1.29], "mediana_bev": 13.8, "mediana_altro": 14.524999999999999}, {"nome": "VMT annuo (miglia)", "tipo": "quantitativa", "etichette": ["0", "2.500", "5.000", "7.500", "10.000", "12.500", "15.000", "17.500", "20.000", "22.500", "25.000", "27.500", "30.000", "32.500", "35.000", "37.500", "40.000", "42.500", "45.000", "47.500", "50.000", "52.500", "55.000", "57.500", "60.000", "62.500", "65.000", "67.500", "70.000", "> 72.500"], "nota": "Barre da 2.500 mi; l'ultima raccoglie l'1% di valori più alti (oltre 72.500 mi).", "bev": [1.35, 6.14, 14.87, 20.58, 20.77, 13.53, 8.49, 4.66, 3.07, 1.93, 1.1, 0.64, 0.76, 0.38, 0.26, 0.14, 0.14, 0.03, 0.07, 0.09, 0.03, 0.05, 0.02, 0.02, 0.05, 0.05, 0.05, 0.0, 0.07, 0.66], "altro": [0.78, 3.31, 10.71, 15.0, 18.83, 13.8, 11.67, 7.36, 5.34, 3.41, 2.76, 1.25, 1.02, 0.74, 0.61, 0.29, 0.45, 0.22, 0.31, 0.1, 0.12, 0.14, 0.08, 0.08, 0.08, 0.08, 0.06, 0.04, 0.04, 1.31], "mediana_bev": 10667.0, "mediana_altro": 12706.5}, {"nome": "Genere", "tipo": "categoriale", "etichette": ["Maschio", "Femmina"], "nota": "", "bev": [76.69, 23.31], "altro": [73.06, 26.94]}, {"nome": "Classe d'età", "tipo": "categoriale", "etichette": ["<25", "25-34", "35-44", "45-54", "55-64", "65-74", "75-79", ">80"], "nota": "", "bev": [0.19, 2.8, 20.22, 29.21, 25.31, 15.72, 6.04, 0.52], "altro": [0.14, 4.09, 18.11, 24.82, 26.8, 19.09, 6.05, 0.9]}, {"nome": "Classe di reddito", "tipo": "categoriale", "etichette": ["Bassa", "Media", "Alta", "Molto alta", "Estremamente alta"], "nota": "", "bev": [1.9, 32.0, 35.02, 19.29, 11.78], "altro": [3.6, 41.56, 34.73, 13.9, 6.21]}, {"nome": "Livello di istruzione", "tipo": "categoriale", "etichette": ["Licenza Media", "Diploma", "Laurea 1L", "Laurea 2L"], "nota": "", "bev": [0.14, 10.11, 38.06, 51.69], "altro": [0.29, 15.0, 40.17, 44.54]}, {"nome": "Casa di proprietà", "tipo": "categoriale", "etichette": ["Si", "No"], "nota": "", "bev": [88.34, 11.66], "altro": [84.44, 15.56]}, {"nome": "Casa indipendente", "tipo": "categoriale", "etichette": ["Si", "No"], "nota": "", "bev": [85.97, 14.03], "altro": [82.15, 17.85]}, {"nome": "Auto precedente", "tipo": "categoriale", "etichette": ["PHEV", "BEV", "HEV", "ICE", "GNC"], "nota": "", "bev": [9.78, 15.41, 16.93, 57.4, 0.48], "altro": [13.41, 5.93, 24.08, 56.17, 0.41]}]}, "espl": {"pca": {"varianza": [{"c": "PC1", "var": 33.4327, "cum": 33.4327}, {"c": "PC2", "var": 25.687, "cum": 59.1198}, {"c": "PC3", "var": 21.4294, "cum": 80.5492}, {"c": "PC4", "var": 19.4508, "cum": 100.0}], "loadings": [{"variabile": "Viaggio più lungo (miglia)", "PC1": 0.431238, "PC2": 0.685797, "PC3": 0.0899736, "PC4": -0.579328}, {"variabile": "Viaggi > 200 miglia (12 mesi)", "PC1": 0.605713, "PC2": 0.258607, "PC3": -0.0341336, "PC4": 0.751711}, {"variabile": "Distanza casa-lavoro (miglia)", "PC1": 0.489034, "PC2": -0.445948, "PC3": -0.698428, "PC4": -0.27235}, {"variabile": "VMT annuo (miglia)", "PC1": 0.456061, "PC2": -0.513746, "PC3": 0.709181, "PC4": -0.158541}], "alpha": 0.32887515589285315}, "mca": {"abitative": {"titolo": "variabili abitative", "dimensioni": ["Stile di vita", "Dimensione familiare"], "varianza": [19.99, 14.32], "dim1": [{"nome": "Casa indipendente: No", "v": 23.8868, "coord": 1.75043}, {"nome": "Un'auto", "v": 19.8174, "coord": 2.73146}, {"nome": "Casa di proprietà: No", "v": 18.7174, "coord": 1.69926}, {"nome": "Single", "v": 15.3964, "coord": 2.10024}, {"nome": "Tre auto", "v": 4.18668, "coord": -0.503535}, {"nome": "Casa indipendente: Si", "v": 3.89724, "coord": -0.285591}], "dim2": [{"nome": "Single", "v": 25.6597, "coord": 2.29435}, {"nome": "Un'auto", "v": 22.868, "coord": 2.48289}, {"nome": "Due auto", "v": 14.5585, "coord": -0.603489}, {"nome": "Coppie", "v": 11.5956, "coord": -0.641211}, {"nome": "Quattro o più auto", "v": 7.41172, "coord": 0.825591}, {"nome": "Famiglie con 3+ figli", "v": 7.29328, "coord": 0.970691}]}, "mobilita": {"titolo": "mobilità e percorrenza", "dimensioni": ["Viaggi", "Mobilità quotidiana"], "varianza": [13.76, 10.63], "dim1": [{"nome": "Viaggio < 175 mi", "v": 34.8806, "coord": 1.62062}, {"nome": "Nessun viaggio lungo", "v": 33.5932, "coord": 1.46956}, {"nome": "1 viaggio lungo", "v": 8.52623, "coord": -0.577276}, {"nome": "Viaggio 350-550 mi", "v": 7.87255, "coord": -0.691584}, {"nome": "3+ viaggi lunghi", "v": 5.13349, "coord": -0.784678}, {"nome": "Viaggio > 550 mi", "v": 3.4106, "coord": -0.720814}], "dim2": [{"nome": "VMT alto", "v": 27.1566, "coord": 1.20594}, {"nome": "VMT basso", "v": 14.0174, "coord": -0.741075}, {"nome": "3+ viaggi lunghi", "v": 12.3868, "coord": 1.07138}, {"nome": "Casa-lavoro > 45 mi", "v": 12.3608, "coord": 1.96209}, {"nome": "Casa-lavoro 25-45 mi", "v": 9.9182, "coord": 0.920889}, {"nome": "1 viaggio lungo", "v": 8.18111, "coord": -0.497036}]}, "sociodemografiche": {"titolo": "variabili socio-demografiche", "dimensioni": ["Status socioeconomico", "Distanza sostenibilità"], "varianza": [8.64, 7.82], "dim1": [{"nome": "Reddito: Media", "v": 19.1803, "coord": 0.881061}, {"nome": "Età: <35", "v": 14.4738, "coord": 2.50622}, {"nome": "Istruzione: Diploma", "v": 12.1391, "coord": 1.24708}, {"nome": "Reddito: Estremamente alta", "v": 9.87404, "coord": -1.04181}, {"nome": "Istruzione: Laurea 2L", "v": 9.7177, "coord": -0.493471}, {"nome": "Reddito: Bassa", "v": 9.44235, "coord": 2.5386}], "dim2": [{"nome": "Età: >65", "v": 18.6008, "coord": 0.98963}, {"nome": "Molto alta", "v": 18.5426, "coord": 0.59984}, {"nome": "Media", "v": 12.1777, "coord": -1.08512}, {"nome": "Età: 35-44", "v": 11.0736, "coord": -0.801401}, {"nome": "Alta", "v": 7.33049, "coord": -0.682409}, {"nome": "Genere: Femmina", "v": 7.2936, "coord": 0.605778}]}}, "famd": {"varianza": [{"c": "Dim 1", "var": 7.48, "cum": 7.48}, {"c": "Dim 2", "var": 5.41, "cum": 12.89}, {"c": "Dim 3", "var": 4.88, "cum": 17.77}, {"c": "Dim 4", "var": 4.31, "cum": 22.08}, {"c": "Dim 5", "var": 4.07, "cum": 26.15}, {"c": "Dim 6", "var": 3.86, "cum": 30.0}, {"c": "Dim 7", "var": 3.81, "cum": 33.81}, {"c": "Dim 8", "var": 3.73, "cum": 37.55}, {"c": "Dim 9", "var": 3.65, "cum": 41.19}, {"c": "Dim 10", "var": 3.61, "cum": 44.8}], "dim1": [{"nome": "Casa indipendente: No", "v": 18.0317}, {"nome": "Casa di proprietà: No", "v": 16.5025}, {"nome": "Auto in famiglia", "v": 15.4479}, {"nome": "Persone in famiglia", "v": 10.4137}, {"nome": "Età: 25-34", "v": 6.14906}, {"nome": "Età: 35-44", "v": 5.40136}, {"nome": "Reddito: Media", "v": 4.03174}, {"nome": "Reddito: Estremamente alta", "v": 3.13166}], "dim2": [{"nome": "Persone in famiglia", "v": 24.8314}, {"nome": "Età: 65-74", "v": 17.0282}, {"nome": "Età: 75-79", "v": 12.3172}, {"nome": "Importanza ridurre emissioni (-3/+3)", "v": 8.11016}, {"nome": "Età: 45-54", "v": 7.73658}, {"nome": "Casa di proprietà: No", "v": 6.54413}, {"nome": "Età: 35-44", "v": 5.05631}, {"nome": "Casa indipendente: No", "v": 2.25431}]}}, "cluster": {"kmode_profili": [{"cluster": "Cluster 1", "sintesi": "Coppie · reddito alto · età 45-64 · VMT basso · Casa-lavoro 6,5-15 mi", "n": 1911, "quota": 32.971014492753625, "eta": 50.0387, "reddito": 217412.0, "persone": 2.74621, "auto": 2.44532, "vmt": 9957.06, "viaggi": 1.91784, "distanza": 13.3115, "emissioni": 1.80359, "bev_prec": 14.338}, {"cluster": "Cluster 2", "sintesi": "Famiglie con 2 figli · reddito alto · età 45-64 · VMT alto · Casa-lavoro 25-45 mi", "n": 1783, "quota": 30.762594893029675, "eta": 48.341, "reddito": 231029.0, "persone": 3.51094, "auto": 2.94504, "vmt": 16743.1, "viaggi": 2.70836, "distanza": 24.5135, "emissioni": 1.53246, "bev_prec": 16.7695}, {"cluster": "Cluster 3", "sintesi": "Coppie · reddito medio · età >65 · VMT medio · Casa-lavoro < 6,5 mi", "n": 1219, "quota": 21.03174603174603, "eta": 55.2363, "reddito": 179799.0, "persone": 2.41838, "auto": 2.31583, "vmt": 12086.0, "viaggi": 1.37818, "distanza": 15.0826, "emissioni": 1.89337, "bev_prec": 14.8482}, {"cluster": "Cluster 4", "sintesi": "Famiglie con 2 figli · reddito molto alto · età 45-64 · VMT medio · Casa-lavoro 15-25 mi", "n": 883, "quota": 15.234644582470668, "eta": 46.2673, "reddito": 258947.0, "persone": 3.4983, "auto": 2.4564, "vmt": 11874.8, "viaggi": 1.74519, "distanza": 18.4209, "emissioni": 1.65889, "bev_prec": 15.7418}], "riepilogo": {"kmode": {"variabili": ["Genere", "Classe Reddito Familiare", "Livello di istruzione", "Casa di proprietà", "Casa Indipendente", "Tipologia di auto precedente", "Numero persone in famiglia categoriale", "Numero di auto in famiglia categoriale", "VMT categoriale", "Viaggio lungo categoriale", "Numero viaggi lunghi categoriale", "Distanza casa-lavoro categoriale", "Sensibilità ambientale categoriale", "Classe età raggruppata"], "k": 4, "costo": 30833.0, "dimensioni": [1911, 1783, 1219, 883], "stabilita_ARI_semi": 0.13487832745563721, "ARI_con_auto_precedente": 0.0004954721082742482}, "tesi": {"variabili": ["Età", "Dimensione familiare", "Stile di vita", "Auto precedente: HEV", "Auto precedente: GNC", "Auto precedente: BEV", "Auto precedente: PHEV", "Auto precedente: ICE", "Mobilità quotidiana PCA", "Viaggi PCA"], "k": 4, "wss": 34641.2926782703, "silhouette": 0.4016966957145627, "stabilita_ARI_bootstrap": 0.9743582713874964, "dimensioni": [3327, 1009, 567, 893], "ARI_con_auto_precedente": 0.9965693130833063, "ARI_con_kmode": 0.0005344017525785248}, "senza_auto_precedente": {"variabili": ["Età", "Dimensione familiare", "Stile di vita", "Mobilità quotidiana PCA", "Viaggi PCA", "Status socioeconomico", "Importanza di ridurre le emissioni di gas serra"], "k": 4, "wss": 27854.641997455154, "silhouette": 0.20587926961177316, "stabilita_ARI_bootstrap": 0.8763051938004589, "dimensioni": [454, 3271, 1004, 1067], "ARI_con_auto_precedente": -0.037903629580177324, "ARI_con_kmode": 0.015838953000842114}, "gerarchico_ward": {"correlazione_cofenetica": 0.535640124025687, "silhouette": 0.37070924058311067, "ARI_vs_kmeans_tesi": 0.9160569575651736}}, "scelta_k": [{"k": 2, "wss": 48100.0, "silhouette": 0.26911}, {"k": 3, "wss": 41226.3, "silhouette": 0.329221}, {"k": 4, "wss": 34641.3, "silhouette": 0.400063}, {"k": 5, "wss": 28776.4, "silhouette": 0.410952}, {"k": 6, "wss": 25264.5, "silhouette": 0.423171}, {"k": 7, "wss": 22588.6, "silhouette": 0.430317}, {"k": 8, "wss": 20195.8, "silhouette": 0.313449}], "scelta_k_senza": [{"k": 2, "wss": 35445.5, "silhouette": 0.243881}, {"k": 3, "wss": 31473.1, "silhouette": 0.220615}, {"k": 4, "wss": 27854.6, "silhouette": 0.209188}, {"k": 5, "wss": 25021.7, "silhouette": 0.22086}, {"k": 6, "wss": 22325.7, "silhouette": 0.201389}, {"k": 7, "wss": 19858.4, "silhouette": 0.204241}, {"k": 8, "wss": 18666.1, "silhouette": 0.188454}], "composizione": {"tipi": ["BEV", "GNC", "HEV", "ICE", "PHEV"], "righe": [{"n": 3327, "quote": [0.0, 0.0, 0.0, 100.0, 0.0]}, {"n": 1009, "quote": [0.0, 2.77502, 97.225, 0.0, 0.0]}, {"n": 567, "quote": [0.0, 0.0, 0.0, 0.0, 100.0]}, {"n": 893, "quote": [100.0, 0.0, 0.0, 0.0, 0.0]}]}, "profilo": [{"cluster": "Cluster 1", "n": 3327, "quota": 57.4, "eta": 48.65404268109408, "reddito": 217019.83769161408, "emissioni": 1.5870453862338445, "vmt": 12615.0724376315, "viaggi": 1.917643522693117, "auto_prec": "ICE (100%)", "istruzione": "Laurea 2L o Dottorato (51%)", "casa": "Si (84%)"}, {"cluster": "Cluster 2", "n": 1009, "quota": 17.4, "eta": 52.01982160555005, "reddito": 215981.16947472745, "emissioni": 2.0016947472745295, "vmt": 12133.862239841426, "viaggi": 1.9157581764122893, "auto_prec": "HEV (97%)", "istruzione": "Laurea 2L o Dottorato (55%)", "casa": "Si (89%)"}, {"cluster": "Cluster 3", "n": 567, "quota": 9.8, "eta": 51.89241622574956, "reddito": 227292.76895943563, "emissioni": 1.8310758377425045, "vmt": 14024.989417989418, "viaggi": 2.2151675485008817, "auto_prec": "PHEV (100%)", "istruzione": "Laurea 2L o Dottorato (47%)", "casa": "Si (88%)"}, {"cluster": "Cluster 4", "n": 893, "quota": 15.4, "eta": 51.75811870100784, "reddito": 231131.0190369541, "emissioni": 1.8072116461366183, "vmt": 13363.526315789471, "viaggi": 2.403135498320269, "auto_prec": "BEV (100%)", "istruzione": "Laurea 2L o Dottorato (53%)", "casa": "Si (90%)"}], "profilo_senza": [{"cluster": "Cluster 1", "n": 454, "quota": 7.8, "eta": 52.12555066079295, "reddito": 169988.98678414096, "emissioni": 2.0400881057268725, "vmt": 14250.788546255506, "viaggi": 2.9317180616740086, "auto_prec": "ICE (66%)", "istruzione": "Laurea 2L o Dottorato (46%)", "casa": "Si (65%)"}, {"cluster": "Cluster 2", "n": 3271, "quota": 56.4, "eta": 53.91164781412412, "reddito": 244221.9504738612, "emissioni": 2.4201864873127485, "vmt": 12730.454906756344, "viaggi": 2.0990522775909506, "auto_prec": "ICE (52%)", "istruzione": "Laurea 2L o Dottorato (59%)", "casa": "Si (97%)"}, {"cluster": "Cluster 3", "n": 1004, "quota": 17.3, "eta": 48.548804780876495, "reddito": 232395.41832669324, "emissioni": -1.118496015936255, "vmt": 13404.569721115538, "viaggi": 2.1384462151394423, "auto_prec": "ICE (63%)", "istruzione": "Laurea 2L o Dottorato (47%)", "casa": "Si (94%)"}, {"cluster": "Cluster 4", "n": 1067, "quota": 18.4, "eta": 38.65979381443299, "reddito": 155459.23149015932, "emissioni": 2.092043111527647, "vmt": 11743.061855670105, "viaggi": 1.2849109653233364, "auto_prec": "ICE (65%)", "istruzione": "Laurea 1L (46%)", "casa": "Si (54%)"}], "kmode_costo": [{"k": 1, "costo": 37916}, {"k": 2, "costo": 34032}, {"k": 3, "costo": 31902}, {"k": 4, "costo": 31143}, {"k": 5, "costo": 29888}, {"k": 6, "costo": 29623}, {"k": 7, "costo": 29532}, {"k": 8, "costo": 28604}], "kmode_centri": [{"variabile": "Genere", "c1": "Maschio", "c2": "Maschio", "c3": "Maschio", "c4": "Maschio"}, {"variabile": "Classe di reddito", "c1": "Alta", "c2": "Alta", "c3": "Media", "c4": "Molto alta"}, {"variabile": "Livello di istruzione", "c1": "Laurea 2L o Dottorato", "c2": "Laurea 2L o Dottorato", "c3": "Laurea 2L o Dottorato", "c4": "Laurea 2L o Dottorato"}, {"variabile": "Casa di proprietà", "c1": "Si", "c2": "Si", "c3": "Si", "c4": "Si"}, {"variabile": "Casa indipendente", "c1": "Si", "c2": "Si", "c3": "Si", "c4": "Si"}, {"variabile": "Auto precedente", "c1": "ICE", "c2": "ICE", "c3": "ICE", "c4": "ICE"}, {"variabile": "Numero persone in famiglia", "c1": "Coppie", "c2": "Famiglie con 2 figli", "c3": "Coppie", "c4": "Famiglie con 2 figli"}, {"variabile": "Numero di auto in famiglia", "c1": "Due auto", "c2": "Tre auto", "c3": "Due auto", "c4": "Due auto"}, {"variabile": "VMT", "c1": "VMT basso", "c2": "VMT alto", "c3": "VMT medio", "c4": "VMT medio"}, {"variabile": "Viaggio lungo", "c1": "Viaggio 350-550 mi", "c2": "Viaggio 175-350 mi", "c3": "Viaggio < 175 mi", "c4": "Viaggio 175-350 mi"}, {"variabile": "Numero viaggi lunghi", "c1": "1 viaggio lungo", "c2": "1 viaggio lungo", "c3": "Nessun viaggio lungo", "c4": "1 viaggio lungo"}, {"variabile": "Distanza casa-lavoro", "c1": "Casa-lavoro 6,5-15 mi", "c2": "Casa-lavoro 25-45 mi", "c3": "Casa-lavoro < 6,5 mi", "c4": "Casa-lavoro 15-25 mi"}, {"variabile": "Sensibilità ambientale", "c1": "Molto alta", "c2": "Molto alta", "c3": "Molto alta", "c4": "Molto alta"}, {"variabile": "Classe età raggruppata", "c1": "45-64", "c2": "45-64", "c3": ">65", "c4": "45-64"}]}, "ml": {"split": {"n_train": 8550, "n_test": 2138, "quota_BEV_train": 0.5423391812865497, "quota_BEV_test": 0.5420954162768943, "feature": ["Genere", "Classe d'età", "Reddito familiare", "Livello di istruzione", "Casa di proprietà", "Casa Indipendente", "Numero persone in famiglia", "Numero di auto in famiglia", "Importanza di ridurre le emissioni di gas serra", "Viaggio più lungo negli ultimi 12 mesi", "Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi", "Distanza casa-lavoro", "VMT annuo", "Auto precedente: PHEV", "Auto precedente: BEV", "Auto precedente: HEV", "Auto precedente: ICE", "Auto precedente: GNC"], "seed": 343}, "screening": [{"nome": "Gradient Boosting", "v": 0.728344, "basso": 0.7168156, "alto": 0.7398724, "acc": 0.674269, "f1": 0.718503}, {"nome": "Random Forest", "v": 0.723835, "basso": 0.7140896, "alto": 0.7335804, "acc": 0.675439, "f1": 0.7131}, {"nome": "LightGBM", "v": 0.72326, "basso": 0.71415312, "alto": 0.73236688, "acc": 0.671813, "f1": 0.712293}, {"nome": "AdaBoost", "v": 0.714036, "basso": 0.7019516, "alto": 0.7261204, "acc": 0.671462, "f1": 0.711936}, {"nome": "SVM", "v": 0.706966, "basso": 0.6940497, "alto": 0.7198823, "acc": 0.656842, "f1": 0.709491}, {"nome": "XGBoost", "v": 0.695899, "basso": 0.6827997, "alto": 0.7089983000000001, "acc": 0.656608, "f1": 0.694791}, {"nome": "Naive Bayes", "v": 0.682048, "basso": 0.6662101, "alto": 0.6978859, "acc": 0.639883, "f1": 0.682331}, {"nome": "MLP", "v": 0.679748, "basso": 0.6651019, "alto": 0.6943941, "acc": 0.635789, "f1": 0.675944}, {"nome": "Regressione logistica", "v": 0.675237, "basso": 0.653845, "alto": 0.6966289999999999, "acc": 0.625848, "f1": 0.675113}, {"nome": "Ridge", "v": 0.671399, "basso": 0.6496666999999999, "alto": 0.6931313, "acc": 0.624444, "f1": 0.675464}, {"nome": "LDA", "v": 0.671397, "basso": 0.6496643, "alto": 0.6931297000000001, "acc": 0.624211, "f1": 0.674995}, {"nome": "QDA", "v": 0.654476, "basso": 0.6356459, "alto": 0.6733060999999999, "acc": 0.611579, "f1": 0.640324}, {"nome": "SGD", "v": 0.63959, "basso": 0.6182421, "alto": 0.6609379, "acc": 0.605614, "f1": 0.653916}, {"nome": "KNN", "v": 0.615783, "basso": 0.5959715, "alto": 0.6355945, "acc": 0.593684, "f1": 0.642225}, {"nome": "Albero decisionale", "v": 0.579794, "basso": 0.5686845, "alto": 0.5909035, "acc": 0.582456, "f1": 0.613437}], "parametri": [{"modello": "Regressione logistica", "auc_cv": 0.6745462140405356, "parametri": "C=0,080, l1_ratio=0,949, penalty=elasticnet"}, {"modello": "Random Forest", "auc_cv": 0.7343005328608477, "parametri": "max_depth=None, max_features=sqrt, min_samples_leaf=8, n_estimators=580"}, {"modello": "Gradient Boosting", "auc_cv": 0.7314204043351163, "parametri": "learning_rate=0,014, max_depth=4, min_samples_split=4, n_estimators=292, subsample=0,534"}, {"modello": "AdaBoost", "auc_cv": 0.7153628330018473, "parametri": "learning_rate=0,367, n_estimators=388"}, {"modello": "SVM", "auc_cv": 0.7039047983288147, "parametri": "C=4,224, gamma=0,011"}, {"modello": "MLP", "auc_cv": 0.7067501154080617, "parametri": "alpha=0,005, hidden_layer_sizes=[32], learning_rate_init=0,005"}, {"modello": "XGBoost", "auc_cv": 0.7342504661697113, "parametri": "colsample_bytree=0,751, learning_rate=0,024, max_depth=5, min_child_weight=19, n_estimators=117, reg_lambda=0,928, subsample=0,515"}, {"modello": "LightGBM", "auc_cv": 0.735181782603826, "parametri": "colsample_bytree=0,817, learning_rate=0,011, min_child_samples=88, n_estimators=403, num_leaves=15, reg_lambda=3,838, subsample=0,517, subsample_freq=1"}, {"modello": "Gradient Boosting (feature selezionate)", "auc_cv": 0.7326118330525636, "parametri": "learning_rate=0,029, max_depth=3, min_samples_split=18, n_estimators=258, subsample=0,521, selezione__k=15"}, {"modello": "Voting (soft)", "auc_cv": null, "parametri": "media delle probabilità di LightGBM, Random Forest, XGBoost"}], "feature_selezionate": 15, "test": [{"nome": "Voting (soft)", "accuracy": 0.662301, "balanced_accuracy": 0.652435, "precision": 0.662212, "recall": 0.769629, "f1": 0.711891, "roc_auc": 0.72502, "roc_auc_ic_basso": 0.70493, "roc_auc_ic_alto": 0.746239, "brier": 0.211058, "gruppo": "alberi"}, {"nome": "LightGBM", "accuracy": 0.668849, "balanced_accuracy": 0.659823, "precision": 0.669932, "recall": 0.767041, "f1": 0.715205, "roc_auc": 0.725004, "roc_auc_ic_basso": 0.704855, "roc_auc_ic_alto": 0.746377, "brier": 0.210797, "gruppo": "alberi"}, {"nome": "XGBoost", "accuracy": 0.662301, "balanced_accuracy": 0.651721, "precision": 0.660073, "recall": 0.777394, "f1": 0.713946, "roc_auc": 0.724649, "roc_auc_ic_basso": 0.70436, "roc_auc_ic_alto": 0.745662, "brier": 0.212119, "gruppo": "alberi"}, {"nome": "Gradient Boosting", "accuracy": 0.660898, "balanced_accuracy": 0.65114, "precision": 0.661458, "recall": 0.767041, "f1": 0.710348, "roc_auc": 0.721143, "roc_auc_ic_basso": 0.700185, "roc_auc_ic_alto": 0.742421, "brier": 0.212664, "gruppo": "alberi"}, {"nome": "Random Forest", "accuracy": 0.663704, "balanced_accuracy": 0.654363, "precision": 0.664918, "recall": 0.765315, "f1": 0.711592, "roc_auc": 0.720983, "roc_auc_ic_basso": 0.700487, "roc_auc_ic_alto": 0.742573, "brier": 0.211735, "gruppo": "alberi"}, {"nome": "Gradient Boosting (feature selezionate)", "accuracy": 0.660898, "balanced_accuracy": 0.651537, "precision": 0.662669, "recall": 0.762726, "f1": 0.709186, "roc_auc": 0.72012, "roc_auc_ic_basso": 0.698799, "roc_auc_ic_alto": 0.740996, "brier": 0.212849, "gruppo": "alberi"}, {"nome": "AdaBoost", "accuracy": 0.65435, "balanced_accuracy": 0.645021, "precision": 0.657658, "recall": 0.755824, "f1": 0.703332, "roc_auc": 0.697801, "roc_auc_ic_basso": 0.675732, "roc_auc_ic_alto": 0.719741, "brier": 0.223623, "gruppo": "alberi"}, {"nome": "MLP", "accuracy": 0.648737, "balanced_accuracy": 0.640479, "precision": 0.656442, "recall": 0.738568, "f1": 0.695087, "roc_auc": 0.690807, "roc_auc_ic_basso": 0.667246, "roc_auc_ic_alto": 0.713998, "brier": 0.222416, "gruppo": "altro"}, {"nome": "SVM", "accuracy": 0.638447, "balanced_accuracy": 0.626863, "precision": 0.63925, "recall": 0.764452, "f1": 0.696267, "roc_auc": 0.678651, "roc_auc_ic_basso": 0.655555, "roc_auc_ic_alto": 0.702083, "brier": 0.22475, "gruppo": "altro"}, {"nome": "Regressione logistica", "accuracy": 0.625819, "balanced_accuracy": 0.615929, "precision": 0.633855, "recall": 0.733391, "f1": 0.68, "roc_auc": 0.663759, "roc_auc_ic_basso": 0.641772, "roc_auc_ic_alto": 0.685592, "brier": 0.230846, "gruppo": "altro"}], "roc": {"Voting (soft)": {"x": [0.0, 0.0031, 0.0061, 0.0102, 0.0143, 0.0184, 0.0215, 0.0266, 0.0327, 0.0358, 0.0398, 0.0439, 0.047, 0.0511, 0.0552, 0.0603, 0.0654, 0.0695, 0.0735, 0.0766, 0.0858, 0.093, 0.0991, 0.1032, 0.1093, 0.1144, 0.1185, 0.1226, 0.1328, 0.1369, 0.145, 0.1522, 0.1583, 0.1614, 0.1706, 0.1777, 0.1818, 0.1869, 0.1941, 0.2012, 0.2084, 0.2125, 0.2176, 0.2206, 0.2298, 0.236, 0.2431, 0.2472, 0.2513, 0.2594, 0.2625, 0.2697, 0.2737, 0.285, 0.2962, 0.3013, 0.3146, 0.3187, 0.3238, 0.3299, 0.334, 0.3391, 0.3473, 0.3524, 0.3565, 0.3667, 0.38, 0.3861, 0.3994, 0.4106, 0.4168, 0.4219, 0.4321, 0.4402, 0.4443, 0.4494, 0.4566, 0.4648, 0.4729, 0.4801, 0.4842, 0.4954, 0.5026, 0.5169, 0.526, 0.5383, 0.5455, 0.5557, 0.5832, 0.5904, 0.5986, 0.6047, 0.6129, 0.6251, 0.6313, 0.6415, 0.6476, 0.6558, 0.666, 0.6803, 0.6874, 0.6915, 0.7048, 0.7181, 0.7252, 0.7446, 0.7508, 0.7579, 0.7722, 0.7886, 0.8039, 0.8131, 0.8366, 0.8478, 0.8611, 0.8866, 0.9081, 0.9377, 0.9459, 1.0], "y": [0.0, 0.0035, 0.0104, 0.0242, 0.0336, 0.0604, 0.0975, 0.1009, 0.1165, 0.1311, 0.1493, 0.1665, 0.1907, 0.2002, 0.2045, 0.2243, 0.2312, 0.2468, 0.2588, 0.2744, 0.2977, 0.3028, 0.3192, 0.3339, 0.3443, 0.371, 0.3874, 0.3995, 0.4098, 0.4331, 0.4392, 0.4461, 0.4513, 0.4573, 0.4642, 0.4745, 0.4814, 0.4892, 0.4927, 0.4996, 0.5073, 0.5125, 0.5229, 0.528, 0.5418, 0.5462, 0.5557, 0.566, 0.5686, 0.5781, 0.5824, 0.5953, 0.6031, 0.6117, 0.6186, 0.6273, 0.6368, 0.6411, 0.6471, 0.6592, 0.6644, 0.6687, 0.673, 0.6782, 0.6885, 0.6963, 0.7049, 0.7101, 0.717, 0.7248, 0.7334, 0.742, 0.7463, 0.7515, 0.7567, 0.7619, 0.767, 0.7714, 0.7791, 0.7817, 0.7869, 0.7938, 0.7998, 0.8067, 0.8136, 0.8214, 0.8257, 0.8369, 0.8404, 0.8456, 0.855, 0.8594, 0.8654, 0.8723, 0.8827, 0.8896, 0.8956, 0.9016, 0.9103, 0.9137, 0.9198, 0.9241, 0.9284, 0.931, 0.937, 0.9413, 0.9439, 0.9482, 0.9577, 0.962, 0.9655, 0.9689, 0.9724, 0.9767, 0.9819, 0.9853, 0.9888, 0.9931, 0.9965, 1.0]}, "LightGBM": {"x": [0.0, 0.0061, 0.0112, 0.0153, 0.0194, 0.0235, 0.0317, 0.0358, 0.0388, 0.0429, 0.0501, 0.0541, 0.0613, 0.0674, 0.0715, 0.0766, 0.0817, 0.0848, 0.0899, 0.096, 0.1032, 0.1073, 0.1113, 0.1164, 0.1205, 0.1246, 0.1338, 0.1389, 0.1461, 0.1573, 0.1655, 0.1685, 0.1767, 0.1828, 0.1869, 0.1941, 0.2022, 0.2053, 0.2114, 0.2165, 0.2237, 0.2339, 0.2462, 0.2492, 0.2543, 0.2584, 0.2615, 0.2717, 0.2778, 0.2809, 0.286, 0.2932, 0.2972, 0.3013, 0.3064, 0.3156, 0.3238, 0.3289, 0.334, 0.3391, 0.3453, 0.3565, 0.3657, 0.3718, 0.379, 0.3882, 0.3943, 0.4035, 0.4116, 0.4239, 0.427, 0.4362, 0.4433, 0.4505, 0.4576, 0.4637, 0.4678, 0.4811, 0.4872, 0.4995, 0.5179, 0.525, 0.5301, 0.5444, 0.5475, 0.5608, 0.573, 0.5781, 0.5884, 0.5924, 0.5975, 0.6108, 0.619, 0.6241, 0.6313, 0.6425, 0.6476, 0.6527, 0.667, 0.6701, 0.6834, 0.6925, 0.6977, 0.712, 0.7211, 0.7283, 0.7385, 0.76, 0.7651, 0.7763, 0.7967, 0.81, 0.8294, 0.8488, 0.857, 0.8948, 0.9162, 0.9377, 0.953, 1.0], "y": [0.0, 0.0052, 0.0276, 0.0475, 0.0673, 0.088, 0.1061, 0.1199, 0.151, 0.17, 0.195, 0.2105, 0.2286, 0.2442, 0.2528, 0.2804, 0.2977, 0.3037, 0.3158, 0.3313, 0.3425, 0.3555, 0.3676, 0.3779, 0.3865, 0.3978, 0.4176, 0.4323, 0.4392, 0.4469, 0.4495, 0.4633, 0.4685, 0.4771, 0.4823, 0.4927, 0.4978, 0.5091, 0.5211, 0.5289, 0.5358, 0.5462, 0.5539, 0.5591, 0.5712, 0.5746, 0.5824, 0.5902, 0.5945, 0.5997, 0.6048, 0.6126, 0.6247, 0.6299, 0.6342, 0.6385, 0.6445, 0.6531, 0.6601, 0.6661, 0.6721, 0.6808, 0.6894, 0.6954, 0.7015, 0.7101, 0.7179, 0.7248, 0.7291, 0.7351, 0.7463, 0.7515, 0.7619, 0.7705, 0.7731, 0.7783, 0.7817, 0.786, 0.7912, 0.7964, 0.7998, 0.805, 0.8128, 0.8197, 0.8292, 0.8369, 0.8404, 0.8447, 0.849, 0.8516, 0.8585, 0.8654, 0.8697, 0.8766, 0.8818, 0.887, 0.8913, 0.8947, 0.8999, 0.9103, 0.9146, 0.9189, 0.9232, 0.9301, 0.9336, 0.9396, 0.9431, 0.9491, 0.9543, 0.9577, 0.9612, 0.9672, 0.9707, 0.9776, 0.9819, 0.9845, 0.9888, 0.994, 0.9965, 1.0]}, "XGBoost": {"x": [0.0, 0.0041, 0.0092, 0.0133, 0.0163, 0.0204, 0.0266, 0.0317, 0.0358, 0.0409, 0.046, 0.0501, 0.0562, 0.0623, 0.0674, 0.0735, 0.0787, 0.0838, 0.0909, 0.096, 0.1021, 0.1083, 0.1124, 0.1185, 0.1256, 0.1297, 0.1338, 0.1379, 0.143, 0.1491, 0.1532, 0.1593, 0.1655, 0.1777, 0.1828, 0.189, 0.1941, 0.2074, 0.2155, 0.2196, 0.2268, 0.2329, 0.238, 0.2462, 0.2513, 0.2574, 0.2625, 0.2676, 0.2748, 0.2809, 0.286, 0.2911, 0.2962, 0.3013, 0.3095, 0.3166, 0.3269, 0.335, 0.3432, 0.3524, 0.3585, 0.3647, 0.3871, 0.3933, 0.3984, 0.4035, 0.4116, 0.4178, 0.427, 0.4331, 0.4392, 0.4454, 0.4515, 0.4576, 0.4637, 0.474, 0.4801, 0.4883, 0.4934, 0.5015, 0.5117, 0.5209, 0.5301, 0.5414, 0.5516, 0.5557, 0.5638, 0.5792, 0.5884, 0.5986, 0.6047, 0.6118, 0.617, 0.6251, 0.6313, 0.6364, 0.6435, 0.6547, 0.6629, 0.6721, 0.6834, 0.6987, 0.7058, 0.7191, 0.7324, 0.7426, 0.7487, 0.762, 0.7794, 0.7875, 0.8121, 0.8335, 0.8396, 0.8509, 0.8652, 0.8948, 0.907, 0.9316, 0.9459, 1.0], "y": [0.0, 0.0086, 0.0155, 0.0276, 0.0621, 0.0802, 0.0958, 0.1035, 0.1346, 0.1579, 0.1769, 0.2019, 0.2114, 0.2442, 0.2571, 0.2752, 0.2873, 0.3037, 0.3175, 0.3296, 0.3529, 0.3581, 0.3736, 0.3822, 0.4055, 0.4107, 0.4185, 0.4305, 0.4366, 0.4426, 0.4487, 0.4633, 0.4702, 0.478, 0.4823, 0.4884, 0.4987, 0.5099, 0.5177, 0.528, 0.5341, 0.547, 0.5539, 0.5582, 0.5634, 0.5764, 0.5824, 0.5884, 0.5953, 0.604, 0.6083, 0.616, 0.6212, 0.6376, 0.6419, 0.6462, 0.6575, 0.6609, 0.6644, 0.673, 0.6773, 0.6842, 0.6954, 0.7041, 0.711, 0.7161, 0.723, 0.7274, 0.7325, 0.7386, 0.7463, 0.7524, 0.7567, 0.7653, 0.7688, 0.7765, 0.7817, 0.7852, 0.7938, 0.8007, 0.8076, 0.811, 0.8162, 0.8205, 0.8257, 0.83, 0.8395, 0.8456, 0.8499, 0.8542, 0.8585, 0.8637, 0.8689, 0.874, 0.8783, 0.8835, 0.8878, 0.8947, 0.8991, 0.9077, 0.9146, 0.918, 0.9241, 0.9292, 0.9362, 0.9405, 0.9439, 0.9525, 0.956, 0.9586, 0.9664, 0.9698, 0.9733, 0.9776, 0.9819, 0.9862, 0.9888, 0.9931, 0.9965, 1.0]}, "Regressione logistica": {"x": [0.0, 0.0072, 0.0112, 0.0163, 0.0204, 0.0245, 0.0296, 0.0347, 0.0429, 0.047, 0.0531, 0.0572, 0.0623, 0.0725, 0.0787, 0.0848, 0.0889, 0.094, 0.1001, 0.1113, 0.1164, 0.1205, 0.1256, 0.1359, 0.141, 0.1461, 0.1532, 0.1604, 0.1655, 0.1706, 0.1747, 0.1818, 0.1879, 0.1931, 0.1992, 0.2063, 0.2135, 0.2186, 0.2237, 0.2298, 0.24, 0.2441, 0.2533, 0.2605, 0.2707, 0.2809, 0.287, 0.2921, 0.2993, 0.3095, 0.3187, 0.3228, 0.3269, 0.3371, 0.3453, 0.3504, 0.3596, 0.3698, 0.379, 0.3861, 0.3922, 0.4025, 0.4106, 0.4178, 0.4259, 0.4331, 0.4433, 0.4494, 0.4566, 0.4637, 0.4719, 0.4831, 0.4872, 0.4934, 0.5015, 0.5189, 0.5301, 0.5342, 0.5434, 0.5506, 0.5557, 0.5669, 0.5822, 0.5924, 0.5975, 0.6057, 0.6139, 0.6241, 0.6292, 0.6476, 0.6558, 0.665, 0.6752, 0.6874, 0.6925, 0.7109, 0.7232, 0.7375, 0.7477, 0.7559, 0.7702, 0.7773, 0.7906, 0.7978, 0.8182, 0.8253, 0.8355, 0.8468, 0.858, 0.8733, 0.8825, 0.8876, 0.9009, 0.9111, 0.9316, 0.9459, 0.9673, 0.9816, 0.9877, 1.0], "y": [0.0, 0.0043, 0.0147, 0.0362, 0.0509, 0.0638, 0.0854, 0.1001, 0.1122, 0.1242, 0.1346, 0.1424, 0.1484, 0.1631, 0.1803, 0.1933, 0.2002, 0.2148, 0.2209, 0.2278, 0.2442, 0.2597, 0.2683, 0.2744, 0.2856, 0.2977, 0.3218, 0.3348, 0.3451, 0.3572, 0.3676, 0.3865, 0.3995, 0.4029, 0.4098, 0.4193, 0.4262, 0.44, 0.4607, 0.4694, 0.4789, 0.484, 0.5022, 0.5134, 0.5194, 0.5263, 0.5306, 0.5401, 0.5496, 0.5582, 0.5686, 0.5746, 0.5815, 0.5953, 0.5997, 0.6074, 0.6126, 0.6178, 0.6281, 0.6342, 0.6402, 0.6454, 0.6497, 0.6557, 0.6635, 0.6713, 0.6782, 0.6825, 0.6911, 0.6997, 0.7075, 0.7144, 0.7213, 0.7274, 0.7334, 0.7377, 0.7515, 0.7575, 0.7688, 0.7765, 0.7826, 0.7929, 0.7972, 0.805, 0.8093, 0.8136, 0.8205, 0.8248, 0.8326, 0.8395, 0.8456, 0.8516, 0.8559, 0.8602, 0.8663, 0.8714, 0.8783, 0.8852, 0.8904, 0.8939, 0.8999, 0.9051, 0.9085, 0.9137, 0.9215, 0.9258, 0.9301, 0.9379, 0.9422, 0.9491, 0.9525, 0.9577, 0.9612, 0.9664, 0.9715, 0.9758, 0.9819, 0.9879, 0.9922, 1.0]}}, "calibrazione": {"Voting (soft)": {"x": [0.2313127842897108, 0.32595803090325204, 0.4012870125553455, 0.48313393844736613, 0.5505724680976699, 0.5981155693948317, 0.6445333500739412, 0.6847462250633878, 0.7319516010985492, 0.7988148085597758], "y": [0.16822429906542055, 0.3130841121495327, 0.4439252336448598, 0.4647887323943662, 0.514018691588785, 0.5794392523364486, 0.5868544600938967, 0.7429906542056075, 0.794392523364486, 0.8130841121495327]}, "Regressione logistica": {"x": [0.29102959857679855, 0.40765860685007466, 0.4548771219570172, 0.49272865693823337, 0.5258621001323966, 0.5568829800206988, 0.5938339686874327, 0.639262080542147, 0.7009617120375146, 0.7959973867127166], "y": [0.32242990654205606, 0.3598130841121495, 0.40654205607476634, 0.49295774647887325, 0.5046728971962616, 0.5327102803738317, 0.6525821596244131, 0.7149532710280374, 0.6822429906542056, 0.7523364485981309]}}, "mcnemar": [{"modello": "Regressione logistica", "n01": 276, "n10": 198, "chi2": 12.5084, "p": 0.000405118}, {"modello": "SVM", "n01": 196, "n10": 145, "chi2": 7.33138, "p": 0.00677611}, {"modello": "LightGBM", "n01": 15, "n10": 29, "chi2": 3.84091, "p": 0.0500164}, {"modello": "MLP", "n01": 179, "n10": 150, "chi2": 2.38298, "p": 0.122663}, {"modello": "AdaBoost", "n01": 97, "n10": 80, "chi2": 1.44633, "p": 0.229118}, {"modello": "Random Forest", "n01": 28, "n10": 31, "chi2": 0.0677966, "p": 0.794572}, {"modello": "Gradient Boosting", "n01": 36, "n10": 33, "chi2": 0.057971, "p": 0.809732}, {"modello": "Gradient Boosting (feature selezionate)", "n01": 36, "n10": 33, "chi2": 0.057971, "p": 0.809732}, {"modello": "XGBoost", "n01": 25, "n10": 25, "chi2": 0.02, "p": 0.887537}], "migliore": "Voting (soft)", "confusione": {"tn": 524, "fp": 455, "fn": 267, "tp": 892}, "shap": [{"nome": "N. viaggi lunghi", "v": 0.380327}, {"nome": "VMT annuo", "v": 0.253548}, {"nome": "Reddito", "v": 0.20879}, {"nome": "BEV precedente", "v": 0.161842}, {"nome": "Sensibilità ambientale", "v": 0.140445}, {"nome": "Classe età", "v": 0.0763513}, {"nome": "N. auto fam.", "v": 0.0678039}, {"nome": "HEV precedente", "v": 0.067803}, {"nome": "Viaggio più lungo", "v": 0.0629458}, {"nome": "Distanza casa-lavoro", "v": 0.0628134}, {"nome": "ICE precedente", "v": 0.0555474}, {"nome": "Genere (M)", "v": 0.054085}], "permutazione": [{"nome": "N. viaggi lunghi", "v": 0.0758933}, {"nome": "VMT annuo", "v": 0.0464961}, {"nome": "BEV precedente", "v": 0.031215}, {"nome": "Reddito", "v": 0.0289478}, {"nome": "N. auto fam.", "v": 0.0122943}, {"nome": "Classe età", "v": 0.00854916}, {"nome": "Viaggio più lungo", "v": 0.00689122}, {"nome": "Sensibilità ambientale", "v": 0.00464315}, {"nome": "HEV precedente", "v": 0.00397449}, {"nome": "PHEV precedente", "v": 0.00330777}, {"nome": "ICE precedente", "v": 0.00304223}, {"nome": "Distanza casa-lavoro", "v": 0.00193573}], "ablation": [{"nome": "LightGBM (tutte le variabili)", "accuracy": 0.668849, "f1": 0.715205, "roc_auc": 0.725004}, {"nome": "LightGBM senza 'Auto precedente: BEV'", "accuracy": 0.66043, "f1": 0.706785, "roc_auc": 0.719152}], "modello_shap": "LightGBM"}, "dl": {"architetture": [{"nome": "ANN base", "input": 18, "strati": "16 → 64 → 128 → 64", "attivazione": "ReLU", "regolarizzazione": "–", "batch_norm": false, "dropout": 0.2, "ottimizzatore": "Adam", "parametri": 18033, "epoche": 48}, {"nome": "ANN regolarizzata", "input": 18, "strati": "64 → 32", "attivazione": "ReLU", "regolarizzazione": "L2 0,001", "batch_norm": false, "dropout": 0.3, "ottimizzatore": "Adam", "parametri": 3329, "epoche": 92}, {"nome": "ANN avanzata (tesi)", "input": 189, "strati": "64 → 128 → 256 → 128 → 64", "attivazione": "LeakyReLU", "regolarizzazione": "L1 + L2 0,001", "batch_norm": true, "dropout": 0.3, "ottimizzatore": "AdamW", "parametri": 94977, "epoche": 189}], "storie": {"ANN base": {"loss": [0.6804461479187012, 0.6663416028022766, 0.659672200679779, 0.6570950150489807, 0.6480576992034912, 0.6489416360855103, 0.6458348035812378, 0.6445470452308655, 0.6394678950309753, 0.6346890330314636, 0.6319789290428162, 0.6358585953712463, 0.6340253353118896, 0.6289837956428528, 0.628189742565155, 0.6267042756080627, 0.6236556768417358, 0.6257851123809814, 0.6227773427963257, 0.621028482913971, 0.6200931072235107, 0.621833860874176, 0.6174778938293457, 0.6182016134262085, 0.6166502237319946, 0.6160078644752502, 0.6169198751449585, 0.6157740354537964, 0.6152296662330627, 0.6161447763442993, 0.6139324307441711, 0.6153674125671387, 0.6185211539268494, 0.6142278909683228, 0.6129184365272522, 0.613987386226654, 0.6120669841766357, 0.6118304133415222, 0.6114490628242493, 0.6133308410644531, 0.6103388071060181, 0.6124503016471863, 0.6098415851593018, 0.6071789264678955, 0.6129710674285889, 0.6125909686088562, 0.6084884405136108, 0.6119601130485535], "val_loss": [0.6577745079994202, 0.6542914509773254, 0.6524958610534668, 0.6484531164169312, 0.6465180516242981, 0.6437117457389832, 0.6423124074935913, 0.6395670771598816, 0.6389018297195435, 0.6355879902839661, 0.6350544095039368, 0.6326677799224854, 0.6315257549285889, 0.6308614611625671, 0.6289464831352234, 0.6276107430458069, 0.6277625560760498, 0.62412029504776, 0.6248995661735535, 0.6249611377716064, 0.6247205138206482, 0.6247318983078003, 0.6244821548461914, 0.62523353099823, 0.6241540908813477, 0.6248141527175903, 0.6236810088157654, 0.6234927773475647, 0.6241773962974548, 0.6240127086639404, 0.6252356171607971, 0.6247792840003967, 0.6238622665405273, 0.6241440176963806, 0.6239812970161438, 0.6240466833114624, 0.6240023970603943, 0.6242524981498718, 0.6238211989402771, 0.624139666557312, 0.6237813234329224, 0.624108076095581, 0.623943030834198, 0.6236644983291626, 0.6236986517906189, 0.6238109469413757, 0.623893141746521, 0.6235611438751221], "auc": [0.5815934538841248, 0.6252292394638062, 0.6438242197036743, 0.6472645998001099, 0.6654667854309082, 0.6689488887786865, 0.6703383922576904, 0.6746193170547485, 0.6837739944458008, 0.6905068159103394, 0.6933083534240723, 0.6875792741775513, 0.692217230796814, 0.6976054310798645, 0.6982996463775635, 0.703001856803894, 0.7067076563835144, 0.7029997110366821, 0.7066413164138794, 0.7098814845085144, 0.7111446261405945, 0.7085219621658325, 0.71397465467453, 0.7133455276489258, 0.716748833656311, 0.7163963913917542, 0.7150294184684753, 0.7175451517105103, 0.7167401909828186, 0.7161380648612976, 0.7173212766647339, 0.7153221368789673, 0.7132800221443176, 0.7178072333335876, 0.7193541526794434, 0.7174445986747742, 0.7216272354125977, 0.7223986387252808, 0.7211836576461792, 0.7186521887779236, 0.7219334244728088, 0.7208467721939087, 0.7222901582717896, 0.7269880771636963, 0.720752477645874, 0.7198242545127869, 0.7239154577255249, 0.7220768928527832], "val_auc": [0.6523873805999756, 0.6613672971725464, 0.6626423597335815, 0.667490541934967, 0.669920802116394, 0.67530357837677, 0.6776959300041199, 0.6804341077804565, 0.6826447248458862, 0.6866083741188049, 0.687815248966217, 0.6919394135475159, 0.6941306591033936, 0.6957371234893799, 0.6989809274673462, 0.7012857794761658, 0.7010027170181274, 0.7060155272483826, 0.7047569751739502, 0.7044525146484375, 0.7065004706382751, 0.7062407732009888, 0.7067208886146545, 0.7058184742927551, 0.7069358229637146, 0.7071465849876404, 0.7075998783111572, 0.7080675959587097, 0.7074297070503235, 0.7071796655654907, 0.7072616815567017, 0.7063171863555908, 0.7071555852890015, 0.7074854969978333, 0.7069330215454102, 0.7075702548027039, 0.7067773938179016, 0.7063723206520081, 0.706762969493866, 0.7064192295074463, 0.7070543169975281, 0.7068710327148438, 0.7069474458694458, 0.7073938846588135, 0.7071493864059448, 0.7071810960769653, 0.7070838809013367, 0.7075268626213074]}, "ANN regolarizzata": {"loss": [0.7682300209999084, 0.7310692071914673, 0.7142428159713745, 0.6984154582023621, 0.6929550170898438, 0.68642657995224, 0.6817564964294434, 0.6771583557128906, 0.6719717383384705, 0.6648530960083008, 0.6621145606040955, 0.6577777862548828, 0.6539884805679321, 0.6555125713348389, 0.6502810716629028, 0.6467356085777283, 0.6428593397140503, 0.6407184600830078, 0.6421120166778564, 0.6406279802322388, 0.6315776705741882, 0.6338013410568237, 0.6327270269393921, 0.6320623755455017, 0.6295364499092102, 0.6240195631980896, 0.6274110078811646, 0.6256113052368164, 0.6207066178321838, 0.6274453401565552, 0.6253525018692017, 0.6204374432563782, 0.6223436594009399, 0.6211797595024109, 0.6202106475830078, 0.6188046336174011, 0.6160043478012085, 0.6188828349113464, 0.6151894927024841, 0.6178545951843262, 0.619779109954834, 0.6168517470359802, 0.6135489344596863, 0.6176316738128662, 0.6157441139221191, 0.6134994029998779, 0.612997829914093, 0.6104332208633423, 0.6142362356185913, 0.6137609481811523, 0.6086327433586121, 0.6103967428207397, 0.6111445426940918, 0.6121469736099243, 0.6086705327033997, 0.6061847805976868, 0.6060255765914917, 0.6069661378860474, 0.604941725730896, 0.6077437400817871, 0.6087782979011536, 0.6077507734298706, 0.6045343279838562, 0.6059162616729736, 0.606691300868988, 0.6065844893455505, 0.6068039536476135, 0.6057198643684387, 0.604600191116333, 0.6034422516822815, 0.6074392795562744, 0.6025363206863403, 0.6054407954216003, 0.6086205244064331, 0.6050968170166016, 0.6065471172332764, 0.6081037521362305, 0.6043606400489807, 0.6045636534690857, 0.605920135974884, 0.604311466217041, 0.6053751707077026, 0.6057919263839722, 0.6039295196533203, 0.6026929020881653, 0.6082773804664612, 0.6057472229003906, 0.6035124063491821, 0.6041542887687683, 0.6039957404136658, 0.6037499904632568, 0.6026160717010498], "val_loss": [0.7211554050445557, 0.7089318633079529, 0.7003017067909241, 0.6927981972694397, 0.6881479620933533, 0.6825749278068542, 0.6770594120025635, 0.6730379462242126, 0.6691172122955322, 0.6640738248825073, 0.6619385480880737, 0.6582703590393066, 0.655881404876709, 0.6532617211341858, 0.6501202583312988, 0.6475975513458252, 0.6462033987045288, 0.6445018649101257, 0.6435536742210388, 0.6418485641479492, 0.6407238245010376, 0.6398932933807373, 0.6388593316078186, 0.6404627561569214, 0.6395262479782104, 0.6389121413230896, 0.637922465801239, 0.6375073790550232, 0.6361693143844604, 0.6360310316085815, 0.6363325715065002, 0.6362903118133545, 0.6356569528579712, 0.6348631978034973, 0.63580322265625, 0.6354897618293762, 0.6344146132469177, 0.6330058574676514, 0.6356779336929321, 0.6346405148506165, 0.6338255405426025, 0.6345219612121582, 0.6348810791969299, 0.635429322719574, 0.6349764466285706, 0.6368069648742676, 0.6352871656417847, 0.6341159343719482, 0.634100079536438, 0.6339594125747681, 0.6344912648200989, 0.6333546042442322, 0.6338881254196167, 0.6337457299232483, 0.6338305473327637, 0.6339861154556274, 0.6337049603462219, 0.6339461207389832, 0.6338176727294922, 0.6336026191711426, 0.6337844729423523, 0.6336054801940918, 0.6332085728645325, 0.6331910490989685, 0.6331660151481628, 0.6330471634864807, 0.6328465938568115, 0.632931649684906, 0.6330955028533936, 0.6329449415206909, 0.6330598592758179, 0.6329125165939331, 0.6330487132072449, 0.6330399513244629, 0.6328669190406799, 0.6328554153442383, 0.6327865123748779, 0.6327879428863525, 0.6327317357063293, 0.6326937675476074, 0.6328162550926208, 0.6330375671386719, 0.6329792737960815, 0.6329753398895264, 0.6330317854881287, 0.6331215500831604, 0.6330677270889282, 0.6330351829528809, 0.6330541968345642, 0.6330747008323669, 0.6331185102462769, 0.6331536769866943], "auc": [0.5661669969558716, 0.6291726231575012, 0.6500521898269653, 0.6740979552268982, 0.6762787699699402, 0.680051326751709, 0.6817514896392822, 0.684573769569397, 0.6902426481246948, 0.6972158551216125, 0.6976889967918396, 0.7005211114883423, 0.7012351155281067, 0.7008401155471802, 0.7055108547210693, 0.7079939246177673, 0.7119374871253967, 0.7138504385948181, 0.712092936038971, 0.7119904160499573, 0.7235130667686462, 0.717849850654602, 0.7181239128112793, 0.7181015014648438, 0.7201739549636841, 0.7265669107437134, 0.7203717231750488, 0.724401593208313, 0.7283423542976379, 0.7205724120140076, 0.7225207090377808, 0.7288395166397095, 0.7262282371520996, 0.7273283004760742, 0.7266905307769775, 0.7295013666152954, 0.7311033606529236, 0.7307869791984558, 0.732447624206543, 0.7296940088272095, 0.7280960083007812, 0.7297194004058838, 0.7350104451179504, 0.7286176085472107, 0.7321183681488037, 0.7342605590820312, 0.7352347373962402, 0.737595796585083, 0.7336899042129517, 0.7337279319763184, 0.7393163442611694, 0.7375665903091431, 0.7374781370162964, 0.7338547706604004, 0.7394587397575378, 0.7421650886535645, 0.7427490949630737, 0.7418434619903564, 0.7435975074768066, 0.7404258251190186, 0.7394614815711975, 0.7412078976631165, 0.744937002658844, 0.7430061101913452, 0.7426142692565918, 0.7420030236244202, 0.7417087554931641, 0.7443949580192566, 0.7446863651275635, 0.7458511590957642, 0.7411496639251709, 0.7466003894805908, 0.7427507638931274, 0.7410237193107605, 0.7434900403022766, 0.7417654991149902, 0.741118848323822, 0.7447733879089355, 0.7453607320785522, 0.7438669800758362, 0.7444724440574646, 0.7428721189498901, 0.742789626121521, 0.7455717921257019, 0.7472226619720459, 0.7404212951660156, 0.7422995567321777, 0.7456493377685547, 0.7451515197753906, 0.7441996932029724, 0.7459461688995361, 0.7467858195304871], "val_auc": [0.6528785824775696, 0.6654356718063354, 0.6696872711181641, 0.6739988327026367, 0.6774059534072876, 0.6804623603820801, 0.6846065521240234, 0.6878917217254639, 0.6908454895019531, 0.6943414807319641, 0.6959203481674194, 0.6971471905708313, 0.6990140080451965, 0.7013953328132629, 0.7036631107330322, 0.7057785987854004, 0.7062373161315918, 0.707183837890625, 0.7073987722396851, 0.7086386680603027, 0.7083858251571655, 0.7088818550109863, 0.7091284990310669, 0.7067960500717163, 0.7080772519111633, 0.7079649567604065, 0.7083597183227539, 0.7085890769958496, 0.7103222608566284, 0.7099853754043579, 0.7098214626312256, 0.7109056711196899, 0.7097835540771484, 0.7108498811721802, 0.7099316120147705, 0.7106783986091614, 0.7120878100395203, 0.712955117225647, 0.7103539109230042, 0.7117440104484558, 0.7117805480957031, 0.7115105390548706, 0.7119534611701965, 0.7109856009483337, 0.7107699513435364, 0.708354115486145, 0.7109326124191284, 0.7123081684112549, 0.7119789719581604, 0.7122111320495605, 0.7115945816040039, 0.7128297090530396, 0.7123288512229919, 0.7126505970954895, 0.7131768465042114, 0.7126636505126953, 0.7129756808280945, 0.7129275798797607, 0.7128510475158691, 0.7130169868469238, 0.7126505374908447, 0.7126374244689941, 0.7139421701431274, 0.7138091921806335, 0.7135522961616516, 0.7140847444534302, 0.714268684387207, 0.7141880393028259, 0.7139731645584106, 0.7142032384872437, 0.7140847444534302, 0.7145525217056274, 0.7142376899719238, 0.7138574123382568, 0.7143678665161133, 0.7143348455429077, 0.7143775224685669, 0.7141653895378113, 0.7143940925598145, 0.7144980430603027, 0.7144581079483032, 0.7141454219818115, 0.7141618728637695, 0.7140923142433167, 0.7140200138092041, 0.713947057723999, 0.7141791582107544, 0.714117169380188, 0.713975191116333, 0.714279055595398, 0.7140991687774658, 0.7141833305358887]}, "ANN avanzata (tesi)": {"loss": [6.789453029632568, 4.5860395431518555, 2.8316330909729004, 1.7858421802520752, 1.234726905822754, 0.9676049947738647, 0.8409271240234375, 0.7794293761253357, 0.7469668984413147, 0.7267850041389465, 0.7140383124351501, 0.7048906683921814, 0.699569821357727, 0.6963016986846924, 0.6941827535629272, 0.6914826035499573, 0.6913998126983643, 0.6895042657852173, 0.6891451478004456, 0.688102662563324, 0.6843718886375427, 0.6844100952148438, 0.6825175881385803, 0.684211254119873, 0.6800625920295715, 0.6847071051597595, 0.682806134223938, 0.6850346326828003, 0.6750388145446777, 0.6724655628204346, 0.6720468997955322, 0.6696592569351196, 0.6718755960464478, 0.6688858270645142, 0.6664970517158508, 0.6725015044212341, 0.6710382699966431, 0.6674423217773438, 0.6627191305160522, 0.6653085947036743, 0.6604671478271484, 0.6577209234237671, 0.6602628231048584, 0.6619078516960144, 0.6598736047744751, 0.657625138759613, 0.6585211753845215, 0.6596741676330566, 0.6582456827163696, 0.6565485596656799, 0.6560957431793213, 0.654199481010437, 0.6534898281097412, 0.6526825428009033, 0.6555783152580261, 0.6526936888694763, 0.6512401103973389, 0.6517285704612732, 0.6565343141555786, 0.6517778635025024, 0.6541176438331604, 0.6534068584442139, 0.6525036692619324, 0.650823712348938, 0.6530486345291138, 0.65432208776474, 0.6536277532577515, 0.6531244516372681, 0.651287853717804, 0.6512230634689331, 0.6478017568588257, 0.6515705585479736, 0.6475392580032349, 0.6492642760276794, 0.6544411182403564, 0.6483641266822815, 0.654804527759552, 0.6541993021965027, 0.649055540561676, 0.64957195520401, 0.6520041227340698, 0.649700939655304, 0.6468849778175354, 0.6498481631278992, 0.6500326991081238, 0.6491091251373291, 0.6500674486160278, 0.6501194834709167, 0.6506538987159729, 0.6487485766410828, 0.6484989523887634, 0.6478485465049744, 0.6495990753173828, 0.6480952501296997, 0.6441224217414856, 0.6481347680091858, 0.6507131457328796, 0.64751136302948, 0.6479628086090088, 0.6466836929321289, 0.6488544940948486, 0.6466267704963684, 0.6512540578842163, 0.6487292051315308, 0.6454530358314514, 0.6487393379211426, 0.6457613706588745, 0.6496526598930359, 0.6474870443344116, 0.6480639576911926, 0.6515721082687378, 0.6525409817695618, 0.6422520875930786, 0.648240327835083, 0.6489426493644714, 0.6476983428001404, 0.651888906955719, 0.6435748934745789, 0.6463711857795715, 0.643118679523468, 0.6471694707870483, 0.6481605768203735, 0.6477982997894287, 0.6481725573539734, 0.6497605443000793, 0.6479352116584778, 0.6501110792160034, 0.64298015832901, 0.6459112167358398, 0.647675096988678, 0.649540901184082, 0.6462306976318359, 0.6456753611564636, 0.6482758522033691, 0.6440224051475525, 0.645880937576294, 0.6480915546417236, 0.6472012996673584, 0.6454943418502808, 0.6466119885444641, 0.6483332514762878, 0.6479359865188599, 0.648518443107605, 0.64609694480896, 0.6456241607666016, 0.6488772630691528, 0.6465793251991272, 0.648520827293396, 0.6467640399932861, 0.6486003398895264, 0.6463046669960022, 0.6514633893966675, 0.6439410448074341, 0.6446507573127747, 0.6482473015785217, 0.6472069025039673, 0.646628737449646, 0.6421152353286743, 0.6475635170936584, 0.64293372631073, 0.6485165953636169, 0.6445247530937195, 0.6471912860870361, 0.6450068354606628, 0.6469038128852844, 0.647558331489563, 0.6484552025794983, 0.6457778811454773, 0.644944429397583, 0.6474371552467346, 0.6475778222084045, 0.6484264135360718, 0.6449800729751587, 0.6458246111869812, 0.6487617492675781, 0.6452799439430237, 0.6463720798492432, 0.646340012550354, 0.6485358476638794, 0.6472480893135071, 0.6458669304847717, 0.6436930298805237, 0.6455533504486084, 0.6428559422492981, 0.6459339261054993, 0.6443179249763489, 0.6455821990966797, 0.6436934471130371, 0.6458602547645569], "val_loss": [5.610036849975586, 3.572824716567993, 2.191809892654419, 1.4611724615097046, 1.079194188117981, 0.8996722102165222, 0.803824245929718, 0.7622250318527222, 0.7308955788612366, 0.7230187058448792, 0.7046689391136169, 0.7142089009284973, 0.7079014182090759, 0.6900608539581299, 0.6939717531204224, 0.6857761144638062, 0.6883794069290161, 0.6827245950698853, 0.6822836995124817, 0.684409499168396, 0.6972578167915344, 0.6873277425765991, 0.6790931224822998, 0.7003463506698608, 0.6945242285728455, 0.6804987788200378, 0.6826826333999634, 0.6875518560409546, 0.6747804284095764, 0.6712183356285095, 0.6704956293106079, 0.6701107025146484, 0.6661571264266968, 0.671130895614624, 0.6737016439437866, 0.6734994649887085, 0.667993426322937, 0.6692912578582764, 0.6613931059837341, 0.6600489020347595, 0.6622243523597717, 0.6603376865386963, 0.6615660786628723, 0.6601030230522156, 0.6583534479141235, 0.6665933728218079, 0.6610124707221985, 0.6595884561538696, 0.6607798933982849, 0.6583014130592346, 0.6567484140396118, 0.6562842130661011, 0.6565732955932617, 0.6558570265769958, 0.6574183702468872, 0.6554497480392456, 0.6551342606544495, 0.6556285619735718, 0.6565104126930237, 0.6569045186042786, 0.6545807123184204, 0.6560642719268799, 0.6541615128517151, 0.6545739769935608, 0.6547247171401978, 0.6551742553710938, 0.6567345261573792, 0.6554990410804749, 0.6544005870819092, 0.6541100740432739, 0.6541154980659485, 0.6541427373886108, 0.6540605425834656, 0.6533565521240234, 0.6532962322235107, 0.6529926657676697, 0.6526098847389221, 0.6528490781784058, 0.6531974673271179, 0.653033971786499, 0.6531614065170288, 0.653217613697052, 0.6527574062347412, 0.6526528000831604, 0.652600109577179, 0.6525043249130249, 0.6530033349990845, 0.6530183553695679, 0.6531125903129578, 0.6529800891876221, 0.6530262231826782, 0.6528377532958984, 0.652778148651123, 0.6526546478271484, 0.6525858640670776, 0.6525469422340393, 0.6524137258529663, 0.6524419188499451, 0.6524422764778137, 0.652545154094696, 0.6525713205337524, 0.6525663137435913, 0.6526878476142883, 0.652716338634491, 0.6525558233261108, 0.6525274515151978, 0.6524794697761536, 0.6525112986564636, 0.6524491906166077, 0.6524021625518799, 0.6523852348327637, 0.6524702310562134, 0.6523293256759644, 0.6523241400718689, 0.6523864269256592, 0.6523908376693726, 0.6524671316146851, 0.652425229549408, 0.652413010597229, 0.6522892117500305, 0.6523189544677734, 0.6522687673568726, 0.6521986126899719, 0.6521589756011963, 0.6521263718605042, 0.6520234942436218, 0.6521868705749512, 0.6522965431213379, 0.6522026062011719, 0.6520801186561584, 0.6520284414291382, 0.6520148515701294, 0.6520430445671082, 0.652050793170929, 0.6520964503288269, 0.6521053314208984, 0.6520784497261047, 0.6520565152168274, 0.6520034670829773, 0.6520872116088867, 0.6520872712135315, 0.6520364880561829, 0.6519187092781067, 0.6519396305084229, 0.6519013047218323, 0.6518962383270264, 0.651806116104126, 0.6518735885620117, 0.6518489718437195, 0.6517466902732849, 0.651786744594574, 0.6517758965492249, 0.6518402695655823, 0.6518142223358154, 0.6517637968063354, 0.6517600417137146, 0.651745080947876, 0.6518338918685913, 0.6518312692642212, 0.651898205280304, 0.6519431471824646, 0.6518833041191101, 0.6517308354377747, 0.6517196893692017, 0.6517044901847839, 0.6516069769859314, 0.6515936255455017, 0.6515020132064819, 0.6514671444892883, 0.6515153646469116, 0.6515008807182312, 0.6515018343925476, 0.6515656113624573, 0.6515214443206787, 0.6514893174171448, 0.651557207107544, 0.6515442132949829, 0.6515841484069824, 0.6517096757888794, 0.6517370939254761, 0.6517514586448669, 0.6517325639724731, 0.6515904664993286, 0.6516149044036865, 0.6516655683517456, 0.6516971588134766, 0.6517598628997803, 0.6517359018325806, 0.6516929268836975], "auc": [0.5635166764259338, 0.5837827324867249, 0.6121283769607544, 0.6453186273574829, 0.6583060622215271, 0.6648547053337097, 0.6649181842803955, 0.6706807613372803, 0.6756244897842407, 0.674553394317627, 0.6735330820083618, 0.6796392798423767, 0.6821284294128418, 0.6789058446884155, 0.6803359389305115, 0.6823644638061523, 0.6800822019577026, 0.6835451126098633, 0.6816979646682739, 0.6794775724411011, 0.6826275587081909, 0.6890383958816528, 0.6852731108665466, 0.6833875179290771, 0.6899060606956482, 0.6851491332054138, 0.6883241534233093, 0.6843866109848022, 0.6926376819610596, 0.6927235722541809, 0.694091260433197, 0.6976951360702515, 0.691261887550354, 0.6972008943557739, 0.6995338201522827, 0.6908926367759705, 0.6954219341278076, 0.6965276002883911, 0.7027490139007568, 0.6989028453826904, 0.7020955085754395, 0.7057705521583557, 0.7043747901916504, 0.6992902755737305, 0.7026278972625732, 0.707927942276001, 0.7036497592926025, 0.7024189233779907, 0.7053090333938599, 0.7073965668678284, 0.7083104252815247, 0.7072614431381226, 0.7081248760223389, 0.7088923454284668, 0.7088345885276794, 0.7108439207077026, 0.7132935523986816, 0.7116490602493286, 0.705621600151062, 0.7091862559318542, 0.707754373550415, 0.7096675634384155, 0.7110989093780518, 0.7119295597076416, 0.7079927325248718, 0.7072993516921997, 0.7109920382499695, 0.7130283117294312, 0.7109707593917847, 0.7115767002105713, 0.7173146605491638, 0.7112659215927124, 0.7154051065444946, 0.7126913666725159, 0.7072321176528931, 0.7167119383811951, 0.7093182802200317, 0.7070403099060059, 0.7118275761604309, 0.7110928893089294, 0.7092190980911255, 0.7126914262771606, 0.716356098651886, 0.7142484784126282, 0.7122652530670166, 0.7128051519393921, 0.7096279263496399, 0.7117211222648621, 0.7124885320663452, 0.7144488096237183, 0.7183324694633484, 0.7142716646194458, 0.7125829458236694, 0.7161964774131775, 0.7180386781692505, 0.713247537612915, 0.7101438045501709, 0.715806782245636, 0.7161741256713867, 0.7165251970291138, 0.7126514315605164, 0.7142238616943359, 0.7101094722747803, 0.7131640911102295, 0.716456413269043, 0.7130980491638184, 0.7189548015594482, 0.7120181322097778, 0.7147776484489441, 0.7132145762443542, 0.7109651565551758, 0.7091825008392334, 0.7228560447692871, 0.7151548266410828, 0.7148118019104004, 0.7156919240951538, 0.7111414670944214, 0.7201473712921143, 0.7148028612136841, 0.7198203802108765, 0.7151981592178345, 0.7138388752937317, 0.7139154672622681, 0.7115938663482666, 0.7133774161338806, 0.7133126854896545, 0.7097460031509399, 0.720793604850769, 0.7156466841697693, 0.716051459312439, 0.713443398475647, 0.7189345359802246, 0.7145459651947021, 0.7150038480758667, 0.718987762928009, 0.7181389331817627, 0.7158566117286682, 0.7184970378875732, 0.7166837453842163, 0.7178643941879272, 0.7117597460746765, 0.7156275510787964, 0.7128205299377441, 0.7192253470420837, 0.7183339595794678, 0.7132078409194946, 0.7157794833183289, 0.7158222198486328, 0.7152247428894043, 0.7120327353477478, 0.716947615146637, 0.7111260890960693, 0.7192632555961609, 0.7190362215042114, 0.7142613530158997, 0.7159649133682251, 0.7192785739898682, 0.7217543721199036, 0.7137710452079773, 0.7225408554077148, 0.7115030288696289, 0.717792272567749, 0.7141318321228027, 0.7156892418861389, 0.7164197564125061, 0.7162274718284607, 0.7153843641281128, 0.7170590162277222, 0.7196565270423889, 0.7155024409294128, 0.7171077132225037, 0.7121107578277588, 0.719508171081543, 0.7160899043083191, 0.7116901278495789, 0.7172260284423828, 0.715385913848877, 0.714012622833252, 0.7132349014282227, 0.7155219316482544, 0.7181146740913391, 0.7209518551826477, 0.7169668674468994, 0.7196509838104248, 0.7189939022064209, 0.7198967337608337, 0.7150976657867432, 0.7207499146461487, 0.7173715829849243], "val_auc": [0.6134284138679504, 0.6362309455871582, 0.6558454632759094, 0.6610794067382812, 0.6757464408874512, 0.6739471554756165, 0.6825158596038818, 0.6792231798171997, 0.6849991679191589, 0.6912174820899963, 0.6844584345817566, 0.683441698551178, 0.6865814924240112, 0.6899051666259766, 0.6894775032997131, 0.6904088258743286, 0.6950675249099731, 0.6929044723510742, 0.6967710256576538, 0.6871456503868103, 0.6924154162406921, 0.6905189752578735, 0.6950454711914062, 0.6939212083816528, 0.6961304545402527, 0.695013165473938, 0.6930436491966248, 0.6937029361724854, 0.6982865333557129, 0.6967731714248657, 0.6992130279541016, 0.6973131895065308, 0.7002415657043457, 0.6990573406219482, 0.697843611240387, 0.6983409523963928, 0.6998687982559204, 0.6992178559303284, 0.701911985874176, 0.7025222778320312, 0.7030327916145325, 0.7012169361114502, 0.7033937573432922, 0.702965259552002, 0.7032842040061951, 0.7027379274368286, 0.7043595314025879, 0.7031739950180054, 0.7034832239151001, 0.7030065655708313, 0.7027488946914673, 0.7039620876312256, 0.7037636041641235, 0.7044215202331543, 0.7035356760025024, 0.70438152551651, 0.704269289970398, 0.7042182683944702, 0.705801248550415, 0.7054892778396606, 0.705930769443512, 0.704737663269043, 0.7058591842651367, 0.7056469917297363, 0.7055429816246033, 0.7046467065811157, 0.704495906829834, 0.7052880525588989, 0.7060720324516296, 0.705424427986145, 0.7052860260009766, 0.704690158367157, 0.70563805103302, 0.7057661414146423, 0.7059755325317383, 0.7063999176025391, 0.7074641585350037, 0.7064688205718994, 0.7069716453552246, 0.7065431475639343, 0.706319272518158, 0.706101655960083, 0.7062476277351379, 0.7061312198638916, 0.7062841653823853, 0.7067629098892212, 0.7062476873397827, 0.7063971757888794, 0.7063261270523071, 0.7054940462112427, 0.705268144607544, 0.7053287029266357, 0.7057192921638489, 0.7055057883262634, 0.7057399749755859, 0.7059983015060425, 0.705733060836792, 0.7063902020454407, 0.7061243653297424, 0.7054919600486755, 0.7053217887878418, 0.7055877447128296, 0.7055429220199585, 0.7055718898773193, 0.7055443525314331, 0.7060072422027588, 0.706106424331665, 0.7066554427146912, 0.7063323259353638, 0.7055215835571289, 0.7057943940162659, 0.7063061594963074, 0.7057461738586426, 0.7058101892471313, 0.7057840824127197, 0.7056442499160767, 0.7061746120452881, 0.7067180871963501, 0.7057620286941528, 0.7067911624908447, 0.7063833475112915, 0.7057206630706787, 0.7060388922691345, 0.7061153650283813, 0.7056435346603394, 0.7060223817825317, 0.7060540914535522, 0.7066072821617126, 0.7063895463943481, 0.7065693140029907, 0.7065432071685791, 0.7064790725708008, 0.7061870694160461, 0.7060892581939697, 0.7065927982330322, 0.7061077952384949, 0.7057206630706787, 0.7061236500740051, 0.706181526184082, 0.7063047885894775, 0.7060437798500061, 0.705649733543396, 0.70549476146698, 0.7066720128059387, 0.7058922052383423, 0.7064859867095947, 0.7057048678398132, 0.7063612937927246, 0.7062421441078186, 0.7056297063827515, 0.7059610486030579, 0.7068593502044678, 0.7061160802841187, 0.7062979340553284, 0.7058804631233215, 0.7065845131874084, 0.7061305046081543, 0.7059376835823059, 0.7064061164855957, 0.7068586349487305, 0.7064425945281982, 0.7061925530433655, 0.7065534591674805, 0.706886887550354, 0.7056869268417358, 0.706605851650238, 0.7064743041992188, 0.7054719924926758, 0.7070378065109253, 0.7065452337265015, 0.7066609859466553, 0.7068008184432983, 0.7060920000076294, 0.7061753273010254, 0.7062207460403442, 0.7065266370773315, 0.7058418989181519, 0.7063144445419312, 0.7065397500991821, 0.7063751220703125, 0.7066161632537842, 0.7062076926231384, 0.7065253257751465, 0.7060499787330627, 0.7059452533721924, 0.7064460515975952, 0.706459105014801, 0.7065004706382751, 0.7064398527145386]}}, "test": [{"nome": "ANN regolarizzata", "accuracy": 0.650608, "precision": 0.654192, "recall": 0.754098, "f1": 0.700601, "roc_auc": 0.694006, "roc_auc_ic_basso": 0.671965, "roc_auc_ic_alto": 0.715964, "brier": 0.220697}, {"nome": "ANN base", "accuracy": 0.630496, "precision": 0.643804, "recall": 0.712683, "f1": 0.676495, "roc_auc": 0.683347, "roc_auc_ic_basso": 0.661787, "roc_auc_ic_alto": 0.705525, "brier": 0.223751}, {"nome": "ANN avanzata (tesi)", "accuracy": 0.645931, "precision": 0.661316, "recall": 0.710958, "f1": 0.685239, "roc_auc": 0.6718, "roc_auc_ic_basso": 0.648314, "roc_auc_ic_alto": 0.694813, "brier": 0.225702}], "roc": {"Voting (soft)": {"x": [0.0, 0.0031, 0.0061, 0.0102, 0.0143, 0.0184, 0.0215, 0.0266, 0.0327, 0.0358, 0.0398, 0.0439, 0.047, 0.0511, 0.0552, 0.0603, 0.0654, 0.0695, 0.0735, 0.0766, 0.0858, 0.093, 0.0991, 0.1032, 0.1093, 0.1144, 0.1185, 0.1226, 0.1328, 0.1369, 0.145, 0.1522, 0.1583, 0.1614, 0.1706, 0.1777, 0.1818, 0.1869, 0.1941, 0.2012, 0.2084, 0.2125, 0.2176, 0.2206, 0.2298, 0.236, 0.2431, 0.2472, 0.2513, 0.2594, 0.2625, 0.2697, 0.2737, 0.285, 0.2962, 0.3013, 0.3146, 0.3187, 0.3238, 0.3299, 0.334, 0.3391, 0.3473, 0.3524, 0.3565, 0.3667, 0.38, 0.3861, 0.3994, 0.4106, 0.4168, 0.4219, 0.4321, 0.4402, 0.4443, 0.4494, 0.4566, 0.4648, 0.4729, 0.4801, 0.4842, 0.4954, 0.5026, 0.5169, 0.526, 0.5383, 0.5455, 0.5557, 0.5832, 0.5904, 0.5986, 0.6047, 0.6129, 0.6251, 0.6313, 0.6415, 0.6476, 0.6558, 0.666, 0.6803, 0.6874, 0.6915, 0.7048, 0.7181, 0.7252, 0.7446, 0.7508, 0.7579, 0.7722, 0.7886, 0.8039, 0.8131, 0.8366, 0.8478, 0.8611, 0.8866, 0.9081, 0.9377, 0.9459, 1.0], "y": [0.0, 0.0035, 0.0104, 0.0242, 0.0336, 0.0604, 0.0975, 0.1009, 0.1165, 0.1311, 0.1493, 0.1665, 0.1907, 0.2002, 0.2045, 0.2243, 0.2312, 0.2468, 0.2588, 0.2744, 0.2977, 0.3028, 0.3192, 0.3339, 0.3443, 0.371, 0.3874, 0.3995, 0.4098, 0.4331, 0.4392, 0.4461, 0.4513, 0.4573, 0.4642, 0.4745, 0.4814, 0.4892, 0.4927, 0.4996, 0.5073, 0.5125, 0.5229, 0.528, 0.5418, 0.5462, 0.5557, 0.566, 0.5686, 0.5781, 0.5824, 0.5953, 0.6031, 0.6117, 0.6186, 0.6273, 0.6368, 0.6411, 0.6471, 0.6592, 0.6644, 0.6687, 0.673, 0.6782, 0.6885, 0.6963, 0.7049, 0.7101, 0.717, 0.7248, 0.7334, 0.742, 0.7463, 0.7515, 0.7567, 0.7619, 0.767, 0.7714, 0.7791, 0.7817, 0.7869, 0.7938, 0.7998, 0.8067, 0.8136, 0.8214, 0.8257, 0.8369, 0.8404, 0.8456, 0.855, 0.8594, 0.8654, 0.8723, 0.8827, 0.8896, 0.8956, 0.9016, 0.9103, 0.9137, 0.9198, 0.9241, 0.9284, 0.931, 0.937, 0.9413, 0.9439, 0.9482, 0.9577, 0.962, 0.9655, 0.9689, 0.9724, 0.9767, 0.9819, 0.9853, 0.9888, 0.9931, 0.9965, 1.0]}, "ANN regolarizzata": {"x": [0.0, 0.0041, 0.0102, 0.0153, 0.0204, 0.0255, 0.0306, 0.0358, 0.0398, 0.0449, 0.049, 0.0582, 0.0664, 0.0695, 0.0746, 0.0787, 0.0838, 0.0899, 0.097, 0.1021, 0.1062, 0.1093, 0.1144, 0.1205, 0.1256, 0.1328, 0.1369, 0.144, 0.1481, 0.1512, 0.1583, 0.1645, 0.1706, 0.1767, 0.1818, 0.1869, 0.192, 0.1992, 0.2043, 0.2114, 0.2176, 0.2227, 0.2268, 0.236, 0.2411, 0.2451, 0.2533, 0.2625, 0.2686, 0.2758, 0.285, 0.2891, 0.2983, 0.3034, 0.3075, 0.3166, 0.3207, 0.3248, 0.3289, 0.333, 0.3422, 0.3555, 0.3677, 0.3749, 0.383, 0.3902, 0.3963, 0.4055, 0.4116, 0.4178, 0.4208, 0.4311, 0.4372, 0.4454, 0.4607, 0.4688, 0.474, 0.4821, 0.4862, 0.4944, 0.5026, 0.5097, 0.5169, 0.5271, 0.5373, 0.5516, 0.5628, 0.5669, 0.5751, 0.5894, 0.6037, 0.6139, 0.62, 0.6323, 0.6394, 0.6476, 0.6609, 0.6762, 0.6936, 0.6987, 0.7058, 0.7181, 0.7324, 0.7426, 0.762, 0.7702, 0.7845, 0.7947, 0.8008, 0.8121, 0.8243, 0.8315, 0.8529, 0.858, 0.8744, 0.8927, 0.9183, 0.9346, 0.9602, 1.0], "y": [0.0, 0.0069, 0.0173, 0.0371, 0.0483, 0.0613, 0.0708, 0.088, 0.0992, 0.1182, 0.132, 0.151, 0.1752, 0.1959, 0.2062, 0.2157, 0.2321, 0.2485, 0.2606, 0.2692, 0.2778, 0.2882, 0.2994, 0.3141, 0.327, 0.333, 0.3434, 0.3538, 0.3581, 0.3684, 0.396, 0.4021, 0.409, 0.4124, 0.4193, 0.4314, 0.4374, 0.4478, 0.4616, 0.4702, 0.4763, 0.484, 0.4866, 0.4927, 0.5004, 0.5203, 0.5306, 0.541, 0.547, 0.5513, 0.5557, 0.5643, 0.5712, 0.5789, 0.5858, 0.5928, 0.6014, 0.6074, 0.6117, 0.623, 0.6299, 0.6411, 0.6471, 0.6523, 0.6609, 0.6721, 0.6747, 0.6799, 0.6954, 0.7032, 0.7084, 0.7196, 0.7265, 0.7325, 0.7386, 0.7472, 0.7541, 0.7584, 0.7662, 0.7722, 0.7757, 0.7791, 0.7903, 0.7964, 0.8016, 0.8119, 0.8188, 0.8266, 0.83, 0.8352, 0.8412, 0.8456, 0.8525, 0.8585, 0.868, 0.8732, 0.8792, 0.8878, 0.8947, 0.8973, 0.9034, 0.9085, 0.912, 0.918, 0.9249, 0.9292, 0.9353, 0.9379, 0.9439, 0.9482, 0.9534, 0.9612, 0.9672, 0.9715, 0.9767, 0.9793, 0.9836, 0.9896, 0.994, 1.0]}, "ANN base": {"x": [0.0, 0.0041, 0.0082, 0.0123, 0.0174, 0.0215, 0.0266, 0.0317, 0.0368, 0.0409, 0.0449, 0.0501, 0.0541, 0.0582, 0.0633, 0.0674, 0.0746, 0.0797, 0.0848, 0.0899, 0.0981, 0.1021, 0.1073, 0.1144, 0.1195, 0.1277, 0.1338, 0.143, 0.1491, 0.1573, 0.1634, 0.1685, 0.1767, 0.1818, 0.1859, 0.191, 0.1961, 0.2033, 0.2165, 0.2268, 0.2329, 0.238, 0.2451, 0.2492, 0.2543, 0.2635, 0.2737, 0.2829, 0.2921, 0.3003, 0.3095, 0.3166, 0.3218, 0.3279, 0.332, 0.3391, 0.3463, 0.3504, 0.3555, 0.3636, 0.3728, 0.381, 0.3933, 0.3973, 0.4035, 0.4198, 0.4259, 0.4321, 0.4433, 0.4474, 0.4566, 0.4678, 0.474, 0.4821, 0.4913, 0.4985, 0.5026, 0.5128, 0.526, 0.5312, 0.5403, 0.5567, 0.57, 0.5771, 0.5873, 0.5935, 0.6016, 0.6129, 0.6221, 0.6272, 0.6374, 0.6445, 0.6486, 0.666, 0.6782, 0.6854, 0.6956, 0.7028, 0.7089, 0.7222, 0.7385, 0.7538, 0.761, 0.7681, 0.7865, 0.7957, 0.7998, 0.811, 0.8274, 0.8447, 0.8672, 0.8764, 0.8958, 0.9101, 0.9203, 0.9265, 0.9438, 0.9602, 0.9775, 1.0], "y": [0.0, 0.0121, 0.0181, 0.0362, 0.0492, 0.0578, 0.0682, 0.0854, 0.0915, 0.1001, 0.1113, 0.1234, 0.1441, 0.1562, 0.1639, 0.1786, 0.1915, 0.1976, 0.2131, 0.2243, 0.2312, 0.2373, 0.2511, 0.2752, 0.2847, 0.3011, 0.3201, 0.3365, 0.371, 0.3831, 0.3883, 0.396, 0.4167, 0.4271, 0.4461, 0.4625, 0.4711, 0.4797, 0.484, 0.4918, 0.4996, 0.5056, 0.5125, 0.5237, 0.5306, 0.5393, 0.5531, 0.5626, 0.5703, 0.5746, 0.5833, 0.5876, 0.6005, 0.604, 0.6109, 0.6186, 0.6247, 0.6281, 0.6324, 0.6385, 0.6462, 0.6514, 0.6583, 0.6687, 0.6764, 0.6833, 0.6885, 0.6946, 0.6989, 0.7058, 0.7101, 0.7153, 0.7308, 0.7403, 0.7481, 0.7575, 0.7627, 0.7688, 0.7739, 0.7808, 0.7843, 0.7921, 0.799, 0.8041, 0.8085, 0.8128, 0.8171, 0.8231, 0.8283, 0.8335, 0.8395, 0.8525, 0.8568, 0.8611, 0.8663, 0.8706, 0.8766, 0.8844, 0.8956, 0.9025, 0.9085, 0.9146, 0.9189, 0.9232, 0.9292, 0.9344, 0.9379, 0.9448, 0.9491, 0.9551, 0.9603, 0.9638, 0.9698, 0.975, 0.981, 0.9845, 0.9879, 0.9914, 0.9965, 1.0]}, "ANN avanzata (tesi)": {"x": [0.0, 0.0061, 0.0133, 0.0174, 0.0245, 0.0286, 0.0347, 0.0419, 0.047, 0.0521, 0.0582, 0.0633, 0.0715, 0.0776, 0.0817, 0.0868, 0.0919, 0.1011, 0.1062, 0.1113, 0.1175, 0.1277, 0.1328, 0.1379, 0.144, 0.1491, 0.1532, 0.1604, 0.1675, 0.1726, 0.1798, 0.189, 0.1931, 0.1992, 0.2043, 0.2084, 0.2145, 0.2206, 0.2319, 0.237, 0.2421, 0.2503, 0.2554, 0.2615, 0.2686, 0.2758, 0.2819, 0.2911, 0.2983, 0.3054, 0.3115, 0.3197, 0.3309, 0.3391, 0.3432, 0.3483, 0.3534, 0.3585, 0.3626, 0.3677, 0.3749, 0.383, 0.3871, 0.3912, 0.4004, 0.4045, 0.4127, 0.4198, 0.4259, 0.4321, 0.4382, 0.4443, 0.4556, 0.4668, 0.476, 0.4862, 0.4923, 0.5015, 0.5087, 0.5138, 0.5199, 0.5301, 0.5363, 0.5465, 0.5546, 0.5669, 0.572, 0.5771, 0.5822, 0.5945, 0.6057, 0.6272, 0.6333, 0.6425, 0.6517, 0.6558, 0.6701, 0.6844, 0.6936, 0.7099, 0.716, 0.7283, 0.7334, 0.7436, 0.764, 0.7702, 0.7804, 0.7957, 0.8141, 0.8223, 0.8447, 0.855, 0.8713, 0.8825, 0.8897, 0.9152, 0.9346, 0.9704, 0.9847, 1.0], "y": [0.0, 0.0112, 0.0233, 0.0345, 0.0569, 0.0716, 0.0794, 0.0906, 0.1035, 0.1087, 0.1217, 0.1389, 0.1441, 0.1484, 0.1596, 0.1691, 0.1829, 0.1967, 0.2105, 0.2226, 0.2355, 0.2494, 0.2554, 0.2683, 0.2839, 0.289, 0.3011, 0.3132, 0.3218, 0.3348, 0.3512, 0.3676, 0.3762, 0.3831, 0.3934, 0.4055, 0.4116, 0.4193, 0.4271, 0.4409, 0.4513, 0.4582, 0.4625, 0.4702, 0.4832, 0.5039, 0.5116, 0.522, 0.5462, 0.5513, 0.5574, 0.5695, 0.5772, 0.5893, 0.5979, 0.6031, 0.6091, 0.6169, 0.6264, 0.6324, 0.6419, 0.6497, 0.6601, 0.6661, 0.6799, 0.6851, 0.6903, 0.6963, 0.7041, 0.711, 0.717, 0.7248, 0.7299, 0.7368, 0.742, 0.7489, 0.7558, 0.761, 0.7739, 0.7774, 0.7834, 0.7903, 0.7972, 0.8024, 0.8085, 0.8145, 0.8179, 0.8231, 0.83, 0.8343, 0.8387, 0.8456, 0.8516, 0.855, 0.8611, 0.8654, 0.8775, 0.8818, 0.8878, 0.893, 0.9008, 0.9068, 0.9129, 0.9198, 0.9258, 0.931, 0.9344, 0.9387, 0.9448, 0.9525, 0.956, 0.9612, 0.9646, 0.9681, 0.975, 0.9802, 0.9836, 0.9896, 0.9948, 1.0]}}}};
+
+// --- Utilità --------------------------------------------------------------------------------
+const fmt = (v, d = 3) => v == null ? "–" : Number(v).toLocaleString("it-IT", {minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always"});
+const pct = (v, d = 1) => fmt(v, d) + "%";
+const pv = p => p < 0.001 ? "< 0,001" : fmt(p, 3);
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attr = {}, t) => { const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attr)) e.setAttribute(k, v); if (t != null) e.textContent = t; return e; };
+const nuovoSvg = (w, h) => el("svg", {viewBox: `0 0 ${w} ${h}`, width: w, height: h, role: "img"});
+const scrivi = (s, x, y, t, a = {}) => s.append(el("text", {x, y, "font-size": 12, fill: "var(--ink-2)", ...a}, t));
+const $ = id => document.getElementById(id);
+
+const tip = $("suggerimento");
+function conTooltip(nodo, t) {
+  nodo.addEventListener("pointermove", e => { tip.hidden = false; tip.textContent = t;
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - 310) + "px"; tip.style.top = (e.clientY + 14) + "px"; });
+  nodo.addEventListener("pointerleave", () => tip.hidden = true);
+  // Al tocco il suggerimento compare e sparisce da solo
+  nodo.addEventListener("pointerdown", e => { if (e.pointerType === "mouse") return;
+    tip.hidden = false; tip.textContent = t; tip.style.left = Math.max(8, Math.min(e.clientX - 140, innerWidth - 310)) + "px";
+    tip.style.top = Math.max(8, e.clientY - 56) + "px"; clearTimeout(tip.timer); tip.timer = setTimeout(() => tip.hidden = true, 2500); });
+}
+
+// Ogni grafico è disegnato alla larghezza reale del contenitore, così il testo resta a 11-12 px su ogni schermo;
+// il registro permette di ridisegnarli quando cambia la larghezza della finestra.
+const registro = new Map();
+const grafico = disegna => (id, ...arg) => { registro.set(id, () => disegna(id, ...arg)); disegna(id, ...arg); };
+const larghezza = (id, ripiego = 520) => Math.round($(id).clientWidth) || ripiego;
+const STRETTO = 600;   // sotto questa larghezza le etichette lunghe vanno sopra la barra
+const tronca = (t, max) => t.length > max ? t.slice(0, Math.max(1, max - 1)) + "…" : t;
+
+// Barre verticali (quote per categoria)
+const barreVerticali = grafico(function (id, righe, {media = null, max = 100} = {}) {
+  // Etichette lunghe: prima si prova ad andare a capo, se non basta si ruotano
+  const W = larghezza(id), bw = (W - 50) / righe.length, entra = t => t.length * 6.4 <= bw - 4;
+  const aCapo = t => { const i = t.indexOf(" ", Math.floor(t.length / 2) - 3); return i > 0 ? [t.slice(0, i), t.slice(i + 1)] : [t]; };
+  const ruota = righe.some(r => !aCapo(r.etichetta).every(entra)), due = !ruota && righe.some(r => !entra(r.etichetta));
+  const H = ruota ? 290 : due ? 272 : 260, m = {l: 40, r: 10, t: 22, b: ruota ? 70 : due ? 52 : 40};
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, ih = H - m.t - m.b, y = v => m.t + ih * (1 - v / max), passo = iw / righe.length;
+  for (const t of [0, 25, 50, 75, 100]) {
+    s.append(el("line", {x1: m.l, x2: W - m.r, y1: y(t), y2: y(t), stroke: "var(--line)"}));
+    scrivi(s, m.l - 6, y(t) + 4, t + "%", {"text-anchor": "end", "font-size": 11, fill: "var(--ink-3)"});
+  }
+  righe.forEach((r, i) => {
+    const w = Math.min(passo * 0.62, 56), x = m.l + i * passo + (passo - w) / 2, cx = x + w / 2;
+    const b = el("path", {d: `M${x},${y(0)} V${y(r.valore) + 4} q0,-4 4,-4 H${x + w - 4} q4,0 4,4 V${y(0)} Z`, fill: "var(--s1)"});
+    conTooltip(b, `${r.etichetta}: ${pct(r.valore)} BEV su ${fmt(r.n, 0)} rispondenti`); s.append(b);
+    scrivi(s, cx, y(r.valore) - 6, pct(r.valore, 0), {"text-anchor": "middle", "font-weight": 600, fill: "var(--ink)", "font-size": passo < 40 ? 10.5 : 12,
+      stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke", "stroke-linejoin": "round"});
+    if (ruota) scrivi(s, cx, H - m.b + 16, r.etichetta, {"text-anchor": "end", "font-size": 11, transform: `rotate(-35 ${cx} ${H - m.b + 16})`});
+    else (entra(r.etichetta) ? [r.etichetta] : aCapo(r.etichetta)).forEach((riga, k) =>
+      scrivi(s, cx, H - m.b + 16 + k * 14, riga, {"text-anchor": "middle", "font-size": 11.5}));
+  });
+  if (media != null) s.querySelector("path").before(el("line", {x1: m.l, x2: W - m.r, y1: y(media), y2: y(media), stroke: "var(--ink-2)", "stroke-dasharray": "5 4"}));
+  $(id).replaceChildren(s);
+});
+
+// Barre orizzontali: etichetta a sinistra, oppure sopra la barra sugli schermi stretti
+const barreOrizzontali = grafico(function (id, righe, {formato = v => fmt(v), etichetta = 210, colore = () => "var(--s1)"} = {}) {
+  const W = larghezza(id), stretto = W < STRETTO, lab = stretto ? 0 : Math.min(etichetta, W * 0.42);
+  const riga = stretto ? 40 : 26, m = {l: stretto ? 0 : lab, r: 58, t: 4, b: 4}, H = m.t + m.b + riga * righe.length;
+  const s = nuovoSvg(W, H), max = Math.max(...righe.map(r => r.v)) * 1.02, x = v => m.l + (W - m.l - m.r) * v / max;
+  righe.forEach((r, i) => {
+    const y = m.t + i * riga + (stretto ? 20 : 5), h = stretto ? 14 : riga - 10, w = Math.max(x(r.v) - m.l, 1), k = Math.min(4, w);
+    if (stretto) scrivi(s, 0, y - 6, r.nome, {fill: "var(--ink)"});
+    else { const t = scrivi(s, m.l - 10, y + h / 2 + 4, tronca(r.nome, Math.floor((lab - 14) / 6.2)), {"text-anchor": "end", fill: "var(--ink)"}); }
+    const b = el("path", {d: `M${m.l},${y} H${m.l + w - k} q${k},0 ${k},4 V${y + h - 4} q0,4 -${k},4 H${m.l} Z`, fill: colore(r)});
+    conTooltip(b, `${r.nome}: ${formato(r.v)}`); s.append(b);
+    scrivi(s, m.l + w + 6, y + h / 2 + 4, formato(r.v), {"font-family": "var(--f-data)", "font-size": 11.5});
+  });
+  $(id).replaceChildren(s);
+});
+
+// Intervalli orizzontali (forest plot, modelli)
+const intervalli = grafico(function (id, righe, {min, max, log = false, rif = null, ticks, etichetta = 250, formato = v => fmt(v)}) {
+  const W = larghezza(id, 900), stretto = W < STRETTO, lab = Math.min(etichetta, W * 0.4);
+  const riga = stretto ? 44 : 28, m = {l: stretto ? 8 : lab, r: stretto ? 54 : 70, t: 8, b: 32}, H = m.t + m.b + riga * righe.length;
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r;
+  const tr = v => log ? Math.log(v) : v, x = v => m.l + iw * (tr(Math.min(Math.max(v, min), max)) - tr(min)) / (tr(max) - tr(min));
+  for (const t of ticks) {
+    s.append(el("line", {x1: x(t), x2: x(t), y1: m.t, y2: H - m.b, stroke: "var(--line)"}));
+    scrivi(s, x(t), H - m.b + 18, formato(t), {"text-anchor": "middle", fill: "var(--ink-3)", "font-size": 11});
+  }
+  if (rif != null) s.append(el("line", {x1: x(rif), x2: x(rif), y1: m.t, y2: H - m.b, stroke: "var(--ink-2)", "stroke-dasharray": "4 4"}));
+  righe.forEach((r, i) => {
+    const top = m.t + riga * i, cy = stretto ? top + 30 : top + riga / 2;
+    const hit = el("rect", {x: 0, y: top, width: W, height: riga, fill: "transparent"}); conTooltip(hit, r.tooltip); s.append(hit);
+    const testo = {fill: "var(--ink)", "font-weight": r.forte ? 700 : 400, "pointer-events": "none"};
+    if (stretto) scrivi(s, 0, top + 14, r.nome, {...testo, "font-size": 12, stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke", "stroke-linejoin": "round"});
+    else scrivi(s, m.l - 12, cy + 4, tronca(r.nome, Math.floor((lab - 14) / 6.4)), {...testo, "text-anchor": "end", "font-size": 12.5});
+    s.append(el("line", {x1: x(r.basso), x2: x(r.alto), y1: cy, y2: cy, stroke: r.colore, "stroke-width": 2, "stroke-linecap": "round", "pointer-events": "none"}));
+    s.append(el("circle", {cx: x(r.v), cy, r: 5.5, fill: r.colore, stroke: "var(--surface)", "stroke-width": 2, "pointer-events": "none"}));
+    scrivi(s, W - m.r + 10, cy + 4, formato(r.v), {"font-family": "var(--f-data)", "font-size": 11.5, "pointer-events": "none"});
+  });
+  $(id).replaceChildren(s);
+});
+
+// Linee (scree, gomito, ROC, calibrazione, addestramento)
+const linee = grafico(function (id, serie, {xmin, xmax, ymin, ymax, ticksX, ticksY, fx = v => fmt(v, 0), fy = v => fmt(v, 2), titoloX = "", diagonale = false, barre = null, H = 280, legenda = null}) {
+  const W = larghezza(id), m = {l: 48, r: 14, t: 12, b: titoloX ? 46 : 30};
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const x = v => m.l + iw * (v - xmin) / (xmax - xmin), y = v => m.t + ih * (1 - (Math.min(Math.max(v, ymin), ymax) - ymin) / (ymax - ymin));
+  for (const t of ticksY) { s.append(el("line", {x1: m.l, x2: W - m.r, y1: y(t), y2: y(t), stroke: "var(--line)"}));
+    scrivi(s, m.l - 6, y(t) + 4, fy(t), {"text-anchor": "end", "font-size": 11, fill: "var(--ink-3)"}); }
+  // Su schermi stretti si mostra un'etichetta dell'asse x ogni due se non c'è spazio
+  const salto = iw / ticksX.length < 34 ? 2 : 1;
+  ticksX.forEach((t, i) => { if (i % salto === 0 || i === ticksX.length - 1) scrivi(s, x(t), H - m.b + 16, fx(t), {"text-anchor": "middle", "font-size": 11, fill: "var(--ink-3)"}); });
+  if (titoloX) scrivi(s, m.l + iw / 2, H - 8, titoloX, {"text-anchor": "middle", "font-size": 11.5});
+  if (diagonale) s.append(el("line", {x1: x(xmin), y1: y(ymin), x2: x(xmax), y2: y(ymax), stroke: "var(--ink-3)", "stroke-dasharray": "4 4"}));
+  if (barre) { const bw = Math.min(iw / (xmax - xmin) * 0.6, 64);
+    barre.forEach(b => { const r = el("rect", {x: x(b.x) - bw / 2, y: y(b.y), width: bw, height: y(ymin) - y(b.y), rx: 3, fill: "var(--s1)"});
+      conTooltip(r, b.t); s.append(r); }); }
+  serie.forEach(se => {
+    const d = se.x.map((v, i) => `${i ? "L" : "M"}${x(v).toFixed(1)},${y(se.y[i]).toFixed(1)}`).join(" ");
+    s.append(el("path", {d, fill: "none", stroke: se.colore, "stroke-width": 2, "stroke-dasharray": se.tratto || "", "stroke-linejoin": "round"}));
+    if (se.punti) se.x.forEach((v, i) => { const c = el("circle", {cx: x(v), cy: y(se.y[i]), r: 4.5, fill: se.colore, stroke: "var(--surface)", "stroke-width": 2});
+      conTooltip(c, `${se.nome}: ${se.tooltip ? se.tooltip(v, se.y[i]) : fy(se.y[i])}`); s.append(c); });
+  });
+  $(id).replaceChildren(s);
+  if (legenda) $(legenda).innerHTML = serie.map(se => `<span><i class="linea" style="background:${se.colore}"></i>${se.nome}</span>`).join("");
+});
+
+// Tabella da dati
+function tabella(id, colonne, righe, {evidenzia = () => false, classe = () => ""} = {}) {
+  $(id).classList.toggle("larga", colonne.length > 4);
+  $(id).classList.toggle("compatta", colonne.length > 8);
+  $(id).innerHTML = "<thead><tr>" + colonne.map(c => `<th class="${c.n ? "n" : ""}">${c.t}</th>`).join("") + "</tr></thead><tbody>" +
+    righe.map(r => `<tr class="${evidenzia(r) ? "evidenza" : ""} ${classe(r)}">` + colonne.map(c => {
+      const v = c.f ? c.f(r) : r[c.k]; return `<td class="${c.n ? "n" : ""} ${c.debole && c.debole(r) ? "debole" : ""}">${v}</td>`; }).join("") + "</tr>").join("") + "</tbody>";
+}
+const badge = (classe, t) => `<span class="esito ${classe}">${t}</span>`;
+const esito = e => badge(e === "Confermata" ? "ok" : e === "Contraria" ? "no" : e.startsWith("Aumenta") || e.startsWith("Riduce") ? "info" : "nd", e);
+
+// --- Contenuti ------------------------------------------------------------------------------
+const V = DATI.valori, ST = DATI.stat, ES = DATI.espl, CL = DATI.cluster, ML = DATI.ml, DL = DATI.dl;
+document.querySelectorAll("[data-v]").forEach(n => { n.textContent = V[n.dataset.v]; });
+$("cifre").innerHTML = DATI.cifre.map(c => `<div class="cifra"><b>${c.v}</b><span>${c.t}</span></div>`).join("");
+const SERIE = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
+
+// 1.1
+tabella("t-descrittive", [
+  {t: "Variabile", k: "variabile"}, {t: "Media", n: 1, f: r => fmt(r.media, 2)}, {t: "Dev. std", n: 1, f: r => fmt(r.dev_std, 2)},
+  {t: "Min", n: 1, f: r => fmt(r.min, 2)}, {t: "Q1", n: 1, f: r => fmt(r.q1, 2)}, {t: "Mediana", n: 1, f: r => fmt(r.mediana, 2)},
+  {t: "Q3", n: 1, f: r => fmt(r.q3, 2)}, {t: "Max", n: 1, f: r => fmt(r.max, 2)}, {t: "Asimmetria", n: 1, f: r => fmt(r.asimmetria, 2)}], ST.descrittive);
+
+
+// 1.1 distribuzioni (pannello apribile)
+const barreAffiancate = grafico(function (id, d) {
+  const W = larghezza(id, 900), H = 320, m = {l: 46, r: 10, t: 14, b: 58}, n = d.etichette.length;
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const max = Math.max(...d.bev, ...d.altro), passo = max > 40 ? 20 : max > 20 ? 10 : max > 8 ? 5 : 2, top = Math.ceil(max / passo) * passo;
+  const y = v => m.t + ih * (1 - v / top);
+  for (let t = 0; t <= top; t += passo) { s.append(el("line", {x1: m.l, x2: W - m.r, y1: y(t), y2: y(t), stroke: "var(--line)"}));
+    scrivi(s, m.l - 6, y(t) + 4, t + "%", {"text-anchor": "end", "font-size": 11, fill: "var(--ink-3)"}); }
+  const gw = iw / n, bw = Math.max(Math.min((gw - 4) / 2, 36), 1), ogni = Math.ceil(n / Math.max(4, Math.floor(iw / 48)));
+  d.etichette.forEach((e, i) => {
+    const x0 = m.l + i * gw + (gw - 2 * bw - 2) / 2;
+    [[d.bev[i], "var(--s1)", "BEV"], [d.altro[i], "var(--s2)", "altri veicoli"]].forEach(([v, c, g], j) => {
+      const x = x0 + j * (bw + 2), h = Math.max(y(0) - y(v), v > 0 ? 1 : 0), r = Math.min(3, h, bw / 2);
+      const b = el("path", {d: `M${x},${y(0)} V${y(0) - h + r} q0,-${r} ${r},-${r} H${x + bw - r} q${r},0 ${r},${r} V${y(0)} Z`, fill: c});
+      conTooltip(b, `${d.nome} ${e}: ${pct(v)} dei ${g}`); s.append(b);
+    });
+    const ruota = n > 10 || gw < 70;
+    if (i % ogni === 0 || i === n - 1) scrivi(s, m.l + i * gw + gw / 2, H - m.b + 16, e, {"text-anchor": ruota ? "end" : "middle", "font-size": 11,
+      transform: ruota ? `rotate(-35 ${m.l + i * gw + gw / 2} ${H - m.b + 16})` : ""});
+  });
+  $(id).replaceChildren(s);
+});
+function mostraDistribuzione(i) {
+  const d = ST.distribuzioni[i];
+  document.querySelectorAll("#scelte-distribuzioni .scelta").forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
+  $("titolo-distribuzione").textContent = d.nome;
+  $("mediane-distribuzione").innerHTML = d.tipo === "quantitativa"
+    ? `Mediana: BEV <span class="num">${fmt(d.mediana_bev, d.mediana_bev % 1 ? 2 : 0)}</span> · altri veicoli <span class="num">${fmt(d.mediana_altro, d.mediana_altro % 1 ? 2 : 0)}</span>` : "";
+  $("nota-distribuzione").textContent = (d.nota ? d.nota + " " : "") + "Percentuali calcolate separatamente su ciascun gruppo.";
+  barreAffiancate("g-distribuzione", d);
+}
+(function () {
+  const scelte = ST.distribuzioni.map((d, i) => `${i === 0 || d.tipo !== ST.distribuzioni[i - 1].tipo
+      ? `<span class="gruppo-scelte">${d.tipo === "quantitativa" ? "Variabili quantitative" : "Variabili categoriali"}</span>` : ""}` +
+    `<button class="scelta" type="button" aria-pressed="false" data-i="${i}">${d.nome}</button>`).join("");
+  $("scelte-distribuzioni").innerHTML = scelte;
+  $("scelte-distribuzioni").addEventListener("click", e => { const b = e.target.closest(".scelta"); if (b) mostraDistribuzione(+b.dataset.i); });
+  const pulsante = $("apri-distribuzioni"), pannello = $("pannello-distribuzioni");
+  pulsante.addEventListener("click", () => {
+    const aperto = pannello.hidden;
+    pannello.hidden = !aperto;
+    pulsante.setAttribute("aria-expanded", String(aperto));
+    pulsante.textContent = aperto ? "Nascondi i grafici delle distribuzioni" : "Mostra i grafici delle distribuzioni";
+    if (aperto) registro.get("g-distribuzione")?.();
+  });
+  mostraDistribuzione(0);
+})();
+
+// 1.2
+barreVerticali("g-q-reddito", ST.quote.reddito, {media: V.media_bev});
+barreVerticali("g-q-auto", ST.quote.auto, {media: V.media_bev});
+barreVerticali("g-q-eta", ST.quote.eta, {media: V.media_bev});
+barreVerticali("g-q-istruzione", ST.quote.istruzione, {media: V.media_bev});
+barreOrizzontali("g-effetti", ST.bivariati, {etichetta: 280, colore: r => r.tipo === "categoriale" ? "var(--s1)" : "var(--s3)", formato: v => fmt(v, 3)});
+
+// 1.3
+intervalli("g-forest", ST.logit.map(r => ({nome: r.nome, v: r.or, basso: r.basso, alto: r.alto, colore: r.sig ? "var(--s1)" : "var(--s4)",
+  tooltip: `${r.nome}: OR ${fmt(r.or)} (IC ${fmt(r.basso)}–${fmt(r.alto)}), p ${pv(r.p)}`})),
+  {min: 0.15, max: 5, log: true, rif: 1, ticks: [0.25, 0.5, 1, 2, 4], etichetta: 300, formato: v => fmt(v, 2)});
+const ameSig = ST.ame.filter(r => r.p < 0.05).sort((a, b) => b.v - a.v);
+$("ame-bev").textContent = fmt(ST.ame.find(r => r.nome.startsWith("Auto precedente BEV")).v, 0);
+intervalli("g-ame", ameSig.map(r => ({nome: r.nome, v: r.v, basso: r.basso, alto: r.alto, colore: r.v > 0 ? "var(--s1)" : "var(--s2)",
+  tooltip: `${r.nome}: ${fmt(r.v, 1)} punti (IC ${fmt(r.basso, 1)} / ${fmt(r.alto, 1)})`})),
+  {min: -30, max: 30, rif: 0, ticks: [-30, -20, -10, 0, 10, 20, 30], etichetta: 300, formato: v => (v > 0 ? "+" : "") + fmt(v, 1)});
+
+// 1.4
+tabella("t-ipotesi", [
+  {t: "Ipotesi", f: r => r.primo ? `<b>${r.codice}</b> ${r.descrizione}${r.esplorativa ? ' <em style="color:var(--ink-3)">(esplorativa)</em>' : ""}` : ""}, {t: "Variabile", k: "variabile"},
+  {t: "Odds ratio", n: 1, f: r => fmt(r.or)}, {t: "p-value", n: 1, f: r => pv(r.p)}, {t: "Esito", f: r => esito(r.esito)}],
+  ST.ipotesi.map((r, i, a) => ({...r, primo: !i || a[i - 1].codice !== r.codice})), {classe: r => r.primo ? "inizio-gruppo" : "nel-gruppo"});
+
+// 2.1
+linee("g-pca-scree", [{nome: "cumulata", x: [1, 2, 3, 4], y: ES.pca.varianza.map(r => r.cum), colore: "var(--s2)", punti: true, tooltip: (x, y) => pct(y)}],
+  {xmin: 0.4, xmax: 4.6, ymin: 0, ymax: 100, ticksX: [1, 2, 3, 4], ticksY: [0, 25, 50, 75, 100], fx: v => "PC" + v, fy: v => v + "%",
+   barre: ES.pca.varianza.map((r, i) => ({x: i + 1, y: r.var, t: `${r.c}: ${pct(r.var)}`}))});
+tabella("t-loadings", [{t: "Variabile", k: "variabile"}, ...["PC1", "PC2", "PC3", "PC4"].map(c => ({t: c, n: 1, f: r => fmt(r[c], 2), debole: r => Math.abs(r[c]) < 0.3}))], ES.pca.loadings);
+
+// 2.2
+$("mca-gruppi").innerHTML = Object.entries(ES.mca).map(([k, g]) => `
+  <h4 style="font:800 1.02rem/1.3 var(--f-display);margin:28px 0 0">MCA sulle ${g.titolo}</h4>
+  <p style="margin:4px 0 0;font-size:.9rem;color:var(--ink-2)">Dim 1 <span class="num">${pct(g.varianza[0])}</span> → indice <em>${g.dimensioni[0]}</em> · Dim 2 <span class="num">${pct(g.varianza[1])}</span> → indice <em>${g.dimensioni[1]}</em></p>
+  <div class="affiancate"><figure><div class="titolo-fig">Contributi a Dim 1 (%)</div><div class="grafico" id="g-mca-${k}-1"></div></figure>
+  <figure><div class="titolo-fig">Contributi a Dim 2 (%)</div><div class="grafico" id="g-mca-${k}-2"></div></figure></div>`).join("");
+for (const [k, g] of Object.entries(ES.mca)) {
+  barreOrizzontali(`g-mca-${k}-1`, g.dim1, {formato: v => fmt(v, 1), etichetta: 250});
+  barreOrizzontali(`g-mca-${k}-2`, g.dim2, {formato: v => fmt(v, 1), etichetta: 250, colore: () => "var(--s3)"});
+}
+
+// 2.3
+linee("g-famd-scree", [{nome: "cumulata", x: ES.famd.varianza.map((_, i) => i + 1), y: ES.famd.varianza.map(r => r.cum), colore: "var(--s2)", punti: true, tooltip: (x, y) => pct(y)}],
+  {xmin: 0.4, xmax: 10.6, ymin: 0, ymax: 50, ticksX: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ticksY: [0, 10, 20, 30, 40, 50], fy: v => v + "%", H: 260,
+   barre: ES.famd.varianza.map((r, i) => ({x: i + 1, y: r.var, t: `${r.c}: ${pct(r.var)}`}))});
+barreOrizzontali("g-famd-1", ES.famd.dim1, {formato: v => fmt(v, 1), etichetta: 250});
+barreOrizzontali("g-famd-2", ES.famd.dim2, {formato: v => fmt(v, 1), etichetta: 250, colore: () => "var(--s3)"});
+
+// 3.2
+const ks = CL.scelta_k.map(r => r.k);
+linee("g-wss", [{nome: "WSS", x: ks, y: CL.scelta_k.map(r => r.wss / 1000), colore: "var(--s1)", punti: true, tooltip: (x, y) => `k=${x}, ${fmt(y * 1000, 0)}`}],
+  {xmin: 1.6, xmax: 8.4, ymin: 15, ymax: 50, ticksX: ks, ticksY: [20, 30, 40, 50], fy: v => fmt(v, 0) + "k", titoloX: "numero di cluster (k)"});
+linee("g-sil", [{nome: "Silhouette", x: ks, y: CL.scelta_k.map(r => r.silhouette), colore: "var(--s1)", punti: true, tooltip: (x, y) => `k=${x}, ${fmt(y, 3)}`}],
+  {xmin: 1.6, xmax: 8.4, ymin: 0.2, ymax: 0.5, ticksX: ks, ticksY: [0.2, 0.3, 0.4, 0.5], titoloX: "numero di cluster (k)"});
+
+// 3.2 composizione
+grafico(function (id) {
+  const tipi = CL.composizione.tipi, colori = ["#3f93aa", "#ddd4c1", "#263a5a", "var(--ink)", "#e2462a"], testi = ["#0d0d0d", "#0d0d0d", "#fff", "var(--bg)", "#fff"];
+  $("l-cluster").innerHTML = tipi.map((t, i) => `<span><i style="background:${colori[i]}"></i>${t}</span>`).join("");
+  const W = larghezza(id, 900), stretto = W < STRETTO, riga = stretto ? 52 : 42;
+  const m = {l: stretto ? 0 : 150, r: stretto ? 4 : 20, t: 6, b: 26}, H = m.t + m.b + riga * CL.composizione.righe.length;
+  const s = nuovoSvg(W, H), iw = W - m.l - m.r, x = v => m.l + iw * v / 100;
+  for (const t of [0, 25, 50, 75, 100]) scrivi(s, Math.min(Math.max(x(t), 14), W - 18), H - 8, t + "%", {"text-anchor": "middle", fill: "var(--ink-3)", "font-size": 11});
+  CL.composizione.righe.forEach((r, i) => {
+    const y = m.t + i * riga + (stretto ? 20 : 7), h = stretto ? 24 : riga - 14; let acc = 0;
+    if (stretto) scrivi(s, 0, y - 6, `Cluster ${i + 1} · ${fmt(r.n, 0)}`, {fill: "var(--ink)"});
+    else scrivi(s, m.l - 12, y + h / 2 + 4, `Cluster ${i + 1} · ${fmt(r.n, 0)}`, {"text-anchor": "end", fill: "var(--ink)", "font-size": 12.5});
+    tipi.forEach((t, j) => { const v = r.quote[j]; if (v <= 0) return;
+      const rect = el("rect", {x: x(acc) + 1, y, width: Math.max(0, x(acc + v) - x(acc) - 2), height: h, rx: 3, fill: colori[j]});
+      conTooltip(rect, `Cluster ${i + 1}: ${pct(v)} ${t}`); s.append(rect);
+      if (v > 12) scrivi(s, x(acc + v / 2), y + h / 2 + 4, `${t} ${pct(v, 0)}`, {"text-anchor": "middle", "font-weight": 600, fill: testi[j], "pointer-events": "none"});
+      acc += v; });
+  });
+  $(id).replaceChildren(s);
+})("g-cluster");
+const colProfilo = [
+  {t: "Cluster", k: "cluster"}, {t: "n", n: 1, f: r => fmt(r.n, 0)}, {t: "%", n: 1, f: r => fmt(r.quota, 1)},
+  {t: "Età", n: 1, f: r => fmt(r.eta, 1)}, {t: "Reddito (USD)", n: 1, f: r => fmt(r.reddito, 0)}, {t: "Emissioni", n: 1, f: r => fmt(r.emissioni, 2)},
+  {t: "VMT", n: 1, f: r => fmt(r.vmt, 0)}, {t: "Viaggi lunghi", n: 1, f: r => fmt(r.viaggi, 1)},
+  {t: "Auto precedente", k: "auto_prec"}, {t: "Istruzione", k: "istruzione"}, {t: "Casa indip.", k: "casa"}];
+tabella("t-profilo", colProfilo, CL.profilo);
+tabella("t-profilo-senza", colProfilo, CL.profilo_senza);
+
+// 3.1 K-Mode
+$("profili-kmode").innerHTML = CL.kmode_profili.map(r => `<div><h4>${r.cluster} · ${fmt(r.n, 0)} (${pct(r.quota, 0)})</h4><p>${r.sintesi}</p></div>`).join("");
+tabella("t-kmode-medie", [{t: "Cluster", k: "cluster"}, {t: "n", n: 1, f: r => fmt(r.n, 0)}, {t: "Età", n: 1, f: r => fmt(r.eta, 1)},
+  {t: "Reddito (USD)", n: 1, f: r => fmt(r.reddito, 0)}, {t: "Persone", n: 1, f: r => fmt(r.persone, 1)}, {t: "Auto", n: 1, f: r => fmt(r.auto, 1)},
+  {t: "VMT", n: 1, f: r => fmt(r.vmt, 0)}, {t: "Viaggi > 200 mi", n: 1, f: r => fmt(r.viaggi, 1)}, {t: "Casa-lavoro (mi)", n: 1, f: r => fmt(r.distanza, 1)},
+  {t: "BEV precedente", n: 1, f: r => pct(r.bev_prec)}], CL.kmode_profili);
+const kk = CL.kmode_costo.map(r => r.k);
+linee("g-kmode", [{nome: "Costo", x: kk, y: CL.kmode_costo.map(r => r.costo / 1000), colore: "var(--s3)", punti: true, tooltip: (x, y) => `k=${x}, ${fmt(y * 1000, 0)}`}],
+  {xmin: 0.6, xmax: 8.4, ymin: 25, ymax: 40, ticksX: kk, ticksY: [25, 30, 35, 40], fy: v => fmt(v, 0) + "k", titoloX: "numero di cluster (k)"});
+tabella("t-kmode", [{t: "Variabile", k: "variabile"}, {t: "C1", k: "c1"}, {t: "C2", k: "c2"}, {t: "C3", k: "c3"}, {t: "C4", k: "c4"}], CL.kmode_centri);
+
+// 4.1
+intervalli("g-screening", ML.screening.map((r, i) => ({nome: r.nome, v: r.v, basso: r.basso, alto: r.alto, forte: i === 0, colore: i < 4 ? "var(--s1)" : "var(--s2)",
+  tooltip: `${r.nome}: ROC-AUC ${fmt(r.v)} ± ${fmt(r.alto - r.v)} · accuracy ${pct(r.acc * 100)} · F1 ${fmt(r.f1)}`})),
+  {min: 0.55, max: 0.76, ticks: [0.55, 0.6, 0.65, 0.7, 0.75], etichetta: 230});
+
+// 4.2
+tabella("t-parametri", [{t: "Modello", k: "modello"}, {t: "ROC-AUC CV", n: 1, f: r => fmt(r.auc_cv)}, {t: "Iperparametri scelti", k: "parametri"}], ML.parametri);
+
+// 4.3
+intervalli("g-modelli", ML.test.map((r, i) => ({nome: r.nome, v: r.roc_auc, basso: r.roc_auc_ic_basso, alto: r.roc_auc_ic_alto, forte: i === 0,
+  colore: r.gruppo === "alberi" ? "var(--s1)" : "var(--s2)", tooltip: `${r.nome}: ROC-AUC ${fmt(r.roc_auc)} (IC ${fmt(r.roc_auc_ic_basso)}–${fmt(r.roc_auc_ic_alto)})`})),
+  {min: 0.62, max: 0.76, ticks: [0.62, 0.66, 0.70, 0.74], etichetta: 290});
+tabella("t-test", [{t: "Modello", k: "nome"}, ...[["Accuracy", "accuracy"], ["Bal. acc.", "balanced_accuracy"], ["Precision", "precision"], ["Recall", "recall"],
+  ["F1", "f1"], ["ROC-AUC", "roc_auc"], ["Brier", "brier"]].map(([t, k]) => ({t, n: 1, f: r => fmt(r[k])}))], ML.test, {evidenzia: r => r.nome === ML.migliore});
+const cm = ML.confusione;
+$("confusione").innerHTML = `<div class="confusione"><div class="et"></div><div class="et">Predetto non BEV</div><div class="et">Predetto BEV</div>
+  <div class="et">Reale non BEV</div><div class="giusto"><b>${cm.tn}</b>corretti</div><div class="errato"><b>${cm.fp}</b>falsi positivi</div>
+  <div class="et">Reale BEV</div><div class="errato"><b>${cm.fn}</b>falsi negativi</div><div class="giusto"><b>${cm.tp}</b>corretti</div></div>`;
+tabella("t-mcnemar", [{t: "Modello", k: "modello"}, {t: "χ²", n: 1, f: r => fmt(r.chi2, 2)}, {t: "p-value", n: 1, f: r => pv(r.p)},
+  {t: "Differenza", f: r => r.p < 0.05 ? badge("no", "Significativa") : badge("nd", "Non significativa")}], ML.mcnemar);
+
+// 4.4
+const nomiRoc = Object.keys(ML.roc);
+linee("g-roc", nomiRoc.map((n, i) => ({nome: n, x: ML.roc[n].x, y: ML.roc[n].y, colore: SERIE[i]})),
+  {xmin: 0, xmax: 1, ymin: 0, ymax: 1, ticksX: [0, 0.25, 0.5, 0.75, 1], ticksY: [0, 0.25, 0.5, 0.75, 1], fx: v => fmt(v, 2), titoloX: "tasso di falsi positivi", diagonale: true, legenda: "l-roc"});
+const nomiCal = Object.keys(ML.calibrazione);
+linee("g-cal", nomiCal.map((n, i) => ({nome: n, x: ML.calibrazione[n].x, y: ML.calibrazione[n].y, colore: [SERIE[0], SERIE[1]][i], punti: true,
+  tooltip: (x, y) => `predetta ${fmt(x, 2)}, osservata ${fmt(y, 2)}`})),
+  {xmin: 0, xmax: 1, ymin: 0, ymax: 1, ticksX: [0, 0.25, 0.5, 0.75, 1], ticksY: [0, 0.25, 0.5, 0.75, 1], fx: v => fmt(v, 2), titoloX: "probabilità predetta", diagonale: true, legenda: "l-cal"});
+
+// 4.5
+barreOrizzontali("g-shap", ML.shap, {etichetta: 170});
+barreOrizzontali("g-perm", ML.permutazione, {etichetta: 170, colore: () => "var(--s2)"});
+
+// 5.1
+tabella("t-architetture", [{t: "Rete", k: "nome"}, {t: "Input", n: 1, k: "input"}, {t: "Neuroni per strato", k: "strati"}, {t: "Attivazione", k: "attivazione"},
+  {t: "Regolarizzazione", k: "regolarizzazione"}, {t: "BatchNorm", f: r => r.batch_norm ? "Sì" : "–"}, {t: "Dropout", n: 1, f: r => fmt(r.dropout, 1)},
+  {t: "Ottimizzatore", k: "ottimizzatore"}, {t: "Parametri", n: 1, f: r => fmt(r.parametri, 0)}, {t: "Epoche", n: 1, k: "epoche"}], DL.architetture);
+
+// 5.2
+$("storie").innerHTML = Object.keys(DL.storie).map((n, i) => `<figure><div class="titolo-fig">${n}: loss</div><div class="grafico" id="g-st-${i}-l"></div></figure>
+  <figure><div class="titolo-fig">${n}: ROC-AUC</div><div class="grafico" id="g-st-${i}-a"></div></figure>`).join("");
+Object.entries(DL.storie).forEach(([n, st], i) => {
+  const ep = st.loss.map((_, j) => j + 1), E = ep.length, tx = [1, Math.round(E / 2), E];
+  // Con la regolarizzazione L1 le prime epoche hanno una loss molto alta: l'asse è calcolato sul 90% finale delle epoche e i valori oltre vengono tagliati
+  const k0 = Math.max(2, Math.round(E / 10)), coda = [...st.loss.slice(k0), ...st.val_loss.slice(k0)], taglio = Math.max(...st.loss, ...st.val_loss) > 2 * Math.max(...coda);
+  const lo = Math.floor(Math.min(...coda) * 20) / 20, hi = Math.ceil(Math.max(...(taglio ? coda : [...st.loss, ...st.val_loss])) * 20) / 20;
+  const clip = v => Math.min(v, hi);
+  if (taglio) $(`g-st-${i}-l`).previousElementSibling.textContent += " (prime epoche fuori scala)";
+  linee(`g-st-${i}-l`, [{nome: "training", x: ep, y: st.loss.map(clip), colore: "var(--s1)"}, {nome: "validazione", x: ep, y: st.val_loss.map(clip), colore: "var(--s2)", tratto: "5 4"}],
+    {xmin: 1, xmax: E, ymin: lo, ymax: hi, ticksX: tx, ticksY: [lo, (lo + hi) / 2, hi], titoloX: "epoca", H: 240});
+  linee(`g-st-${i}-a`, [{nome: "training", x: ep, y: st.auc, colore: "var(--s1)"}, {nome: "validazione", x: ep, y: st.val_auc, colore: "var(--s2)", tratto: "5 4"}],
+    {xmin: 1, xmax: E, ymin: 0.5, ymax: 0.8, ticksX: tx, ticksY: [0.5, 0.6, 0.7, 0.8], titoloX: "epoca", H: 240});
+});
+
+// 5.3
+const nomiDl = Object.keys(DL.roc);
+linee("g-roc-dl", nomiDl.map((n, i) => ({nome: n, x: DL.roc[n].x, y: DL.roc[n].y, colore: SERIE[i]})),
+  {xmin: 0, xmax: 1, ymin: 0, ymax: 1, ticksX: [0, 0.25, 0.5, 0.75, 1], ticksY: [0, 0.25, 0.5, 0.75, 1], fx: v => fmt(v, 2), titoloX: "tasso di falsi positivi", diagonale: true, legenda: "l-roc-dl"});
+tabella("t-dl", [{t: "Modello", k: "nome"}, {t: "Accuracy", n: 1, f: r => fmt(r.accuracy)}, {t: "F1", n: 1, f: r => fmt(r.f1)}, {t: "ROC-AUC", n: 1, f: r => fmt(r.roc_auc)},
+  {t: "IC 95%", n: 1, f: r => `${fmt(r.roc_auc_ic_basso)}–${fmt(r.roc_auc_ic_alto)}`}], [ML.test[0], ...DL.test], {evidenzia: r => r.nome === ML.migliore});
+
+// --- Indice: voce attiva durante lo scorrimento ----------------------------------------------
+const voci = [...document.querySelectorAll(".indice a")];
+const osservatore = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) voci.forEach(a => a.classList.toggle("attivo", a.getAttribute("href") === "#" + e.target.id)); });
+}, {rootMargin: "0px 0px -75% 0px"});
+voci.map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean).forEach(b => osservatore.observe(b));
+
+// Ridisegno dei grafici quando cambia la larghezza (rotazione del telefono, finestra ridimensionata)
+let ultimaLarghezza = innerWidth, attesa;
+addEventListener("resize", () => { clearTimeout(attesa); attesa = setTimeout(() => {
+  if (innerWidth === ultimaLarghezza) return; ultimaLarghezza = innerWidth; registro.forEach(f => f()); }, 150); });
+
+// Pulsante "Indice" sugli schermi stretti: compare dopo la copertina
+const vaiIndice = $("vai-indice");
+new IntersectionObserver(([e]) => vaiIndice.classList.toggle("visibile", !e.isIntersecting && e.boundingClientRect.top < 0))
+  .observe($("indice"));
+
+// Tema
+$("tema").addEventListener("click", () => {
+  const r = document.documentElement, scuro = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = scuro ? "light" : "dark";
+});
+</script>

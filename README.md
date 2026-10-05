@@ -1,123 +1,95 @@
-# Progetto Tesi Magistrale in Data Science
+# Analisi data-driven per l'adozione di veicoli elettrici
 
-Questa repository contiene il codice e i materiali relativi alla **Tesi Magistrale** incentrata sull'ambito della _Data Science_, svolta nell'ambito del corso di Laurea Magistrale in Management e Comunicazione d'Impresa (LM77) presso l'Università degli Studi di Modena e Reggio Emilia. Il lavoro si concentra sull'analisi statistica e predittiva per comprendere le caratteristiche degli utilizzatori di auto elettriche.
+*Analisi statistiche e predittive sugli acquirenti di auto elettriche*
 
-La repository è organizzata in due cartelle principali:
+Tesi magistrale di **Federico Gamberini** (mat. 178147), relatore **Prof. Roberto Cavicchioli**. Laurea Magistrale in Management e Comunicazione d'Impresa (LM77), Università degli Studi di Modena e Reggio Emilia, Dipartimento di Comunicazione ed Economia, A.A. 2023/2024.
 
-- **[Analisi_Statistiche](Analisi_Statistiche)**: contiene i materiali e il codice per le Analisi Statistiche ed Esplorative.
-- **[Apprendimento_Automatico_analisi_predittive](Apprendimento_Automatico_analisi_predittive)**: contiene il codice per l'analisi predittiva tramite algoritmi di Machine e Deep Learning.
+Il progetto analizza **10.688 possessori di veicoli a basse emissioni** in California per capire cosa distingue chi guida un'auto 100% elettrica (BEV) da chi ha scelto un ibrido plug-in, un full hybrid o l'idrogeno. Comprende analisi statistiche e una regressione logistica per le ipotesi di ricerca, analisi multivariate (PCA, MCA, FAMD), una segmentazione dei possessori di BEV e modelli predittivi di machine e deep learning, con una dashboard interattiva.
 
----
+## Risultati principali
 
-## **1. ANALISI STATISTICHE**
+| | |
+|---|---|
+| Quota di BEV nel campione | 54,2% |
+| Ipotesi confermate | H1 (reddito), H2.3 (BEV precedente), H3 (percorrenze, in parte), H4 (sensibilità ambientale) |
+| Ipotesi non supportata | H2.1: chi aveva una PHEV ha odds di BEV 0,66 volte quelle di chi aveva un'auto ICE |
+| Ipotesi esplorativa | H2.2: rispetto alla PHEV, l'auto ICE aumenta la probabilità di BEV (OR 1,51); HEV e GNC senza effetto significativo |
+| Segmentazione | K-Mode (k = 4), come nella tesi: coppie con reddito alto e VMT basso, famiglie pendolari con 3 auto, over 65 con reddito medio, famiglie con reddito molto alto. I profili sono descrittivi, perché la partizione cambia con il seed (ARI 0,13); il K-Means, scartato nella tesi, coincide con l'auto precedente (ARI 0,997) |
+| Reti neurali | la rete avanzata della tesi (189 feature polinomiali), validata senza usare il test set: accuracy 64,6%, ROC-AUC 0,672, sotto la rete più semplice (0,694) |
+| Miglior modello predittivo | Voting/LightGBM, ROC-AUC 0,725 (IC 95% 0,705–0,746); i primi 6 modelli sono statisticamente equivalenti |
+| Fattori più importanti (SHAP) | viaggi lunghi e VMT (in negativo), reddito, auto precedente BEV, sensibilità ambientale |
 
-Le analisi statistiche sono contenute nell'apposita cartella e includono diversi passaggi per esplorare e comprendere i dati, tra cui analisi univariate e bivariate, analisi VIF, regressione logistica e analisi cluster. L'analisi esplorativa è stata eseguita principalmente in Python, mentre alcune tecniche più avanzate (FAMD, MCA, PCA) sono state eseguite in R.
+Tutti i risultati, capitolo per capitolo, sono in [`docs/RISULTATI.md`](docs/RISULTATI.md) e nella pagina interattiva [`docs/risultati.html`](docs/risultati.html), con indice e grafici (GitHub ne mostra solo il codice: va aperta nel browser dopo averla scaricata). Il testo completo della tesi e la presentazione di laurea sono in [`docs/Tesi_Gamberini_v_digitale.pdf`](docs/Tesi_Gamberini_v_digitale.pdf) e [`docs/MCI_178147.pdf`](docs/MCI_178147.pdf).
 
-### **Contenuti della cartella Analisi_Statistiche:**
+## Limiti e conclusioni
 
-#### 1. Raccolta ed Elaborazione dei Dati
-Caricamento e preparazione dei dataset utilizzati in per le future analisi statistiche.
+I limiti principali sono il contesto geografico (solo California), una capacità esplicativa contenuta (pseudo-R² 0,064, ROC-AUC 0,725) e l'assenza di variabili psicologiche e culturali. Reddito, miglia annue e viaggi lunghi sono i fattori più influenti; l'adozione del BEV appare come una transizione culturale oltre che tecnologica. Il testo completo è in [`docs/RISULTATI.md`](docs/RISULTATI.md).
 
-- [Cap. 1 Caricamento e preparazione dataset, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+## Notebook
 
-#### 2. Analisi Univariata
-Sono state condotte analisi univariate per ciascuna delle variabili. Queste analisi hanno permesso di esplorare la distribuzione, la centralità e la dispersione delle variabili.
+I notebook presentano le analisi: la logica è nel pacchetto `src/tesi_bev`. Si aprono direttamente su Google Colab: la prima cella clona il repository e installa le dipendenze mancanti (`requirements-colab.txt`). I notebook sono generati da `scripts/genera_notebook.py`: per modificarli si cambia lo script, non il file `.ipynb`.
 
-- [Cap. 2 Analisi Univariata, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+| Notebook | Contenuto | |
+|---|---|---|
+| [01 Dati e analisi descrittive](notebooks/01_dati_e_analisi_descrittive.ipynb) | qualità dei dati, distribuzioni, test bivariati | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FedeGambe/Master_s_thesis_Data_science/blob/revisione-progetto/notebooks/01_dati_e_analisi_descrittive.ipynb) |
+| [02 Regressione logistica](notebooks/02_regressione_logistica.ipynb) | VIF, logit, effetti marginali, ipotesi H1-H4 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FedeGambe/Master_s_thesis_Data_science/blob/revisione-progetto/notebooks/02_regressione_logistica.ipynb) |
+| [03 Analisi esplorative](notebooks/03_analisi_esplorative.ipynb) | PCA, MCA, FAMD, indici compositi (versione Python degli script R) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FedeGambe/Master_s_thesis_Data_science/blob/revisione-progetto/notebooks/03_analisi_esplorative.ipynb) |
+| [04 Cluster](notebooks/04_cluster.ipynb) | K-Mode (segmentazione finale), verificato con K-Means e gerarchico | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FedeGambe/Master_s_thesis_Data_science/blob/revisione-progetto/notebooks/04_cluster.ipynb) |
+| [05 Machine learning](notebooks/05_machine_learning.ipynb) | 15 modelli, ottimizzazione, IC bootstrap, McNemar, SHAP | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FedeGambe/Master_s_thesis_Data_science/blob/revisione-progetto/notebooks/05_machine_learning.ipynb) |
+| [06 Reti neurali](notebooks/06_reti_neurali.ipynb) | reti Keras con validazione separata | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FedeGambe/Master_s_thesis_Data_science/blob/revisione-progetto/notebooks/06_reti_neurali.ipynb) |
+| [07 Dashboard](notebooks/07_dashboard.ipynb) | dashboard di predizione | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FedeGambe/Master_s_thesis_Data_science/blob/revisione-progetto/notebooks/07_dashboard.ipynb) |
 
-#### 3. Analisi Bivariata
-È stata eseguita un'analisi bivariata per esaminare le relazioni tra ciascuna delle variabili indipendenti e la variabile dipendente.
+## Struttura
 
-- [Cap. 3 Analisi Bivariata, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
-  
-#### 4. Formulazione delle Ipotesi di Ricerca
-Dopo le analisi bivariate, sono state redatte le 4 Ipotesi di Ricerca focalizzate sul tema della logistica.
+```
+├── dati/
+│   ├── originali/         dataset di partenza (dataset_originale.csv è la fonte usata da tutte le analisi)
+│   └── elaborati/         dataset derivati per R e per il clustering (non versionati, creati dalle fasi 01 e 03)
+├── src/tesi_bev/          pacchetto Python: configurazione, dati, statistica, esplorativa, cluster,
+│                          modelli, reti neurali, valutazione, grafici, salvataggio, esportazione web
+├── scripts/               una fase dell'analisi per script (01 → 08), esegui_tutto.py, genera_notebook.py
+├── R/                     PCA, MCA, FAMD e cluster in R (stesse analisi della versione Python)
+├── notebooks/             notebook di presentazione, eseguibili su Colab
+├── app/                   dashboard Dash (dashboard.py) e sorgenti della dashboard HTML (modello_bev.js, modello_dashboard.html)
+├── modelli/               pipeline finale (StandardScaler + LightGBM) usata dalle dashboard
+├── risultati/             tabelle CSV/JSON prodotte dagli script, una cartella per fase (risultati/r/ per R)
+├── docs/                  pagina e documento dei risultati, dashboard.html, tesi e presentazione in PDF
+├── tests/                 test automatici (pytest)
+├── .github/workflows/     integrazione continua (test Python)
+└── legacy/                codice, dataset intermedi, modelli e notebook originali della tesi
+```
 
-- [Cap. 4 Ipotesi di Ricerca, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+La descrizione dettagliata di ogni cartella e file, con il flusso dei dati tra le fasi, è in [`struttura.md`](struttura.md).
 
-#### 5. Analisi VIF e Correlazione
-Sono stati calcolati gli Indici di Inflazione della Varianza (VIF) per identificare potenziali problemi di multicollinearità tra le variabili indipendenti.
+## Eseguire l'analisi in locale
 
-- [Cap. 5.1, 5.2 Analisi VIF e Correlazione, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 
-#### 6. Analisi di Regressione Logistica
-L'analisi di regressione logistica è stata eseguita per testare le Ipotesi di Ricerca formulate, valutando l'influenza delle variabili indipendenti sulla probabilità della variabile dipendente.
+python scripts/esegui_tutto.py            # tutte le fasi, R, notebook, pagina e dashboard (circa 25 minuti)
+                                          # --veloce: prova rapida del ML; --senza-r: salta gli script R
+# oppure una fase alla volta:
+python scripts/01_prepara_dati.py         # crea anche i CSV in dati/elaborati/ letti dagli script R
+python scripts/02_statistica.py
+python scripts/03_esplorativa.py
+python scripts/04_cluster.py
+python scripts/05_machine_learning.py
+python scripts/06_reti_neurali.py
+python scripts/07_pagina_risultati.py     # docs/risultati.html e docs/RISULTATI.md
+python scripts/08_dashboard_html.py       # docs/dashboard.html (dashboard autonoma, si apre con doppio clic)
 
-- [Cap. 5.3, 5.4 Regressione Logistica, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+Rscript R/esegui_tutto.R                  # analisi R (dopo le fasi 01 e 03)
+python app/dashboard.py                   # dashboard Dash su http://127.0.0.1:8050
+pytest                                    # test
+```
 
-#### 7. Trasformazione delle Variabili
-Le variabili quantitative sono state trasformate in variabili ordinali per la successiva analisi tramite **Multiple Correspondence Analysis (MCA)**.
+Python 3.10 o successivo; le versioni esatte con cui sono stati prodotti i risultati sono in `requirements.txt`. Per `tests/test_dashboard_html.py` serve anche Node.js (senza, il test viene saltato).
 
-- [Cap. 6 Trasformazione delle Variabili, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-- Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+Pacchetti R richiesti: `dplyr`, `FactoMineR`, `factoextra`, `cluster`, `psych`, `ggplot2`, `klaR`.
 
-#### 8. Analisi Esplorative
-Sono state condotte le seguenti analisi esplorative utilizzando R:
+## Dati
 
-- **FAMD (Factor Analysis of Mixed Data)**: Analisi di variabili sia quantitative che qualitative.
-  - [File R: FAMD](Analisi_Statistiche/Analisi_Esplorative_FAMD.R)
-  
-- **MCA (Multiple Correspondence Analysis)**: Analisi delle relazioni tra variabili categoriche.
-  - [File R: MCA](Analisi_Statistiche/Analisi_Esplorative_MCA.R)
-  
-- **PCA (Principal Component Analysis)**: Riduzione della dimensionalità delle variabili quantitative.
-  - [File R: PCA](Analisi_Statistiche/Analisi_Esplorative_PCA.R)
-  
-- **Cluster Analysis**: Utilizzo di vari algoritmi di clustering (K-Means, K-Mode, K-Prototype, e Clustering Gerarchico) per raggruppare le osservazioni simili.
-  - [File R: Cluster](Analisi_Statistiche/Analisi_Esplorative_CLUSTER.R)
-  - [Cap. 7 Analisi Cluster, Notebook: Python](Analisi_Statistiche/Analisi_univariata,_bivariata,_logistica_e_cluster.ipynb)
-  - Link Colab: [![Apri su Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bPEGyp3IGkF0hbej1MXPqgE-6VONrB5h?usp=sharing)
+Fonte: *Sociodemographic data for BEV owning households in California* (UC Davis), derivato dalla ricerca *Understanding the Early Adopters of Fuel Cell Vehicles* di Scott Hardman. Dai 27.021 casi e 27 variabili originali la pulizia (OpenRefine e Python) ha portato a 10.688 casi e 16 variabili in 5 gruppi (il file ha 18 colonne: in più ci sono il modello e la tipologia dell'auto attuale, da cui deriva `BEV dummy`): socio-demografiche, abitative, sensibilità ambientale, classe veicolare, mobilità e percorrenza.
 
----
-
-
-## **2. APPRENDIMENTO AUTOMATICO:** analisi predittive
-
-La cartella **Apprendimento_Automatico_analisi_Predittive** contiene gli script per le analisi predittive, che includono la preparazione dei dati e l'applicazione di modelli di machine learning (ML) e deep learning.
-
-### **Contenuti della cartella Apprendimento_Automatico_analisi_Predittive:**
-
-#### 1. Raccolta ed Elaborazione dei Dati
-Descrizione della preparazione dei dati per le analisi predittive.
-
-- [Cap. 1 Caricamento e preparazione dataset, Notebook: Python](Apprendimento_Automatico_analisi_predittive/Apprendimento_Automatico(ML_e_DL).ipynb)
-- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Z_kfWzuhDTwt1zL9Ys41RGjKldEvE4I-?usp=sharing)
-
-#### 2. Preparazione per le Analisi Predittive ML
-Descrizione delle tecniche utilizzate per preparare i dati per l'analisi predittiva.
-
-- [Cap. 2 Preparazione per le Analisi Predittive, Notebook: Python](Apprendimento_Automatico_analisi_predittive/Apprendimento_Automatico(ML_e_DL).ipynb)
-- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Z_kfWzuhDTwt1zL9Ys41RGjKldEvE4I-?usp=sharing)
-
-#### 3. Analisi dei Modelli ML
-Applicazione dei modelli di machine learning per predire i comportamenti degli utilizzatori di auto elettriche.
-
-- [Cap. 3 Modelli ML, Notebook: Python](Apprendimento_Automatico_analisi_predittive/Apprendimento_Automatico(ML_e_DL).ipynb)
-- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Z_kfWzuhDTwt1zL9Ys41RGjKldEvE4I-?usp=sharing)
-
-#### 4. Migliore Modello e Migliori Features
-Analisi dei modelli migliori e selezione delle migliori features in base ai risultati.
-
-- [Cap. 4 Migliore Modello e Migliori Features, Notebook: Python](Apprendimento_Automatico_analisi_predittive/Apprendimento_Automatico(ML_e_DL).ipynb)
-- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Z_kfWzuhDTwt1zL9Ys41RGjKldEvE4I-?usp=sharing)
-
-#### 5. Artificial Neural Network
-Creazione di modello più e meno complessi a base di reti neurali artificiali.
-
-- [Cap. 5 Reti Neurali, Notebook: Python](Apprendimento_Automatico_analisi_predittive/Apprendimento_Automatico(ML_e_DL).ipynb)
-- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Z_kfWzuhDTwt1zL9Ys41RGjKldEvE4I-?usp=sharing)
-
-#### 6. Dashboard di predizione
-Le dashboard di predizioni offrono uno strumento interattivo per testare i modelli di previsione, consentendo di inserire nuovi dati relativi a potenziali consumatori. Una volta inseriti, i modelli analizzano le caratteristiche del cliente e restituiscono una predizione sulla probabilità che quel consumatore possa acquisire una vettura elettrica in futuro.
-
-- [Dashboard di predizione: Python](Apprendimento_Automatico_analisi_predittive/Dashboard_di_Predizione.ipynb)
-- Link Colab: [![Apri con Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1o16naCS0C706khjFKP6L75mbwCVxMVrg?usp=drive_link) 
-
-
-
+Il campione è composto da possessori californiani di veicoli a basse emissioni (BEV, PHEV, HEV, FCEV). La variabile dipendente `BEV dummy` vale 1 se il veicolo attuale è un BEV. Le variabili indipendenti riguardano caratteristiche socio-demografiche (genere, età, reddito, istruzione), abitative (casa di proprietà o indipendente, componenti e auto in famiglia), l'importanza attribuita alla riduzione delle emissioni, il tipo di auto precedente e la mobilità (viaggio più lungo, viaggi oltre 200 miglia, distanza casa-lavoro, miglia annue).

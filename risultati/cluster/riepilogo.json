@@ -1,0 +1,84 @@
+{
+  "kmode": {
+    "variabili": [
+      "Genere",
+      "Classe Reddito Familiare",
+      "Livello di istruzione",
+      "Casa di proprietà",
+      "Casa Indipendente",
+      "Tipologia di auto precedente",
+      "Numero persone in famiglia categoriale",
+      "Numero di auto in famiglia categoriale",
+      "VMT categoriale",
+      "Viaggio lungo categoriale",
+      "Numero viaggi lunghi categoriale",
+      "Distanza casa-lavoro categoriale",
+      "Sensibilità ambientale categoriale",
+      "Classe età raggruppata"
+    ],
+    "k": 4,
+    "costo": 30833.0,
+    "dimensioni": [
+      1911,
+      1783,
+      1219,
+      883
+    ],
+    "stabilita_ARI_semi": 0.13487832745563721,
+    "ARI_con_auto_precedente": 0.0004954721082742482
+  },
+  "tesi": {
+    "variabili": [
+      "Età",
+      "Dimensione familiare",
+      "Stile di vita",
+      "Auto precedente: HEV",
+      "Auto precedente: GNC",
+      "Auto precedente: BEV",
+      "Auto precedente: PHEV",
+      "Auto precedente: ICE",
+      "Mobilità quotidiana PCA",
+      "Viaggi PCA"
+    ],
+    "k": 4,
+    "wss": 34641.2926782703,
+    "silhouette": 0.4016966957145627,
+    "stabilita_ARI_bootstrap": 0.9743582713874964,
+    "dimensioni": [
+      3327,
+      1009,
+      567,
+      893
+    ],
+    "ARI_con_auto_precedente": 0.9965693130833063,
+    "ARI_con_kmode": 0.0005344017525785248
+  },
+  "senza_auto_precedente": {
+    "variabili": [
+      "Età",
+      "Dimensione familiare",
+      "Stile di vita",
+      "Mobilità quotidiana PCA",
+      "Viaggi PCA",
+      "Status socioeconomico",
+      "Importanza di ridurre le emissioni di gas serra"
+    ],
+    "k": 4,
+    "wss": 27854.641997455154,
+    "silhouette": 0.20587926961177316,
+    "stabilita_ARI_bootstrap": 0.8763051938004589,
+    "dimensioni": [
+      454,
+      3271,
+      1004,
+      1067
+    ],
+    "ARI_con_auto_precedente": -0.037903629580177324,
+    "ARI_con_kmode": 0.015838953000842114
+  },
+  "gerarchico_ward": {
+    "correlazione_cofenetica": 0.535640124025687,
+    "silhouette": 0.37070924058311067,
+    "ARI_vs_kmeans_tesi": 0.9160569575651736
+  }
+}

@@ -1,0 +1,10 @@
+,n01,n10,chi2,p_value
+Regressione logistica,276,198,12.5084,0.000405118
+Random Forest,28,31,0.0677966,0.794572
+Gradient Boosting,36,33,0.057971,0.809732
+AdaBoost,97,80,1.44633,0.229118
+SVM,196,145,7.33138,0.00677611
+MLP,179,150,2.38298,0.122663
+XGBoost,25,25,0.02,0.887537
+LightGBM,15,29,3.84091,0.0500164
+Gradient Boosting (feature selezionate),36,33,0.057971,0.809732

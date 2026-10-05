@@ -1,0 +1,52 @@
+{
+  "modello": "LightGBM",
+  "feature": [
+    "Genere",
+    "Classe d'età",
+    "Reddito familiare",
+    "Livello di istruzione",
+    "Casa di proprietà",
+    "Casa Indipendente",
+    "Numero persone in famiglia",
+    "Numero di auto in famiglia",
+    "Importanza di ridurre le emissioni di gas serra",
+    "Viaggio più lungo negli ultimi 12 mesi",
+    "Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi",
+    "Distanza casa-lavoro",
+    "VMT annuo",
+    "Auto precedente: PHEV",
+    "Auto precedente: BEV",
+    "Auto precedente: HEV",
+    "Auto precedente: ICE",
+    "Auto precedente: GNC"
+  ],
+  "soglia": 0.5,
+  "soglia_youden": 0.5617263336516213,
+  "metriche_test": {
+    "accuracy": 0.6688493919550982,
+    "balanced_accuracy": 0.6598226254361435,
+    "precision": 0.6699321778447627,
+    "recall": 0.7670405522001725,
+    "specificity": 0.5526046986721144,
+    "f1": 0.7152051488334674,
+    "roc_auc": 0.725004208305388,
+    "pr_auc": 0.7306591877992744,
+    "brier": 0.21079650724391533,
+    "log_loss": 0.6098266763995813,
+    "tn": 541.0,
+    "fp": 438.0,
+    "fn": 270.0,
+    "tp": 889.0,
+    "accuracy_ic_basso": 0.6496725912067353,
+    "accuracy_ic_alto": 0.6894410664172123,
+    "roc_auc_ic_basso": 0.7048549013922347,
+    "roc_auc_ic_alto": 0.7463770107528601,
+    "f1_ic_basso": 0.6952824807505464,
+    "f1_ic_alto": 0.7359743250148439
+  },
+  "modello_shap": "LightGBM",
+  "versioni": {
+    "python": "3.13.2",
+    "scikit-learn": "1.9.1"
+  }
+}

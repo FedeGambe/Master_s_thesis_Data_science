@@ -1,0 +1,9 @@
+,n,media,dev_std,min,q1,mediana,q3,max,asimmetria
+Reddito familiare,10688,204117,116606,50000,125000,175000,275000,500000,1.09981
+Numero persone in famiglia,10688,2.93731,1.23765,1,2,3,4,13,0.71351
+Numero di auto in famiglia,10688,2.51862,0.921667,1,2,2,3,5,0.814238
+Importanza di ridurre le emissioni di gas serra,10688,1.61654,1.63904,-3,0.98,2.51,2.72,3,-1.55375
+Viaggio più lungo negli ultimi 12 mesi,10688,376.739,356.538,0.21,175.353,317.82,434.353,4865.7,4.22978
+Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,10688,2.46314,5.2265,0,0,1,2,65,5.53389
+Distanza casa-lavoro,10688,18.7765,22.5438,0,6.43,14.12,24.52,488.96,8.26949
+VMT annuo,10688,14279.6,15965.6,7,8395.5,11557,15947,378000,9.80602

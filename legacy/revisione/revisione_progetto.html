@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisione Tesi BEV</title>
+<style>
+:root{
+  --bg:#f7f7f5;--surface:#ffffff;--text:#1d1d1b;--muted:#5f5f5a;--border:#e2e1dc;
+  --accent:#2f6f5e;--accent-soft:#e3efe9;--high:#b3261e;--high-soft:#fbe9e7;
+  --mid:#9a6200;--mid-soft:#fdf1dc;--low:#2f5f9e;--low-soft:#e6eef9;--bar:#2f6f5e;
+  --code-bg:#f0efea;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141413;--surface:#1e1e1c;--text:#ecebe6;--muted:#a3a29b;--border:#33332f;
+    --accent:#7cc4ad;--accent-soft:#1f322b;--high:#f2948c;--high-soft:#3a1f1c;
+    --mid:#e8b65c;--mid-soft:#352a17;--low:#8db3ea;--low-soft:#1d2737;--bar:#7cc4ad;
+    --code-bg:#262623;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141413;--surface:#1e1e1c;--text:#ecebe6;--muted:#a3a29b;--border:#33332f;
+  --accent:#7cc4ad;--accent-soft:#1f322b;--high:#f2948c;--high-soft:#3a1f1c;
+  --mid:#e8b65c;--mid-soft:#352a17;--low:#8db3ea;--low-soft:#1d2737;--bar:#7cc4ad;
+  --code-bg:#262623;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 16px 80px}
+header{border-bottom:1px solid var(--border);padding-bottom:24px;margin-bottom:24px}
+.eyebrow{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(26px,4vw,38px);line-height:1.15;margin:8px 0 8px}
+h2{font-size:24px;margin:48px 0 12px;padding-top:8px}
+h3{font-size:18px;margin:28px 0 10px}
+p.lead{color:var(--muted);font-size:17px;margin:0;max-width:70ch}
+.meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:14px;color:var(--muted)}
+.meta code{background:var(--code-bg);padding:1px 6px;border-radius:4px}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
+nav.toc a{font-size:14px;text-decoration:none;color:var(--text);border:1px solid var(--border);
+  background:var(--surface);padding:5px 12px;border-radius:999px}
+nav.toc a:hover{border-color:var(--accent);color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card .k{font-size:13px;color:var(--muted)}
+.card .v{font-size:28px;font-weight:700;margin:2px 0}
+.card p{margin:0;font-size:14px;color:var(--muted)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.p-high{background:var(--high-soft);color:var(--high)}
+.p-mid{background:var(--mid-soft);color:var(--mid)}
+.p-low{background:var(--low-soft);color:var(--low)}
+.p-ok{background:var(--accent-soft);color:var(--accent)}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface);margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+th{font-size:13px;color:var(--muted);font-weight:600;background:var(--bg)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td code,p code,li code{background:var(--code-bg);padding:1px 5px;border-radius:4px;font-size:13px;word-break:break-word}
+.best{font-weight:700;color:var(--accent)}
+.barcell{width:45%}
+.bar{height:10px;border-radius:5px;background:var(--bar);opacity:.85}
+.bartrack{background:var(--code-bg);border-radius:5px}
+.note{border-left:4px solid var(--mid);background:var(--mid-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0;font-size:15px}
+.good{border-left-color:var(--accent);background:var(--accent-soft)}
+pre{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto;font-size:13px;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+.timeline{list-style:none;padding:0;margin:16px 0;counter-reset:s}
+.timeline li{position:relative;padding:14px 16px 14px 56px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px}
+.timeline li::before{counter-increment:s;content:counter(s,decimal) ;position:absolute;left:14px;top:14px;width:28px;height:28px;border-radius:50%;
+  background:var(--accent);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:14px}
+.timeline li:first-child::before{content:"0"}
+.timeline b{display:block}
+.timeline .t{float:right;font-size:13px;color:var(--muted)}
+.timeline span.d{color:var(--muted);font-size:14.5px}
+ul.clean{padding-left:20px} ul.clean li{margin:6px 0}
+.theme-btn{position:fixed;top:14px;right:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);
+  border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+footer{margin-top:56px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);padding-top:16px}
+</style>
+</head>
+<body>
+<button class="theme-btn" id="themeBtn" aria-label="Cambia tema">◐ Tema</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Revisione del progetto</div>
+  <h1>Tesi magistrale: chi sceglie un'auto elettrica?</h1>
+  <p class="lead">Analisi dell'intera repository: cosa funziona, cosa va corretto e come riorganizzare il progetto per renderlo riproducibile e più solido.</p>
+  <div class="meta"><span>Branch <code>revisione-progetto</code></span><span>5 ottobre 2026</span><span>Versione Markdown: <code>docs/REVISIONE_PROGETTO.md</code></span></div>
+  <nav class="toc">
+    <a href="#sintesi">Sintesi</a><a href="#risultati">Risultati</a><a href="#critici">Problemi critici</a>
+    <a href="#organizzazione">Organizzazione</a><a href="#struttura">Nuova struttura</a>
+    <a href="#miglioramenti">Miglioramenti</a><a href="#roadmap">Roadmap</a><a href="#decisioni">Decisioni</a>
+  </nav>
+</header>
+
+<section id="sintesi">
+  <h2>1. Sintesi</h2>
+  <div class="cards">
+    <div class="card"><div class="k">Dataset</div><div class="v">10.688</div><p>osservazioni · 18 variabili · 0 NaN · 0 duplicati</p></div>
+    <div class="card"><div class="k">Target BEV</div><div class="v">54 / 46</div><p>% BEV vs non‑BEV: quasi bilanciato</p></div>
+    <div class="card"><div class="k">Miglior modello</div><div class="v">0,674</div><p>accuracy Gradient Boosting ridotto (AUC 0,738), da ricalcolare</p></div>
+    <div class="card"><div class="k">Problemi trovati</div><div class="v">12</div><p>5 di data leakage · 7 bug nel codice</p></div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Area</th><th>Gravità</th><th>In breve</th></tr></thead>
+    <tbody>
+      <tr><td><b>Correttezza metodologica</b></td><td><span class="pill p-high">Alta</span></td><td>Data leakage: scaler fittato sul test, feature selection su tutto il dataset, early stopping sul test set. Metriche leggermente ottimistiche e non del tutto confrontabili.</td></tr>
+      <tr><td><b>Bug nel codice</b></td><td><span class="pill p-high">Alta</span></td><td>Tabella finale con colonne disallineate; la dashboard inverte il genere e non scala gli input; il report dell'MLP usa le predizioni della SVM.</td></tr>
+      <tr><td><b>Organizzazione</b></td><td><span class="pill p-mid">Media</span></td><td>Notebook monolitici esportati da Colab, percorsi Drive/Desktop, dataset duplicati, README con link rotti, CI R che fallisce sempre.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note good"><b>La buona notizia:</b> i dati sono puliti e i contenuti della tesi sono completi. Il lavoro è di <i>riorganizzazione e correzione</i>, non di rifacimento.</div>
+</section>
+
+<section id="risultati">
+  <h2>2. Risultati attuali</h2>
+  <h3>Screening iniziale: 10‑fold CV sul train (accuracy)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Modello</th><th class="num">Media</th><th class="num">Dev. std</th><th class="barcell">0,55 → 0,70</th></tr></thead>
+    <tbody id="cvBody"></tbody>
+  </table></div>
+
+  <h3>Modelli ottimizzati: test set</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Modello</th><th class="num">Accuracy</th><th class="num">F1</th><th class="num">Recall</th><th class="num">Precision</th><th class="num">AUC</th></tr></thead>
+    <tbody>
+      <tr><td>Gradient Boosting (ridotto)</td><td class="num best">0,674</td><td class="num best">0,718</td><td class="num">0,773</td><td class="num best">0,671</td><td class="num best">0,738</td></tr>
+      <tr><td>Gradient Boosting</td><td class="num">0,660</td><td class="num">0,702</td><td class="num">0,748</td><td class="num">0,661</td><td class="num">0,711</td></tr>
+      <tr><td>ANN (regolarizzata)</td><td class="num">0,663</td><td class="num">–</td><td class="num">0,770</td><td class="num">0,660</td><td class="num">0,708</td></tr>
+      <tr><td>Voting (soft)</td><td class="num">0,659</td><td class="num">0,694</td><td class="num">0,733</td><td class="num">0,658</td><td class="num">0,711</td></tr>
+      <tr><td>AdaBoost</td><td class="num">0,654</td><td class="num">0,697</td><td class="num">0,743</td><td class="num">0,656</td><td class="num">0,698</td></tr>
+      <tr><td>MLP</td><td class="num">0,651</td><td class="num">0,699</td><td class="num">0,760</td><td class="num">0,647</td><td class="num">0,695</td></tr>
+      <tr><td>Random Forest</td><td class="num">0,648</td><td class="num">0,693</td><td class="num">0,743</td><td class="num">0,649</td><td class="num">0,712</td></tr>
+      <tr><td>SVM</td><td class="num">0,633</td><td class="num">0,700</td><td class="num best">0,800</td><td class="num">0,622</td><td class="num">0,683</td></tr>
+      <tr><td>Regressione logistica</td><td class="num">0,621</td><td class="num">0,636</td><td class="num">0,621</td><td class="num">0,652</td><td class="num">0,665</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Attenzione:</b> le differenze tra i modelli (1–3 punti) sono dello stesso ordine della variabilità tra fold (±1–2 punti), e il "GB ridotto" è valutato su uno split diverso dagli altri. Questi numeri vanno ricalcolati dopo le correzioni.</div>
+</section>
+
+<section id="critici">
+  <h2>3. Problemi critici</h2>
+  <h3>3.1 Data leakage</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Dove</th><th>Problema</th><th>Correzione</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill p-high">L1</span></td><td><code>ml_e_dl.py:150</code><br><code>dashboard.py:420</code></td><td><code>X_test = sc.fit_transform(X_test)</code>: lo scaler viene ri‑fittato sul test.</td><td><code>sc.transform(X_test)</code> o <code>Pipeline</code></td></tr>
+      <tr><td><span class="pill p-high">L2</span></td><td><code>ml_e_dl.py:196‑240</code>, <code>:4721</code></td><td>SelectKBest, PolynomialFeatures e la scelta di <i>k</i> sono fatti su tutto <code>X, y</code>.</td><td>Tutto in una Pipeline, <i>k</i> ottimizzato in CV sul train</td></tr>
+      <tr><td><span class="pill p-high">L3</span></td><td><code>ml_e_dl.py:4626, 4673, 4829, 4987, 5138</code></td><td>Le reti neurali usano il test come <code>validation_data</code> con EarlyStopping e <code>restore_best_weights</code>.</td><td><code>validation_split=0.2</code> sul train</td></tr>
+      <tr><td><span class="pill p-high">L4</span></td><td><code>ml_e_dl.py:4372</code></td><td>GB ridotto: scaler su tutto il dataset, <code>random_state=42</code> invece di <code>343</code>.</td><td>Stesso split per tutti i modelli</td></tr>
+      <tr><td><span class="pill p-mid">L5</span></td><td><code>ml_e_dl.py:658</code> e analoghi</td><td>Usa lo stimatore del fold con lo score più alto invece di ri‑addestrare.</td><td><code>refit=True</code> e uso di <code>best_estimator_</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3.2 Bug nel codice</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Dove</th><th>Problema</th><th>Effetto</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill p-high">B1</span></td><td><code>ml_e_dl.py:4115‑4126</code></td><td>Le liste di <code>best_model_df</code> hanno ordini diversi da <code>models</code>; il Voting mescola le metriche del modello soft ridotto e di quello hard completo.</td><td>Il grafico "Metriche a confronto" attribuisce i valori ai modelli sbagliati (es. recall 0,800 → "Voting", che in realtà è la SVM).</td></tr>
+      <tr><td><span class="pill p-high">B2</span></td><td><code>ml_e_dl.py:2830</code></td><td><code>classification_report(y_test, y_pred_svm)</code> nell'MLP.</td><td>Il report dell'MLP mostra i numeri della SVM.</td></tr>
+      <tr><td><span class="pill p-high">B3</span></td><td><code>dashboard.py:90, 242</code></td><td>Maschio=0 / Femmina=1, mentre nel training è il contrario.</td><td>Genere invertito nelle predizioni.</td></tr>
+      <tr><td><span class="pill p-high">B4</span></td><td><code>dashboard.py:79‑82</code></td><td><code>scaled_data</code> viene calcolato ma non usato: <code>poly.transform(data)</code> riceve dati non scalati.</td><td>Input fuori distribuzione.</td></tr>
+      <tr><td><span class="pill p-mid">B5</span></td><td><code>dashboard.py:185</code></td><td>"Accuratezza predizione" = accuracy globale sul test.</td><td>Messaggio fuorviante.</td></tr>
+      <tr><td><span class="pill p-low">B6</span></td><td><code>dashboard.py:96, 251</code></td><td>Etichetta <code>54-64</code> invece di <code>55-64</code>.</td><td>Refuso.</td></tr>
+      <tr><td><span class="pill p-mid">B7</span></td><td><code>analisi_statistiche.py:1340</code></td><td>VIF e Logit per McFadden senza costante; il modello nullo non è quello con sola intercetta.</td><td>R² e VIF non standard. Usare <code>add_constant</code> e <code>prsquared</code>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3.3 Scelte da motivare o rivedere</h3>
+  <ul class="clean">
+    <li><b>Metrica di tuning:</b> ottimizzare su ROC‑AUC o F1 invece che solo su accuracy, e riportare anche Brier score e calibrazione.</li>
+    <li><b>"Auto precedente BEV":</b> è un predittore quasi tautologico. Mostrare il modello con e senza questa variabile.</li>
+    <li><b>Bilanciamento (ADASYN/SMOTE):</b> con classi 54/46 non serve; rimuovere la sezione o spiegare perché non è usata.</li>
+    <li><b>Significatività:</b> aggiungere IC bootstrap sul test e un test di McNemar prima di dichiarare un vincitore.</li>
+    <li><b>Logistica:</b> riportare IC degli odds ratio e gli effetti marginali medi per H1–H4.</li>
+    <li><b>Clustering:</b> fissare i seed (oggi 42, 367889 o nessuno) e riportare silhouette e stabilità.</li>
+  </ul>
+</section>
+
+<section id="organizzazione">
+  <h2>4. Organizzazione e riproducibilità</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Problema</th><th>Proposta</th></tr></thead>
+    <tbody>
+      <tr><td>Script <code>.py</code> esportati da Colab con <code>!pip</code>, <code>drive.mount</code> e blocchi commentati con <code>"""</code></td><td>Pacchetto <code>src/</code> e notebook snelli; flag <code>RETRAIN=False</code></td></tr>
+      <tr><td>Percorsi <code>/content/drive/…</code> e <code>~/Desktop/EDA/…</code>; gli script R leggono CSV assenti dal repo</td><td>Percorsi relativi in <code>config</code>; CSV intermedi generati da script</td></tr>
+      <tr><td>Dati letti da URL GitHub fissati a un vecchio commit</td><td>Un'unica <code>load_data()</code> che usa i file locali o, su Colab, quelli remoti</td></tr>
+      <tr><td><code>data_con_cluster*.csv</code> triplicato, file <code>read</code> vuoto, <code>Import_file_from_github.py</code> di altri progetti</td><td>Eliminare o accorpare; aggiungere un <i>data dictionary</i></td></tr>
+      <tr><td>34 modelli pickle in git senza versioni delle librerie fissate</td><td><code>requirements.txt</code> e un'unica Pipeline salvata (Release o LFS)</td></tr>
+      <tr><td>Preprocessing ripetuto 3 volte; blocco per modello copiato 7 volte</td><td><code>prepare_features()</code> + registro dei modelli + <code>evaluate()</code></td></tr>
+      <tr><td>README duplicati, link a notebook inesistenti</td><td>Un README unico con abstract, risultati e istruzioni</td></tr>
+      <tr><td>CI R con <code>rcmdcheck</code> su un repo che non è un pacchetto: fallisce sempre</td><td>CI Python (lint, pytest, nbmake) o rimozione</td></tr>
+      <tr><td>Mancano licenza e citazione</td><td><code>LICENSE</code> e <code>CITATION.cff</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="struttura">
+  <h2>5. Struttura proposta</h2>
+<pre>Master_s_thesis_Data_science/
+├── README.md · LICENSE · CITATION.cff · requirements.txt
+├── data/        raw/ · processed/ · README.md (data dictionary)
+├── src/bev/     config.py · data.py · models.py · evaluate.py · plots.py
+├── notebooks/   01_eda · 02_logistic_hypotheses · 03_clustering · 04_ml_models · 05_neural_networks
+├── R/           famd.R · mca.R · pca.R · cluster.R   (percorsi relativi con here::here())
+├── models/      pipeline finale + metadata
+├── app/         dashboard.py   (carica UNA pipeline)
+├── reports/     figures/ · results.md (generato dal codice)
+├── docs/        questa revisione
+└── tests/</pre>
+</section>
+
+<section id="miglioramenti">
+  <h2>6. Miglioramenti possibili</h2>
+  <div class="grid2">
+    <div class="card"><b>Modellistica</b>
+      <ul class="clean">
+        <li>XGBoost, LightGBM e CatBoost (già importati, mai usati)</li>
+        <li>Optuna o <code>HalvingGridSearchCV</code> al posto di griglie da oltre 60 minuti</li>
+        <li>Nested cross‑validation</li>
+        <li>Calibrazione e scelta della soglia</li>
+        <li>Ablation con e senza "auto precedente BEV"</li>
+      </ul></div>
+    <div class="card"><b>Interpretabilità e presentazione</b>
+      <ul class="clean">
+        <li>SHAP dependence plot per reddito, VMT e sensibilità ambientale, collegati a H1–H4</li>
+        <li>Confronto tra variabili significative nella logistica e importanza SHAP</li>
+        <li>Tabelle dei risultati generate automaticamente</li>
+        <li>Dashboard con spiegazione della singola predizione, pubblicata su HF Spaces</li>
+        <li>Pagina GitHub Pages con abstract e grafici chiave</li>
+      </ul></div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <h2>7. Roadmap consigliata</h2>
+  <ol class="timeline">
+    <li><span class="t">0,5 g</span><b>Pulizia</b><span class="d">Rimuovere duplicati e file estranei, aggiungere requirements, creare la nuova struttura, sistemare README e CI.</span></li>
+    <li><span class="t">1 g</span><b>Fondamenta</b><span class="d">Scrivere <code>src/bev/data.py</code> e <code>config.py</code>; usare percorsi relativi negli script R e generare i CSV intermedi.</span></li>
+    <li><span class="t">1–2 g</span><b>Correzioni ML</b><span class="d">Pipeline senza leakage, split unico, refit corretto, tabella automatica (L1–L5, B1, B2).</span></li>
+    <li><span class="t">0,5 g</span><b>Statistica</b><span class="d">Logit con costante, IC, effetti marginali, seed fissi nel clustering (B7).</span></li>
+    <li><span class="t">0,5 g</span><b>Reti neurali</b><span class="d">Validation set separato e confronto equo con il Gradient Boosting.</span></li>
+    <li><span class="t">0,5–1 g</span><b>Dashboard</b><span class="d">Un'unica pipeline salvata, correzione di B3–B6 e pubblicazione online.</span></li>
+    <li><span class="t">1–2 g</span><b>Miglioramenti</b><span class="d">XGBoost/LightGBM, calibrazione, ablation, SHAP.</span></li>
+    <li><span class="t">0,5 g</span><b>Comunicazione</b><span class="d">README finale, pagina dei risultati, CITATION.</span></li>
+  </ol>
+</section>
+
+<section id="decisioni">
+  <h2>8. Decisioni da prendere</h2>
+  <ol>
+    <li><b>Notebook o script:</b> tenere i notebook come "racconto" che importa da <code>src/</code> (consigliato) o passare a soli script?</li>
+    <li><b>Colab:</b> il progetto deve continuare a girare su Colab o basta l'esecuzione locale?</li>
+    <li><b>Modelli salvati:</b> rimuoverli e rigenerarli, o spostarli in una Release o su Git LFS?</li>
+    <li><b>Lingua:</b> italiano o inglese (per un progetto da portfolio)?</li>
+    <li><b>Risultati originali:</b> conservarli per un confronto prima/dopo le correzioni?</li>
+  </ol>
+</section>
+
+<footer>Revisione generata sul branch <code>revisione-progetto</code>. I numeri di riga si riferiscono ai file del commit <code>099793a</code>.</footer>
+</div>
+
+<script>
+const cv=[["Gradient Boosting",.682,.011],["AdaBoost",.671,.014],["Random Forest",.669,.011],["SVM",.653,.016],["MLP",.647,.012],["Naive Bayes",.644,.013],["Logistica",.628,.017],["Ridge",.625,.016],["LDA",.625,.016],["SGD",.610,.016],["QDA",.596,.019],["KNN",.592,.011],["Decision Tree",.587,.017]];
+const fmt=v=>v.toFixed(3).replace(".",",");
+document.getElementById("cvBody").innerHTML=cv.map(([n,m,s],i)=>{
+  const w=Math.max(2,(m-.55)/(.70-.55)*100);
+  return `<tr><td${i===0?' class="best"':''}>${n}</td><td class="num${i===0?' best':''}">${fmt(m)}</td><td class="num">±${fmt(s)}</td><td class="barcell"><div class="bartrack"><div class="bar" style="width:${w}%"></div></div></td></tr>`;
+}).join("");
+const btn=document.getElementById("themeBtn"),root=document.documentElement;
+try{const t=localStorage.getItem("theme");if(t)root.dataset.theme=t;}catch(e){}
+btn.onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme=dark?"light":"dark";try{localStorage.setItem("theme",root.dataset.theme);}catch(e){}};
+</script>
+</body>
+</html>

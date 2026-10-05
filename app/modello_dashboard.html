@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generato da scripts/08_dashboard_html.py: modificare questo template (app/modello_dashboard.html), non docs/dashboard.html -->
+<title>Predizione BEV</title>
+<!--__FAVICON__-->
+<meta name="description" content="Probabilità che il veicolo a basse emissioni di un cliente sia un'auto 100% elettrica (BEV), con il contributo di ogni caratteristica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Public+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Stessa identità di docs/risultati.html: parte predittiva in arancio; verso BEV in teal, verso altro veicolo in arancio. */
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --surface-2:#f4f1ea; --ink:#111111; --ink-2:#45484c; --ink-3:#6b6e72; --line:#e4e0d6; --track:#ece8df;
+  --teal:#3f93aa; --teal-ink:#2a7a90; --teal-soft:#e6f1f4; --arancio:#e2462a; --arancio-ink:#c8361c; --arancio-soft:#fbe8e3; --sabbia:#ddd4c1;
+  --scelto-bg:#263a5a; --scelto-ink:#ffffff;
+  --ombra:0 1px 2px rgba(17,17,17,.04), 0 8px 24px -12px rgba(17,17,17,.12);
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-data:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121314; --surface:#1a1c1e; --surface-2:#222427; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#97968f; --line:#2e3032; --track:#2a2c2e;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --teal-soft:#18292e; --arancio:#ee6141; --arancio-ink:#f07a5e; --arancio-soft:#33201a; --sabbia:#5d574b;
+  --scelto-bg:#8ea6d0; --scelto-ink:#0f1216; --ombra:none;
+  color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#121314; --surface:#1a1c1e; --surface-2:#222427; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#97968f; --line:#2e3032; --track:#2a2c2e;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --teal-soft:#18292e; --arancio:#ee6141; --arancio-ink:#f07a5e; --arancio-soft:#33201a; --sabbia:#5d574b;
+  --scelto-bg:#8ea6d0; --scelto-ink:#0f1216; --ombra:none;
+  color-scheme:dark; }
+
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font:16px/1.55 var(--f-body); margin:0; -webkit-font-smoothing:antialiased}
+.pagina{max-width:1200px; margin:0 auto; padding:24px 16px 96px}
+h1,h2,legend{font-family:var(--f-display); letter-spacing:-.01em}
+h1{font-size:clamp(1.9rem,4.4vw,2.9rem); font-weight:900; line-height:1.05; margin:10px 0 0; position:relative; padding-left:.8em; text-wrap:balance}
+h1::before{content:""; position:absolute; left:0; top:.1em; border-style:solid; border-width:.4em 0 .4em .5em;
+  border-color:transparent transparent transparent var(--arancio)}
+h2{font-size:1.05rem; font-weight:800; margin:0; line-height:1.2}
+.num{font-family:var(--f-data); font-variant-numeric:tabular-nums}
+a{color:var(--teal-ink)}
+:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+button{font:inherit; color:inherit; cursor:pointer}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+
+/* Testata */
+.ritorno{display:inline-flex; align-items:center; gap:6px; font-size:.9rem; text-decoration:none; min-height:44px}
+.ritorno:hover{text-decoration:underline}
+.intro{color:var(--ink-2); max-width:68ch; margin:12px 0 14px; font-size:1.02rem}
+.dati-modello{display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none}
+.dati-modello li{font-size:.82rem; color:var(--ink-2); background:var(--surface-2); border-radius:999px; padding:4px 12px}
+.dati-modello b{font-family:var(--f-data); font-weight:600; color:var(--ink)}
+
+/* Barra degli esempi */
+.esempi{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:26px 0 18px}
+.esempi .titolo{font-size:.88rem; font-weight:600; color:var(--ink-2); margin-right:4px}
+.pulsante{min-height:44px; padding:0 16px; border-radius:999px; border:1px solid var(--line); background:var(--surface);
+  font-size:.9rem; font-weight:600; display:inline-flex; align-items:center; gap:8px; transition:border-color .15s, background .15s}
+.pulsante:hover{border-color:var(--ink-3)}
+.pulsante .punto{width:8px; height:8px; border-radius:50%}
+.pulsante.leggero{border-color:transparent; background:transparent; color:var(--ink-2)}
+.pulsante.leggero:hover{background:var(--surface-2)}
+.esempi .spinta{margin-left:auto; display:flex; gap:4px}
+@media (max-width:640px){ .esempi .spinta{margin-left:0} }
+
+/* Griglia */
+.griglia{display:grid; grid-template-columns:minmax(0,1fr); gap:20px; align-items:start}
+@media (min-width:980px){
+  .griglia{grid-template-columns:minmax(0,1fr) minmax(0,480px)}
+  .esiti{position:sticky; top:16px; max-height:calc(100vh - 32px); overflow:auto; scrollbar-width:thin}
+}
+.scheda{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:22px; box-shadow:var(--ombra)}
+
+/* Form */
+form{display:grid; gap:20px}
+fieldset{border:0; margin:0; padding:0; min-width:0}
+.sezione > legend{display:flex; align-items:center; gap:10px; font-size:1.1rem; font-weight:800; padding:0; margin-bottom:18px; float:left; width:100%}
+.sezione > legend + *{clear:both}
+.sezione > legend .passo{display:inline-grid; place-items:center; width:26px; height:26px; border-radius:50%;
+  background:var(--arancio-soft); color:var(--arancio-ink); font:700 .82rem var(--f-data)}
+.campi{display:grid; grid-template-columns:minmax(0,1fr); gap:20px 22px}
+@media (min-width:600px){ .campi{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.largo{grid-column:1/-1}
+.etichetta,.campo > legend{display:block; font:600 .88rem var(--f-body); letter-spacing:0; color:var(--ink-2); margin:0 0 7px; padding:0}
+.aiuto{font-size:.8rem; color:var(--ink-3); margin:6px 0 0; min-height:1.2em}
+.aiuto:empty{display:none}
+.errore-campo{font-size:.8rem; color:var(--arancio-ink); font-weight:600; margin:6px 0 0}
+
+/* Controlli segmentati (radio) */
+.segmenti{display:flex; flex-wrap:wrap; gap:6px}
+.segmenti.colonne{display:grid; grid-template-columns:repeat(auto-fit,minmax(118px,1fr))}
+.segmento{position:relative; flex:1 1 auto}
+.segmento input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer}
+.segmento span{display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height:44px; height:100%; padding:6px 12px;
+  border:1px solid var(--line); border-radius:8px; background:var(--bg); font-size:.9rem; line-height:1.2;
+  transition:background .15s, border-color .15s, color .15s}
+.segmento small{font:500 .7rem var(--f-data); color:var(--ink-3); margin-top:2px}
+.segmento:hover span{border-color:var(--ink-3)}
+.segmento input:checked + span{background:var(--scelto-bg); border-color:var(--scelto-bg); color:var(--scelto-ink); font-weight:600}
+.segmento input:checked + span small{color:inherit; opacity:.8}
+.segmento input:focus-visible + span{outline:2px solid var(--teal); outline-offset:2px}
+
+select,input[type=number]{width:100%; font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line);
+  border-radius:8px; padding:0 12px; min-height:44px}
+select{appearance:none; background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:36px}
+input[type=number]{font-family:var(--f-data); font-variant-numeric:tabular-nums}
+input[aria-invalid=true]{border-color:var(--arancio); background:var(--arancio-soft)}
+.con-unita{position:relative}
+.con-unita input{padding-right:76px}
+.con-unita .unita{position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:.82rem; color:var(--ink-3); pointer-events:none}
+.contatore{display:grid; grid-template-columns:44px minmax(0,1fr) 44px; gap:6px}
+.contatore input{text-align:center; padding:0 4px; -moz-appearance:textfield}
+.contatore input::-webkit-inner-spin-button,.contatore input::-webkit-outer-spin-button{-webkit-appearance:none; margin:0}
+.contatore button{border:1px solid var(--line); background:var(--surface-2); border-radius:8px; font-size:1.2rem; line-height:1}
+.contatore button:hover:not(:disabled){border-color:var(--ink-3)}
+.contatore button:disabled{opacity:.4; cursor:not-allowed}
+
+.cursore{display:flex; align-items:center; gap:14px}
+input[type=range]{flex:1; accent-color:var(--teal); min-height:44px; margin:0}
+.cursore output{font:600 1rem var(--f-data); min-width:3.6em; text-align:right}
+.estremi-cursore{display:flex; justify-content:space-between; font-size:.78rem; color:var(--ink-3); margin-right:calc(3.6em + 14px)}
+
+/* Risultato */
+.esiti{display:grid; gap:16px}
+.risultato{text-align:center}
+.risultato h2{text-align:left}
+.indicatore{display:block; width:100%; max-width:250px; margin:4px auto 0}
+.indicatore .traccia{stroke:var(--track)}
+.indicatore .valore{stroke:var(--teal); transition:stroke-dasharray .35s cubic-bezier(.2,.7,.2,1)}
+.indicatore .valore.basso{stroke:var(--arancio)}
+.indicatore .media{stroke:var(--ink); stroke-width:2.5}
+.indicatore .grande{fill:var(--ink); font:800 38px var(--f-display); font-variant-numeric:tabular-nums}
+.indicatore .estremi{fill:var(--ink-3); font:12px var(--f-data)}
+.delta{font:600 .85rem var(--f-data); min-height:1.4em; margin:2px 0 10px; color:var(--ink-3)}
+.delta.su{color:var(--teal-ink)} .delta.giu{color:var(--arancio-ink)}
+.verdetto{display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; font-weight:700; font-size:.95rem}
+.verdetto svg{width:18px; height:18px; flex:none}
+.verdetto.bev{background:var(--teal-soft); color:var(--teal-ink)}
+.verdetto.altro{background:var(--arancio-soft); color:var(--arancio-ink)}
+.confronto{font-size:.84rem; color:var(--ink-3); margin:12px 0 0}
+.confronto .tacca{display:inline-block; width:3px; height:12px; background:var(--ink); vertical-align:-1px; margin-right:6px}
+.inattivo{opacity:.4; transition:opacity .2s}
+.avviso{background:var(--arancio-soft); color:var(--arancio-ink); border-radius:8px; padding:10px 14px; font-size:.88rem; font-weight:600; text-align:left; margin:12px 0 0}
+
+/* Cascata */
+.sottotitolo{font-size:.86rem; color:var(--ink-3); margin:4px 0 12px}
+.cascata{display:grid; gap:4px}
+.riga{display:grid; grid-template-columns:minmax(0,10em) minmax(0,1fr) 4.2em; gap:10px; align-items:center; min-height:31px}
+.riga .nome{font-size:.86rem; line-height:1.2; min-width:0}
+.riga .nome b{display:block; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.riga .nome span{display:block; font-size:.76rem; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.riga .pista{position:relative; height:18px}
+.riga .pista::before{content:""; position:absolute; inset:50% 0 auto; height:1px; background:var(--line)}
+.riga .seg{position:absolute; top:0; bottom:0; border-radius:3px; min-width:2px; transition:left .3s, width .3s}
+.riga .seg.su{background:var(--teal)} .riga .seg.giu{background:var(--arancio)}
+.riga .segno{position:absolute; top:-3px; bottom:-3px; width:3px; margin-left:-1.5px; border-radius:2px; background:var(--ink-3)}
+.riga .val{font:500 .8rem var(--f-data); text-align:right; white-space:nowrap}
+.riga .val.su{color:var(--teal-ink)} .riga .val.giu{color:var(--arancio-ink)}
+.riga.estremo{border-top:1px dashed var(--line); padding-top:4px}
+.riga.estremo:first-child{border-top:0; border-bottom:1px dashed var(--line); padding:0 0 4px}
+.riga.estremo .val{font-weight:600; color:var(--ink)}
+.riga.finale .segno{background:var(--ink); width:4px; margin-left:-2px}
+.asse-x{display:grid; grid-template-columns:minmax(0,10em) minmax(0,1fr) 4.2em; gap:10px; margin-top:2px}
+.asse-x .tacche{position:relative; height:16px; font:11px var(--f-data); color:var(--ink-3)}
+.asse-x .tacche span{position:absolute; transform:translateX(-50%)}
+.legenda{display:flex; flex-wrap:wrap; gap:14px; font-size:.8rem; color:var(--ink-2); margin:14px 0 0}
+.legenda i{display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-1px; margin-right:6px}
+details.metodo{margin-top:14px; border-top:1px solid var(--line); padding-top:10px; font-size:.84rem; color:var(--ink-2)}
+details.metodo summary{cursor:pointer; font-weight:600; min-height:32px; display:flex; align-items:center}
+details.metodo p{margin:6px 0}
+
+/* Barra fissa su mobile */
+.barra-mobile{position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom,0px)); z-index:10;
+  display:flex; align-items:center; gap:12px; padding:10px 10px 10px 16px; border-radius:14px;
+  background:var(--ink); color:var(--bg); box-shadow:0 10px 30px -10px rgba(0,0,0,.4);
+  transform:translateY(160%); transition:transform .25s cubic-bezier(.2,.7,.2,1)}
+.barra-mobile.visibile{transform:none}
+.barra-mobile .etic{font-size:.8rem; opacity:.8}
+.barra-mobile strong{font:800 1.3rem var(--f-display); font-variant-numeric:tabular-nums}
+.barra-mobile .mdelta{font:500 .8rem var(--f-data); opacity:.85}
+.barra-mobile a{margin-left:auto; color:var(--bg); background:color-mix(in srgb, var(--bg) 16%, transparent); border-radius:10px; padding:0 14px;
+  min-height:44px; display:inline-flex; align-items:center; text-decoration:none; font-weight:600; font-size:.88rem}
+@media (min-width:980px){ .barra-mobile{display:none} }
+
+footer{margin-top:32px; color:var(--ink-3); font-size:.85rem; max-width:80ch}
+.solo-lettori{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header>
+    <a class="ritorno" href="risultati.html">← Risultati dell'analisi</a>
+    <h1>Chi sceglie un'auto elettrica?</h1>
+    <p class="intro">Descrivi un cliente: il modello stima la probabilità che il suo veicolo a basse emissioni sia un'auto
+      <strong>100% elettrica (BEV)</strong> anziché un ibrido (PHEV, HEV) o a idrogeno (FCEV), e mostra quali caratteristiche pesano di più.</p>
+    <ul class="dati-modello" id="dati-modello"></ul>
+  </header>
+
+  <div class="esempi" role="group" aria-label="Profili di esempio">
+    <span class="titolo">Parti da un cliente reale del test set:</span>
+    <button type="button" class="pulsante" data-esempio="alta"><i class="punto" style="background:var(--teal)"></i>Probabilità alta</button>
+    <button type="button" class="pulsante" data-esempio="media"><i class="punto" style="background:var(--sabbia)"></i>Media</button>
+    <button type="button" class="pulsante" data-esempio="bassa"><i class="punto" style="background:var(--arancio)"></i>Bassa</button>
+    <span class="spinta">
+      <button type="button" class="pulsante leggero" id="ripristina">Ripristina</button>
+      <button type="button" class="pulsante leggero" id="copia">Copia link</button>
+    </span>
+  </div>
+
+  <div class="griglia">
+    <form id="profilo" novalidate>
+      <fieldset class="scheda sezione">
+        <legend><span class="passo">1</span>Chi è</legend>
+        <div class="campi">
+          <fieldset class="campo"><legend>Genere</legend><div class="segmenti" data-radio="genere"></div></fieldset>
+          <div class="campo"><label class="etichetta" for="reddito">Reddito familiare annuo</label><select id="reddito"></select></div>
+          <fieldset class="campo largo"><legend>Classe d'età</legend><div class="segmenti" data-radio="eta"></div></fieldset>
+          <fieldset class="campo largo"><legend>Livello di istruzione</legend><div class="segmenti colonne" data-radio="istruzione"></div></fieldset>
+        </div>
+      </fieldset>
+
+      <fieldset class="scheda sezione">
+        <legend><span class="passo">2</span>Casa e famiglia</legend>
+        <div class="campi">
+          <fieldset class="campo"><legend>Casa di proprietà</legend><div class="segmenti" data-radio="casa_prop"></div></fieldset>
+          <fieldset class="campo"><legend>Casa indipendente</legend><div class="segmenti" data-radio="casa_ind"></div></fieldset>
+          <div class="campo" data-contatore="persone"><label class="etichetta" for="persone">Persone in famiglia</label></div>
+          <div class="campo" data-contatore="auto"><label class="etichetta" for="auto">Auto in famiglia</label></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="scheda sezione">
+        <legend><span class="passo">3</span>Atteggiamento e mobilità</legend>
+        <div class="campi">
+          <div class="campo largo">
+            <label class="etichetta" for="emissioni">Quanto è importante per lui ridurre le emissioni di gas serra?</label>
+            <div class="cursore"><input id="emissioni" type="range" step="0.01" aria-describedby="emissioni-estremi"><output id="emissioni-val" for="emissioni"></output></div>
+            <div class="estremi-cursore" id="emissioni-estremi"><span>−3 · per niente</span><span>0</span><span>+3 · moltissimo</span></div>
+          </div>
+          <fieldset class="campo largo"><legend>Auto posseduta prima</legend><div class="segmenti colonne" data-radio="auto_prec"></div></fieldset>
+          <div class="campo" data-miglia="viaggio" data-unita="miglia"><label class="etichetta" for="viaggio">Viaggio più lungo (ultimi 12 mesi)</label></div>
+          <div class="campo" data-contatore="n_viaggi"><label class="etichetta" for="n_viaggi">Viaggi oltre 200 miglia (12 mesi)</label></div>
+          <div class="campo" data-miglia="distanza" data-unita="miglia"><label class="etichetta" for="distanza">Distanza casa-lavoro</label></div>
+          <div class="campo" data-miglia="vmt" data-unita="mi/anno"><label class="etichetta" for="vmt">Miglia percorse in un anno</label></div>
+        </div>
+      </fieldset>
+    </form>
+
+    <aside class="esiti" aria-label="Risultato">
+      <section class="scheda risultato" id="risultato">
+        <h2>Probabilità che sia un BEV</h2>
+        <div id="avviso"></div>
+        <div id="blocco-risultato">
+          <svg class="indicatore" viewBox="0 0 240 152" role="img" aria-labelledby="ind-desc">
+            <desc id="ind-desc">Indicatore della probabilità stimata</desc>
+            <path class="traccia" d="M20 120 A100 100 0 0 1 220 120" fill="none" stroke-width="20" stroke-linecap="round"/>
+            <path class="valore" id="arco" d="M20 120 A100 100 0 0 1 220 120" fill="none" stroke-width="20" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100"/>
+            <line class="media" id="tacca-media"/>
+            <text class="grande" id="percentuale" x="120" y="112" text-anchor="middle">–</text>
+            <text class="estremi" x="20" y="148" text-anchor="middle">0%</text>
+            <text class="estremi" x="220" y="148" text-anchor="middle">100%</text>
+          </svg>
+          <p class="delta" id="delta" aria-live="polite"></p>
+          <div class="verdetto" id="verdetto"></div>
+          <p class="confronto" id="confronto"></p>
+        </div>
+      </section>
+
+      <section class="scheda" id="spiegazione">
+        <h2>Cosa sposta la stima</h2>
+        <p class="sottotitolo" id="sottotitolo-cascata"></p>
+        <div class="cascata" id="cascata" role="list"></div>
+        <div class="asse-x" aria-hidden="true"><span></span><div class="tacche" id="tacche"></div><span></span></div>
+        <div class="legenda" aria-hidden="true"><span><i style="background:var(--teal)"></i>▲ verso BEV</span><span><i style="background:var(--arancio)"></i>▼ verso altro veicolo</span></div>
+        <details class="metodo">
+          <summary>Come leggere il grafico</summary>
+          <p>Si parte dalla stima del modello per il cliente medio (media dei log-odds sul training, per questo non coincide esattamente con la quota di BEV nel campione) e si aggiunge, una alla volta, l'effetto delle caratteristiche di questo profilo,
+            dalla più influente alla meno influente; le restanti sono raggruppate. L'ultima riga è la stima finale.</p>
+          <p>Gli effetti sono i valori SHAP del modello (additivi in log-odds) tradotti in punti percentuali seguendo l'ordine mostrato:
+            la loro somma è esatta, ma il peso di una singola voce in punti percentuali dipende dalla posizione in cui viene aggiunta.</p>
+          <p>Gli effetti descrivono il modello, non relazioni causali: cambiare una caratteristica non garantisce che il cliente scelga un BEV.</p>
+        </details>
+      </section>
+    </aside>
+  </div>
+
+  <footer id="piede"></footer>
+</div>
+
+<div class="barra-mobile" id="barra-mobile">
+  <div><div class="etic">Probabilità BEV</div><strong id="mob-p">–</strong> <span class="mdelta" id="mob-delta"></span></div>
+  <a href="#risultato">Vedi perché</a>
+</div>
+
+<script>
+/*__LOGICA__*/
+</script>
+<script>
+(function () {
+  "use strict";
+  var M = /*__MODELLO__*/null;
+  var I = M.info;
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (opz) { return new Intl.NumberFormat("it-IT", opz); };
+  var pct = fmt({ style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  var pct0 = fmt({ style: "percent", maximumFractionDigits: 0 });
+  var interi = fmt({ maximumFractionDigits: 0 });
+  var dec = fmt({ maximumFractionDigits: 2 });
+  var punti = fmt({ minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: "exceptZero" });
+  var segnato = fmt({ minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: "exceptZero" });
+  var sigmoide = function (s) { return 1 / (1 + Math.exp(-s)); };
+
+  /* --- Campi --- */
+  var PREDEFINITI = { genere: "Maschio", eta: "45-54", reddito: 175000, istruzione: "Laurea 1L", casa_prop: "Si", casa_ind: "Si",
+    persone: 3, auto: 2, emissioni: 1.5, auto_prec: "ICE", viaggio: 300, n_viaggi: 1, distanza: 12, vmt: 11000 };
+  var NOMI = { genere: "Genere", eta: "Età", reddito: "Reddito", istruzione: "Istruzione", casa_prop: "Casa di proprietà",
+    casa_ind: "Casa indipendente", persone: "Persone in famiglia", auto: "Auto in famiglia", emissioni: "Sensibilità ambientale",
+    auto_prec: "Auto precedente", viaggio: "Viaggio più lungo", n_viaggi: "Viaggi > 200 mi", distanza: "Casa-lavoro", vmt: "Miglia annue" };
+  var SI_NO = [["Si", "Sì"], ["No", "No"]];
+  var RADIO = {
+    genere: M.opzioni.genere.map(function (v) { return [v, v]; }),
+    eta: M.opzioni.eta.map(function (v) { return [v, v === ">80" ? "80+" : v === "<25" ? "< 25" : v.replace("-", "–")]; }),
+    istruzione: M.opzioni.istruzione.map(function (v) {
+      return [v, { "Licenza Media": "Licenza media", "Diploma o Qualifica professionale": "Diploma", "Laurea 1L": "Laurea triennale",
+        "Laurea 2L o Dottorato": "Magistrale o dottorato" }[v] || v]; }),
+    casa_prop: SI_NO, casa_ind: SI_NO,
+    auto_prec: ["ICE", "HEV", "PHEV", "BEV", "GNC"].filter(function (v) { return M.opzioni.auto_prec.indexOf(v) >= 0; }).map(function (v) {
+      return [v, { ICE: "Benzina o diesel", HEV: "Ibrida", PHEV: "Ibrida plug-in", BEV: "Elettrica", GNC: "Metano" }[v], v]; })
+  };
+  var ETICHETTA_VALORE = {};
+  Object.keys(RADIO).forEach(function (id) {
+    ETICHETTA_VALORE[id] = {};
+    RADIO[id].forEach(function (o) { ETICHETTA_VALORE[id][o[0]] = o[1]; });
+  });
+
+  Object.keys(RADIO).forEach(function (id) {
+    var box = document.querySelector('[data-radio="' + id + '"]');
+    box.innerHTML = RADIO[id].map(function (o) {
+      return '<label class="segmento"><input type="radio" name="' + id + '" value="' + o[0] + '"><span>' + o[1] +
+        (o[2] ? "<small>" + o[2] + "</small>" : "") + "</span></label>";
+    }).join("");
+  });
+  $("reddito").innerHTML = M.opzioni.reddito.map(function (r) {
+    return '<option value="' + r + '">$' + interi.format(r) + "</option>";
+  }).join("");
+
+  function aggiungiNumero(contenitore, id, html) {
+    var r = M.intervalli[id];
+    contenitore.insertAdjacentHTML("beforeend", html.replace("{input}",
+      '<input id="' + id + '" type="number" min="' + r[0] + '" max="' + r[1] + '" aria-describedby="' + id + '-aiuto ' + id + '-err">') +
+      '<p class="aiuto" id="' + id + '-aiuto"></p><p class="errore-campo" id="' + id + '-err" hidden></p>');
+  }
+  document.querySelectorAll("[data-contatore]").forEach(function (c) {
+    var id = c.dataset.contatore;
+    aggiungiNumero(c, id, '<div class="contatore"><button type="button" data-passo="-1" aria-label="Diminuisci ' + NOMI[id].toLowerCase() +
+      '">−</button>{input}<button type="button" data-passo="1" aria-label="Aumenta ' + NOMI[id].toLowerCase() + '">+</button></div>');
+    $(id).step = 1; $(id).inputMode = "numeric";
+  });
+  document.querySelectorAll("[data-miglia]").forEach(function (c) {
+    var id = c.dataset.miglia;
+    aggiungiNumero(c, id, '<div class="con-unita">{input}<span class="unita">' + c.dataset.unita + "</span></div>");
+    $(id).step = "any"; $(id).inputMode = "decimal";
+  });
+  $("emissioni").min = M.intervalli.emissioni[0]; $("emissioni").max = M.intervalli.emissioni[1];
+
+  /* --- Lettura, scrittura e validazione --- */
+  var NUMERICI = Object.keys(M.intervalli);
+  function leggi(id) {
+    if (RADIO[id]) { var s = document.querySelector('input[name="' + id + '"]:checked'); return s ? s.value : null; }
+    return $(id).value;
+  }
+  function imposta(id, v) {
+    if (RADIO[id]) { var r = document.querySelector('input[name="' + id + '"][value="' + v + '"]'); if (r) r.checked = true; }
+    else $(id).value = v;
+  }
+  function errore(id) {
+    var v = String(leggi(id)).trim(), r = M.intervalli[id];
+    if (v === "") return "Inserisci un valore";
+    var n = Number(v);
+    if (!isFinite(n)) return "Inserisci un numero";
+    if (n < r[0] || n > r[1]) return "Inserisci un valore tra " + interi.format(r[0]) + " e " + interi.format(r[1]);
+    if ($(id).step === "1" && n % 1 !== 0) return "Inserisci un numero intero";
+    return null;
+  }
+  function valido(id, v) {
+    if (v === undefined || v === null) return false;
+    if (RADIO[id]) return RADIO[id].some(function (o) { return o[0] === v; });
+    if (id === "reddito") return M.opzioni.reddito.indexOf(Number(v)) >= 0;
+    var n = Number(v), r = M.intervalli[id];
+    return v !== "" && isFinite(n) && n >= r[0] && n <= r[1];
+  }
+  function caricaProfilo(p) {
+    Object.keys(M.campi).forEach(function (id) { imposta(id, valido(id, p[id]) ? p[id] : PREDEFINITI[id]); });
+  }
+
+  function aggiornaAiuti() {
+    ["viaggio", "distanza", "vmt"].forEach(function (id) {
+      var n = Number($(id).value);
+      $(id + "-aiuto").textContent = $(id).value !== "" && isFinite(n) ? "≈ " + interi.format(n * 1.609344) + " km" + (id === "vmt" ? " all'anno" : "") : "";
+    });
+    document.querySelectorAll(".contatore").forEach(function (c) {
+      var inp = c.querySelector("input"), n = Number(inp.value);
+      c.querySelector('[data-passo="-1"]').disabled = !(n > Number(inp.min));
+      c.querySelector('[data-passo="1"]').disabled = !(n < Number(inp.max));
+    });
+    $("emissioni-val").textContent = segnato.format(Number($("emissioni").value));
+  }
+
+  /* Errori accanto al campo: mostrati per il campo modificato (e aggiornati per quelli già segnalati). */
+  function mostraErrori(campoModificato) {
+    var errati = [];
+    NUMERICI.forEach(function (id) {
+      if (id === "emissioni") return;
+      var e = errore(id);
+      if (e) errati.push(id);
+      var giaSegnalato = $(id).getAttribute("aria-invalid") === "true";
+      if (campoModificato && campoModificato !== id && !giaSegnalato) return;
+      if (e) $(id).setAttribute("aria-invalid", "true"); else $(id).removeAttribute("aria-invalid");
+      $(id + "-err").textContent = e || "";
+      $(id + "-err").hidden = !e;
+    });
+    return errati;
+  }
+
+  function profiloCorrente() {
+    var p = {};
+    Object.keys(M.campi).forEach(function (id) {
+      var v = leggi(id);
+      p[M.campi[id]] = RADIO[id] ? v : Number(v);
+    });
+    return p;
+  }
+
+  /* --- Disegno del risultato --- */
+  var BASE = ModelloBEV.valoreAtteso(M);
+  var ID_DI = {};
+  Object.keys(M.campi).forEach(function (id) { ID_DI[M.campi[id]] = id; });
+  var ICONE = {
+    bev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+    altro: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z"/></svg>'
+  };
+  var precedente = null;
+
+  function valoreLeggibile(id) {
+    var v = leggi(id);
+    if (RADIO[id]) return id === "eta" ? ETICHETTA_VALORE[id][v] + " anni" : ETICHETTA_VALORE[id][v];
+    var n = Number(v);
+    if (id === "reddito") return "$" + interi.format(n);
+    if (id === "emissioni") return segnato.format(n);
+    if (id === "viaggio" || id === "distanza") return dec.format(n) + " mi";
+    if (id === "vmt") return interi.format(n) + " mi/anno";
+    return interi.format(n);
+  }
+
+  function testoDelta(p) {
+    if (precedente === null || Math.abs(p - precedente) < 0.0005) return "";
+    return (p > precedente ? "▲ " : "▼ ") + punti.format((p - precedente) * 100).replace(/^[+−-]/, "");
+  }
+
+  function disegnaIndicatore(p) {
+    $("arco").setAttribute("stroke-dasharray", (p * 100).toFixed(2) + " 100");
+    $("arco").classList.toggle("basso", p < I.soglia);
+    $("percentuale").textContent = pct.format(p);
+    var bev = p >= I.soglia;
+    $("verdetto").className = "verdetto " + (bev ? "bev" : "altro");
+    $("verdetto").innerHTML = ICONE[bev ? "bev" : "altro"] + (bev ? "Più probabile un BEV" : "Più probabile un altro veicolo");
+    var t = testoDelta(p);
+    $("delta").className = "delta" + (t ? (p > precedente ? " su" : " giu") : "");
+    $("delta").textContent = t ? t + " punti rispetto a prima" : precedente === null ? "" : "Nessuna variazione";
+    $("mob-p").textContent = pct.format(p);
+    $("mob-delta").textContent = t;
+  }
+
+  function disegnaCascata(r) {
+    var gruppi = {};
+    r.contributi.forEach(function (v, i) {
+      var id = ID_DI[M.codifica[i].sorgente];
+      gruppi[id] = (gruppi[id] || 0) + v;
+    });
+    var voci = Object.keys(gruppi).map(function (id) { return { id: id, v: gruppi[id] }; })
+      .sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); });
+    var principali = voci.slice(0, 6), resto = voci.slice(6);
+    var righe = principali.map(function (x) { return { nome: NOMI[x.id], dettaglio: valoreLeggibile(x.id), v: x.v }; });
+    if (resto.length) righe.push({ nome: "Altre " + resto.length + " caratteristiche", dettaglio: "effetti minori, sommati",
+      v: resto.reduce(function (s, x) { return s + x.v; }, 0) });
+
+    var s = BASE, p0 = sigmoide(BASE), tutti = [p0];
+    righe.forEach(function (x) { x.da = sigmoide(s); s += x.v; x.a = sigmoide(s); tutti.push(x.a); });
+    var lo = Math.max(0, Math.floor((Math.min.apply(null, tutti) - 0.03) * 10) / 10);
+    var hi = Math.min(1, Math.ceil((Math.max.apply(null, tutti) + 0.03) * 10) / 10);
+    var X = function (p) { return ((p - lo) / (hi - lo) * 100).toFixed(2) + "%"; };
+
+    var html = '<div class="riga estremo" role="listitem"><span class="nome"><b>Cliente medio</b><span>riferimento del modello</span></span>' +
+      '<span class="pista"><span class="segno" style="left:' + X(p0) + '"></span></span><span class="val">' + pct.format(p0) + "</span></div>";
+    righe.forEach(function (x) {
+      var su = x.a >= x.da, pp = Math.abs(x.a - x.da) * 100;
+      html += '<div class="riga" role="listitem"><span class="nome"><b>' + x.nome + "</b><span>" + x.dettaglio + "</span></span>" +
+        '<span class="pista"><span class="seg ' + (su ? "su" : "giu") + '" style="left:' + X(Math.min(x.da, x.a)) +
+        ";width:calc(" + X(Math.max(x.da, x.a)) + " - " + X(Math.min(x.da, x.a)) + ')"></span></span>' +
+        '<span class="val ' + (su ? "su" : "giu") + '">' + (su ? "▲ " : "▼ ") + punti.format(pp).replace(/^\+/, "") +
+        '<span class="solo-lettori"> punti ' + (su ? "verso BEV" : "verso altro veicolo") + "</span></span></div>";
+    });
+    html += '<div class="riga estremo finale" role="listitem"><span class="nome"><b>Questo profilo</b><span>stima finale</span></span>' +
+      '<span class="pista"><span class="segno" style="left:' + X(r.probabilita) + '"></span></span><span class="val">' + pct.format(r.probabilita) + "</span></div>";
+    $("cascata").innerHTML = html;
+
+    var passo = hi - lo > 0.45 ? 0.2 : 0.1, tacche = "";
+    for (var k = Math.ceil(lo / passo - 1e-9); k * passo <= hi + 1e-9; k++) tacche += '<span style="left:' + X(k * passo) + '">' + pct0.format(k * passo) + "</span>";
+    $("tacche").innerHTML = tacche;
+    $("sottotitolo-cascata").textContent = "Dalla stima per il cliente medio (" + pct.format(p0) + ") a questo profilo: effetto di ogni caratteristica, in punti percentuali.";
+  }
+
+  function aggiorna(campoModificato) {
+    aggiornaAiuti();
+    var errati = mostraErrori(campoModificato);
+    var bloccato = errati.length > 0;
+    $("blocco-risultato").classList.toggle("inattivo", bloccato);
+    $("cascata").classList.toggle("inattivo", bloccato);
+    $("avviso").innerHTML = bloccato ? '<p class="avviso" role="alert">Correggi ' + (errati.length === 1 ? "il campo evidenziato" :
+      "i " + errati.length + " campi evidenziati") + ": la stima si riferisce all'ultimo profilo valido.</p>" : "";
+    if (bloccato) return;
+    var r = ModelloBEV.predici(M, profiloCorrente());
+    disegnaIndicatore(r.probabilita);
+    disegnaCascata(r);
+    precedente = r.probabilita;
+    salvaNelLink();
+  }
+
+  /* --- Link condivisibile: il profilo è nell'indirizzo (#genere=...&eta=...) --- */
+  function salvaNelLink() {
+    var q = new URLSearchParams();
+    Object.keys(M.campi).forEach(function (id) { q.set(id, leggi(id)); });
+    try { history.replaceState(null, "", "#" + q.toString()); } catch (e) { /* non disponibile in alcuni browser con file:// */ }
+  }
+  function leggiDalLink() {
+    var q = new URLSearchParams(location.hash.slice(1)), p = {};
+    if (!q.toString()) return null;
+    Object.keys(M.campi).forEach(function (id) { if (q.has(id)) p[id] = RADIO[id] ? q.get(id) : q.get(id); });
+    return p;
+  }
+
+  /* --- Eventi --- */
+  $("profilo").addEventListener("input", function (e) { aggiorna(e.target.id || e.target.name); });
+  $("profilo").addEventListener("submit", function (e) { e.preventDefault(); });
+  $("profilo").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-passo]");
+    if (!b) return;
+    var inp = b.parentNode.querySelector("input");
+    var n = Math.round(Number(inp.value) || 0) + Number(b.dataset.passo);
+    inp.value = Math.min(Number(inp.max), Math.max(Number(inp.min), n));
+    aggiorna(inp.id);
+  });
+  document.querySelectorAll("[data-esempio]").forEach(function (b) {
+    b.addEventListener("click", function () { caricaProfilo(M.esempi[b.dataset.esempio]); aggiorna(); });
+  });
+  $("ripristina").addEventListener("click", function () { caricaProfilo(PREDEFINITI); aggiorna(); });
+  $("copia").addEventListener("click", function () {
+    var b = this, testo = b.textContent;
+    var fatto = function (msg) { b.textContent = msg; setTimeout(function () { b.textContent = testo; }, 1800); };
+    if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(function () { fatto("Link copiato ✓"); }, function () { fatto("Copia non riuscita"); });
+    else fatto("Copia non riuscita");
+  });
+
+  // Barra fissa su mobile: compare quando il risultato è più in basso, fuori dallo schermo
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (voci) {
+      $("barra-mobile").classList.toggle("visibile", !voci[0].isIntersecting && voci[0].boundingClientRect.top > 0);
+    }).observe($("risultato"));
+  }
+
+  /* --- Testi e avvio --- */
+  $("dati-modello").innerHTML = [
+    ["Modello", I.modello], ["ROC-AUC sul test", I.roc_auc.toLocaleString("it-IT", { maximumFractionDigits: 3 })],
+    ["Accuracy", pct.format(I.accuracy)], ["Clienti nel campione", interi.format(I.n)]
+  ].map(function (x) { return "<li>" + x[0] + " <b>" + x[1] + "</b></li>"; }).join("");
+  $("confronto").innerHTML = '<span class="tacca"></span>Quota di BEV nel campione: <span class="num">' + pct.format(I.quota_bev) + "</span>";
+  $("piede").textContent = "Il modello ha una capacità predittiva moderata (ROC-AUC ≈ " +
+    I.roc_auc.toLocaleString("it-IT", { maximumFractionDigits: 2 }) + "): le probabilità indicano una tendenza, non una certezza sul singolo cliente. " +
+    "Il calcolo avviene interamente nel browser e nessun dato viene inviato.";
+  var a = Math.PI * (1 - I.quota_bev);
+  var tacca = $("tacca-media");
+  tacca.setAttribute("x1", 120 + 86 * Math.cos(a)); tacca.setAttribute("y1", 120 - 86 * Math.sin(a));
+  tacca.setAttribute("x2", 120 + 114 * Math.cos(a)); tacca.setAttribute("y2", 120 - 114 * Math.sin(a));
+
+  caricaProfilo(leggiDalLink() || PREDEFINITI);
+  aggiorna();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+variabile,tipo,test,statistica,p_value,effetto,misura_effetto,mediana_BEV,mediana_non_BEV
+Genere,categoriale,Chi-quadro,18.4927,1.70559e-05,0.0418129,V di Cramér,,
+Classe d'età,categoriale,Chi-quadro,63.7549,2.67444e-11,0.077234,V di Cramér,,
+Classe Reddito Familiare,categoriale,Chi-quadro,230.178,1.20868e-48,0.146752,V di Cramér,,
+Livello di istruzione,categoriale,Chi-quadro,85.2877,2.25112e-18,0.0893295,V di Cramér,,
+Casa di proprietà,categoriale,Chi-quadro,34.2116,4.94341e-09,0.056852,V di Cramér,,
+Casa Indipendente,categoriale,Chi-quadro,28.8279,7.91029e-08,0.0521924,V di Cramér,,
+Tipologia di auto precedente,categoriale,Chi-quadro,314.117,9.75357e-67,0.171434,V di Cramér,,
+Reddito familiare,numerica,Mann-Whitney U,1.65787e+07,5.11307e-53,0.169406,r rank-biserial (BEV vs non BEV),175000,175000
+Numero persone in famiglia,numerica,Mann-Whitney U,1.55253e+07,9.23622e-19,0.0951034,r rank-biserial (BEV vs non BEV),3,3
+Numero di auto in famiglia,numerica,Mann-Whitney U,1.5239e+07,4.09245e-13,0.0749104,r rank-biserial (BEV vs non BEV),2,2
+Importanza di ridurre le emissioni di gas serra,numerica,Mann-Whitney U,1.53563e+07,1.15208e-13,0.0831821,r rank-biserial (BEV vs non BEV),2.55,2.44
+Viaggio più lungo negli ultimi 12 mesi,numerica,Mann-Whitney U,1.39778e+07,0.209995,-0.0140525,r rank-biserial (BEV vs non BEV),317.075,318.83
+Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,numerica,Mann-Whitney U,1.20153e+07,3.53324e-46,-0.152481,r rank-biserial (BEV vs non BEV),1,1
+Distanza casa-lavoro,numerica,Mann-Whitney U,1.36635e+07,0.00123339,-0.0362196,r rank-biserial (BEV vs non BEV),13.8,14.525
+VMT annuo,numerica,Mann-Whitney U,1.12113e+07,1.01482e-77,-0.209192,r rank-biserial (BEV vs non BEV),10667,12706.5

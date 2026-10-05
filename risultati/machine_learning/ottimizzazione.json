@@ -1,0 +1,122 @@
+{
+  "Regressione logistica": {
+    "roc_auc_cv": 0.6745462140405356,
+    "tempo_s": 6.604420900344849,
+    "parametri": {
+      "C": 0.079964555472475,
+      "l1_ratio": 0.9489196568272782,
+      "penalty": "elasticnet"
+    }
+  },
+  "Random Forest": {
+    "roc_auc_cv": 0.7343005328608477,
+    "tempo_s": 148.78775668144226,
+    "parametri": {
+      "max_depth": null,
+      "max_features": "sqrt",
+      "min_samples_leaf": 8,
+      "n_estimators": 580
+    }
+  },
+  "Gradient Boosting": {
+    "roc_auc_cv": 0.7314204043351163,
+    "tempo_s": 69.34037590026855,
+    "parametri": {
+      "learning_rate": 0.013561908915433027,
+      "max_depth": 4,
+      "min_samples_split": 4,
+      "n_estimators": 292,
+      "subsample": 0.5335654858237238
+    }
+  },
+  "AdaBoost": {
+    "roc_auc_cv": 0.7153628330018473,
+    "tempo_s": 40.96904706954956,
+    "parametri": {
+      "learning_rate": 0.3666712085605043,
+      "n_estimators": 388
+    }
+  },
+  "SVM": {
+    "roc_auc_cv": 0.7039047983288147,
+    "tempo_s": 114.1707546710968,
+    "parametri": {
+      "C": 4.224128931583576,
+      "gamma": 0.010976600383774224
+    }
+  },
+  "MLP": {
+    "roc_auc_cv": 0.7067501154080617,
+    "tempo_s": 12.51846718788147,
+    "parametri": {
+      "alpha": 0.004531019941508298,
+      "hidden_layer_sizes": [
+        32
+      ],
+      "learning_rate_init": 0.005196490995541211
+    }
+  },
+  "XGBoost": {
+    "roc_auc_cv": 0.7342504661697113,
+    "tempo_s": 7.745154857635498,
+    "parametri": {
+      "colsample_bytree": 0.7512855306230131,
+      "learning_rate": 0.02360876345501205,
+      "max_depth": 5,
+      "min_child_weight": 19,
+      "n_estimators": 117,
+      "reg_lambda": 0.9282082133815117,
+      "subsample": 0.514781781190633
+    }
+  },
+  "LightGBM": {
+    "roc_auc_cv": 0.735181782603826,
+    "tempo_s": 15.032944917678833,
+    "parametri": {
+      "colsample_bytree": 0.8174871266633135,
+      "learning_rate": 0.01067334661076541,
+      "min_child_samples": 88,
+      "n_estimators": 403,
+      "num_leaves": 15,
+      "reg_lambda": 3.8383271409241964,
+      "subsample": 0.5171327154740506,
+      "subsample_freq": 1
+    }
+  },
+  "Gradient Boosting (feature selezionate)": {
+    "roc_auc_cv": 0.7326118330525636,
+    "tempo_s": 53.92632079124451,
+    "parametri": {
+      "learning_rate": 0.02855414069686003,
+      "max_depth": 3,
+      "min_samples_split": 18,
+      "n_estimators": 258,
+      "subsample": 0.5211299930534357,
+      "selezione__k": 15
+    },
+    "feature_selezionate": [
+      "Genere",
+      "Classe d'età",
+      "Reddito familiare",
+      "Livello di istruzione",
+      "Casa di proprietà",
+      "Casa Indipendente",
+      "Numero persone in famiglia",
+      "Numero di auto in famiglia",
+      "Importanza di ridurre le emissioni di gas serra",
+      "Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi",
+      "Distanza casa-lavoro",
+      "VMT annuo",
+      "Auto precedente: PHEV",
+      "Auto precedente: BEV",
+      "Auto precedente: HEV"
+    ]
+  },
+  "Voting (soft)": {
+    "componenti": [
+      "LightGBM",
+      "Random Forest",
+      "XGBoost"
+    ]
+  }
+}

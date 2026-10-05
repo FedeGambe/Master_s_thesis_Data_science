@@ -1,0 +1,27 @@
+{
+  "n_train": 8550,
+  "n_test": 2138,
+  "quota_BEV_train": 0.5423391812865497,
+  "quota_BEV_test": 0.5420954162768943,
+  "feature": [
+    "Genere",
+    "Classe d'età",
+    "Reddito familiare",
+    "Livello di istruzione",
+    "Casa di proprietà",
+    "Casa Indipendente",
+    "Numero persone in famiglia",
+    "Numero di auto in famiglia",
+    "Importanza di ridurre le emissioni di gas serra",
+    "Viaggio più lungo negli ultimi 12 mesi",
+    "Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi",
+    "Distanza casa-lavoro",
+    "VMT annuo",
+    "Auto precedente: PHEV",
+    "Auto precedente: BEV",
+    "Auto precedente: HEV",
+    "Auto precedente: ICE",
+    "Auto precedente: GNC"
+  ],
+  "seed": 343
+}

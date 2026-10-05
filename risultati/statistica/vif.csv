@@ -1,0 +1,29 @@
+variabile,VIF
+Tipologia di auto precedente: ICE vs PHEV,2.62095
+Tipologia di auto precedente: HEV vs PHEV,2.22254
+Tipologia di auto precedente: BEV vs PHEV,1.75896
+Classe d'età: 65-74 vs 45-54,1.62911
+Classe d'età: 55-64 vs 45-54,1.56252
+Numero persone in famiglia,1.47099
+Classe d'età: 35-44 vs 45-54,1.45947
+Casa di proprietà,1.35962
+Numero di auto in famiglia,1.35564
+Classe Reddito Familiare: Alta vs Media,1.34579
+Casa Indipendente,1.34522
+Classe d'età: 75-79 vs 45-54,1.31201
+Classe Reddito Familiare: Molto alta vs Media,1.31106
+Classe Reddito Familiare: Estremamente alta vs Media,1.23368
+Classe d'età: 25-34 vs 45-54,1.19136
+Livello di istruzione: Diploma o Qualifica professionale vs Laurea 2L o Dottorato,1.16774
+Livello di istruzione: Laurea 1L vs Laurea 2L o Dottorato,1.14051
+Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,1.07397
+Importanza di ridurre le emissioni di gas serra,1.0686
+Classe Reddito Familiare: Bassa vs Media,1.06768
+Distanza casa-lavoro (per 10 mi),1.0613
+Viaggio più lungo negli ultimi 12 mesi (per 100 mi),1.05365
+Genere (Maschio),1.051
+VMT annuo (per 1.000 mi),1.04618
+Classe d'età: >80 vs 45-54,1.04473
+Tipologia di auto precedente: GNC vs PHEV,1.03829
+Livello di istruzione: Licenza Media vs Laurea 2L o Dottorato,1.00895
+Classe d'età: <25 vs 45-54,1.00827

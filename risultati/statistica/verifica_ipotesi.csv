@@ -1,0 +1,15 @@
+ipotesi,descrizione,variabile,odds_ratio,p_value,direzione_attesa,esito
+H1,Un reddito più alto aumenta la probabilità di possedere un BEV,Classe Reddito Familiare: Bassa vs Media,0.720233,0.0123372,-,Confermata
+H1,Un reddito più alto aumenta la probabilità di possedere un BEV,Classe Reddito Familiare: Alta vs Media,1.21706,5.44199e-05,+,Confermata
+H1,Un reddito più alto aumenta la probabilità di possedere un BEV,Classe Reddito Familiare: Molto alta vs Media,1.60825,2.36095e-14,+,Confermata
+H1,Un reddito più alto aumenta la probabilità di possedere un BEV,Classe Reddito Familiare: Estremamente alta vs Media,2.11662,2.42256e-20,+,Confermata
+H2.1,"Aver posseduto una PHEV favorisce il passaggio al BEV, rispetto a chi aveva un'auto tradizionale (ICE)",Tipologia di auto precedente: PHEV vs ICE,0.662691,3.1437e-10,+,Contraria
+H2.2,"Come cambia la probabilità di possedere un BEV per chi aveva un'auto ICE, HEV o GNC (rispetto a PHEV)",Tipologia di auto precedente: ICE vs PHEV,1.509,3.1437e-10,nessuna (esplorativa),Aumenta la probabilità
+H2.2,"Come cambia la probabilità di possedere un BEV per chi aveva un'auto ICE, HEV o GNC (rispetto a PHEV)",Tipologia di auto precedente: HEV vs PHEV,0.979612,0.781088,nessuna (esplorativa),Non significativo
+H2.2,"Come cambia la probabilità di possedere un BEV per chi aveva un'auto ICE, HEV o GNC (rispetto a PHEV)",Tipologia di auto precedente: GNC vs PHEV,1.45192,0.222197,nessuna (esplorativa),Non significativo
+H2.3,Chi ha già avuto un BEV tende a ricomprarlo,Tipologia di auto precedente: BEV vs PHEV,3.4739,2.00037e-42,+,Confermata
+H3,Lunghe percorrenze riducono la probabilità di possedere un BEV,Viaggio più lungo negli ultimi 12 mesi (per 100 mi),1.00427,0.465524,-,Non significativo
+H3,Lunghe percorrenze riducono la probabilità di possedere un BEV,Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,0.965515,1.49768e-14,-,Confermata
+H3,Lunghe percorrenze riducono la probabilità di possedere un BEV,Distanza casa-lavoro (per 10 mi),0.98133,0.0476495,-,Confermata
+H3,Lunghe percorrenze riducono la probabilità di possedere un BEV,VMT annuo (per 1.000 mi),0.985027,5.64325e-15,-,Confermata
+H4,Chi dà importanza alla riduzione delle emissioni sceglie più spesso un BEV,Importanza di ridurre le emissioni di gas serra,1.10543,5.66431e-15,+,Confermata

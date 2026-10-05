@@ -1,0 +1,27 @@
+,effetto_marginale,errore_std,z,p_value,ic_2.5%,ic_97.5%
+Genere (Maschio),4.98948,0.0107607,4.63675,3.53937e-06,2.88041,7.09854
+Classe d'età: <25 vs 45-54,2.92379,0.114181,0.256065,0.797901,-19.4554,25.3029
+Classe d'età: 25-34 vs 45-54,-2.56129,0.0274776,-0.932138,0.351265,-7.94679,2.82422
+Classe d'età: 35-44 vs 45-54,2.48419,0.0140477,1.7684,0.0769945,-0.269107,5.23748
+Classe d'età: 55-64 vs 45-54,-5.24585,0.0128396,-4.08568,4.39483e-05,-7.76237,-2.72933
+Classe d'età: 65-74 vs 45-54,-7.85604,0.0144378,-5.44131,5.28909e-08,-10.6858,-5.02629
+Classe d'età: 75-79 vs 45-54,-1.84338,0.0211833,-0.870205,0.384189,-5.99522,2.30847
+Classe d'età: >80 vs 45-54,-15.6181,0.0574671,-2.71775,0.00657277,-26.8815,-4.35477
+Classe Reddito Familiare: Bassa vs Media,-7.45967,0.029778,-2.5051,0.0122418,-13.296,-1.62329
+Classe Reddito Familiare: Alta vs Media,4.46503,0.0110309,4.04774,5.17147e-05,2.30301,6.62705
+Classe Reddito Familiare: Molto alta vs Media,10.8003,0.0140092,7.7094,1.26415e-14,8.0545,13.546
+Classe Reddito Familiare: Estremamente alta vs Media,17.0437,0.0181687,9.38081,6.54702e-21,13.4827,20.6047
+Livello di istruzione: Licenza Media vs Laurea 2L o Dottorato,-20.1652,0.107574,-1.87455,0.0608547,-41.2493,0.91883
+Livello di istruzione: Diploma o Qualifica professionale vs Laurea 2L o Dottorato,-8.19221,0.0150225,-5.4533,4.9444e-08,-11.1366,-5.24786
+Livello di istruzione: Laurea 1L vs Laurea 2L o Dottorato,-2.75917,0.0100487,-2.74579,0.00603656,-4.72869,-0.789654
+Tipologia di auto precedente: BEV vs PHEV,28.3056,0.0200807,14.096,4.02141e-45,24.3699,32.2414
+Tipologia di auto precedente: HEV vs PHEV,-0.46822,0.0168482,-0.277905,0.781085,-3.77041,2.83397
+Tipologia di auto precedente: ICE vs PHEV,9.35232,0.0147589,6.33675,2.34663e-10,6.45964,12.245
+Tipologia di auto precedente: GNC vs PHEV,8.47593,0.0694158,1.22104,0.222072,-5.12933,22.0812
+Casa di proprietà,5.13113,0.0145406,3.52883,0.000417401,2.28122,7.98103
+Numero di auto in famiglia,3.1863,0.00538921,5.91237,3.37217e-09,2.13003,4.24256
+Importanza di ridurre le emissioni di gas serra,2.27843,0.00288505,7.89734,2.84917e-15,1.71297,2.84389
+Numero di viaggi superiori a 200 miglia negli ultimi 12 mesi,-0.7977,0.00102726,-7.76531,8.14447e-15,-0.999039,-0.59636
+Viaggio più lungo negli ultimi 12 mesi (per 100 mi),0.0969316,0.00132812,0.729841,0.465487,-0.163375,0.357238
+Distanza casa-lavoro (per 10 mi),-0.428383,0.00216146,-1.98191,0.047489,-0.852022,-0.00474415
+VMT annuo (per 1.000 mi),-0.342905,0.000434664,-7.88897,3.04699e-15,-0.428098,-0.257712

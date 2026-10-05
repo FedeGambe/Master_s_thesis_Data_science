@@ -1,0 +1,52 @@
+{
+  "ANN base": {
+    "strati": [
+      16,
+      64,
+      128,
+      64
+    ],
+    "dropout": 0.2,
+    "l2": 0.0,
+    "lr": 0.001,
+    "epoche_eseguite": 48,
+    "n_feature": 18,
+    "n_parametri": 18033
+  },
+  "ANN regolarizzata": {
+    "strati": [
+      64,
+      32
+    ],
+    "dropout": 0.3,
+    "l2": 0.001,
+    "lr": 0.001,
+    "epoche_eseguite": 92,
+    "n_feature": 18,
+    "n_parametri": 3329
+  },
+  "ANN avanzata (tesi)": {
+    "strati": [
+      64,
+      128,
+      256,
+      128,
+      64
+    ],
+    "dropout": 0.3,
+    "l1": 0.001,
+    "l2": 0.001,
+    "lr": 0.001,
+    "attivazione": "leaky_relu",
+    "batch_norm": true,
+    "ottimizzatore": "adamw",
+    "polinomiali": true,
+    "batch_size": 32,
+    "monitor": "val_loss",
+    "pazienza": 20,
+    "pazienza_lr": 5,
+    "epoche_eseguite": 189,
+    "n_feature": 189,
+    "n_parametri": 94977
+  }
+}

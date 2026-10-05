@@ -1,0 +1,21 @@
+,Dim1,Dim2,contributo_Dim1_%,contributo_Dim2_%
+Genere__Femmina,0.212862,0.605778,0.815365,7.2936
+Genere__Maschio,-0.0646967,-0.184118,0.24782,2.2168
+Classe età raggruppata__35-44,0.333534,-0.801401,1.73663,11.0736
+Classe età raggruppata__45-64,-0.423662,-0.069552,7.55483,0.224888
+Classe età raggruppata__<35,2.50622,-0.685471,14.4738,1.19587
+Classe età raggruppata__>65,0.398368,0.98963,2.72894,18.6008
+Classe Reddito Familiare__Alta,-0.244628,-0.0734053,1.61811,0.16092
+Classe Reddito Familiare__Bassa,2.5386,0.483747,9.44235,0.378694
+Classe Reddito Familiare__Estremamente alta,-1.04181,0.260223,9.87404,0.680412
+Classe Reddito Familiare__Media,0.881061,0.136972,19.1803,0.511999
+Classe Reddito Familiare__Molto alta,-0.631006,-0.300551,5.92935,1.48572
+Livello di istruzione__Diploma o Qualifica professionale,1.24708,0.155306,12.1391,0.207937
+Livello di istruzione__Laurea 1L,0.34138,-0.377043,3.42438,4.61366
+Livello di istruzione__Laurea 2L o Dottorato,-0.493471,0.243595,9.7177,2.6154
+Livello di istruzione__Licenza Media,-0.679498,1.36699,0.0492,0.219928
+Sensibilità ambientale categoriale__Alta,-0.160376,-0.682409,0.366574,7.33049
+Sensibilità ambientale categoriale__Bassa,-0.141663,-1.1941,0.0537289,4.21635
+Sensibilità ambientale categoriale__Media,0.184958,-1.08512,0.320334,12.1777
+Sensibilità ambientale categoriale__Molto alta,-0.00523313,0.59984,0.0012778,18.5426
+Sensibilità ambientale categoriale__Molto bassa,0.277061,-1.15427,0.326168,6.25264

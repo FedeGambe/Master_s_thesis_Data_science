@@ -1,0 +1,8 @@
+# Pacchetti che mancano nell'ambiente standard di Google Colab (gli altri sono già installati)
+prince
+kmodes
+shap
+lightgbm
+xgboost
+dash
+dash-bootstrap-components

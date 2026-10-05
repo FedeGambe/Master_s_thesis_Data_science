@@ -1,0 +1,5 @@
+,Genere,Classe Reddito Familiare,Livello di istruzione,Casa di proprietà,Casa Indipendente,Tipologia di auto precedente,Numero persone in famiglia categoriale,Numero di auto in famiglia categoriale,VMT categoriale,Viaggio lungo categoriale,Numero viaggi lunghi categoriale,Distanza casa-lavoro categoriale,Sensibilità ambientale categoriale,Classe età raggruppata
+0,Maschio,Alta,Laurea 2L o Dottorato,Si,Si,ICE,Coppie,Due auto,VMT basso,Viaggio 350-550 mi,1 viaggio lungo,"Casa-lavoro 6,5-15 mi",Molto alta,45-64
+1,Maschio,Alta,Laurea 2L o Dottorato,Si,Si,ICE,Famiglie con 2 figli,Tre auto,VMT alto,Viaggio 175-350 mi,1 viaggio lungo,Casa-lavoro 25-45 mi,Molto alta,45-64
+2,Maschio,Media,Laurea 2L o Dottorato,Si,Si,ICE,Coppie,Due auto,VMT medio,Viaggio < 175 mi,Nessun viaggio lungo,"Casa-lavoro < 6,5 mi",Molto alta,>65
+3,Maschio,Molto alta,Laurea 2L o Dottorato,Si,Si,ICE,Famiglie con 2 figli,Due auto,VMT medio,Viaggio 175-350 mi,1 viaggio lungo,Casa-lavoro 15-25 mi,Molto alta,45-64

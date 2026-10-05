@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Installa le dipendenze
+        run: pip install pandas numpy scipy scikit-learn statsmodels xgboost lightgbm pytest
+      - name: Esegui i test
+        run: pytest -q
