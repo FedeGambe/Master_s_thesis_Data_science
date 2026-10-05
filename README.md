@@ -55,7 +55,7 @@ I notebook presentano le analisi: la logica è nel pacchetto `src/tesi_bev`. Si 
 ├── risultati/             tabelle CSV/JSON prodotte dagli script, una cartella per fase (risultati/r/ per R)
 ├── docs/                  pagina e documento dei risultati, dashboard.html, tesi e presentazione in PDF
 ├── tests/                 test automatici (pytest)
-├── .github/workflows/     integrazione continua (test Python)
+├── .github/workflows/     integrazione continua (test Python e script R)
 └── legacy/                codice, dataset intermedi, modelli e notebook originali della tesi
 ```
 

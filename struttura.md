@@ -216,7 +216,7 @@ Si eseguono con `pytest` dalla radice (la configurazione è in `pyproject.toml`)
 | File | Contenuto |
 |---|---|
 | `test.yml` | a ogni push e pull request installa le dipendenze principali su Python 3.12 ed esegue `pytest` |
-| `r.yml` | modello standard di GitHub per pacchetti R (`rcmdcheck`), attivo solo su `main`. Il repository non è un pacchetto R (manca il file `DESCRIPTION`), quindi questo controllo non è adatto agli script in `R/` |
+| `r.yml` | a ogni push o pull request su `main` che tocca `R/`, `src/` o i dati, crea i dataset elaborati (fasi 01 e 03) ed esegue `Rscript R/esegui_tutto.R`; si può lanciare anche a mano da GitHub (*Run workflow*) |
 
 ## `legacy/` — materiale originale
 

@@ -1,40 +1,39 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-#
-# See https://github.com/r-lib/actions/tree/master/examples#readme for
-# additional example workflows available for the R community.
-
 name: R
 
+# Esegue gli script R (PCA, MCA, FAMD, cluster) sui dataset elaborati creati dalle fasi Python 01 e 03.
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
+    paths: ["R/**", "src/**", "scripts/01_prepara_dati.py", "scripts/03_esplorativa.py", "dati/originali/**", ".github/workflows/r.yml"]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+    paths: ["R/**", "src/**", "scripts/01_prepara_dati.py", "scripts/03_esplorativa.py", "dati/originali/**", ".github/workflows/r.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        r-version: ['3.6.3', '4.1.1']
-
+  analisi-r:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90   # il K-Mode di klaR (20 avvii) richiede diversi minuti
     steps:
       - uses: actions/checkout@v4
-      - name: Set up R ${{ matrix.r-version }}
-        uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
+      - uses: actions/setup-python@v5
         with:
-          r-version: ${{ matrix.r-version }}
-      - name: Install dependencies
+          python-version: "3.12"
+          cache: pip
+      - name: Installa le dipendenze Python
+        run: pip install pandas numpy scipy scikit-learn joblib prince kmodes
+      - name: Crea i dataset elaborati (fasi 01 e 03)
         run: |
-          install.packages(c("remotes", "rcmdcheck"))
-          remotes::install_deps(dependencies = TRUE)
+          python scripts/01_prepara_dati.py
+          python scripts/03_esplorativa.py
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - name: Installa i pacchetti R
+        run: install.packages(c("dplyr", "FactoMineR", "factoextra", "cluster", "psych", "ggplot2", "klaR"))
         shell: Rscript {0}
-      - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+      - name: Esegui gli script R
+        run: Rscript R/esegui_tutto.R
