@@ -18,7 +18,7 @@ import nbformat as nbf
 RADICE = Path(__file__).resolve().parents[1]
 DIR_NB = RADICE / "notebooks"
 REPO = "FedeGambe/Master_s_thesis_Data_science"
-RAMO = "revisione-progetto"
+RAMO = "main"
 
 
 def badge(nome):

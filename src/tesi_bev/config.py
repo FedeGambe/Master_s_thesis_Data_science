@@ -17,7 +17,7 @@ FILE_DATASET = DIR_DATI_ORIGINALI / "dataset_originale.csv"
 
 # Copia remota usata quando il file locale non è disponibile (es. notebook aperto da solo su Colab).
 REPO_GITHUB = "FedeGambe/Master_s_thesis_Data_science"
-RAMO_GITHUB = "revisione-progetto"
+RAMO_GITHUB = "main"
 URL_DATASET = (
     f"https://raw.githubusercontent.com/{REPO_GITHUB}/{RAMO_GITHUB}/dati/originali/dataset_originale.csv"
 )

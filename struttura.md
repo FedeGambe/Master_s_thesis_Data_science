@@ -70,7 +70,7 @@ Le fasi 02, 03, 05 e 06 leggono direttamente il dataset originale tramite `tesi_
 | `dataset_originale.csv` | **La fonte di tutte le analisi.** 10.688 righe, 18 colonne, nessun valore mancante. Contiene le 16 variabili della tesi (socio-demografiche, abitative, sensibilità ambientale, auto precedente, mobilità e target `BEV dummy`) più `Auto attuale` (modello del veicolo) e `Tipologia di auto attuale` (BEV, PHEV, HEV, FCEV), da cui deriva il target. |
 | `dataset_partenza.csv` | Versione già codificata usata nel lavoro originale (dummy e confronti con le categorie di riferimento, es. `Classe d'età: <25 vs 45-54`). Conservata per confronto, non è letta dal codice. |
 
-Se il file locale non è presente (ad esempio un notebook aperto da solo su Colab), `config.URL_DATASET` punta alla copia su GitHub nel ramo `revisione-progetto`.
+Se il file locale non è presente (ad esempio un notebook aperto da solo su Colab), `config.URL_DATASET` punta alla copia su GitHub nel branch `main`.
 
 ### `dati/elaborati/` (ignorata da git)
 
