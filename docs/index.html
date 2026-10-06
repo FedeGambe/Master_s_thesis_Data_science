@@ -1,99 +1,141 @@
 <!doctype html>
 <html lang="it">
-<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adozione dei veicoli elettrici</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3CclipPath id=%22q%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path=%22url%28%23q%29%22%3E%3Crect width=%2232%22 height=%2264%22 fill=%22%230d0d0d%22/%3E%3Crect x=%2232%22 width=%2232%22 height=%2264%22 fill=%22%235aa4bb%22/%3E%3Cpath d=%22M32 13a19 19 0 0 0 0 38z%22 fill=%22%23e2462a%22/%3E%3Cpath d=%22M32 13a19 19 0 0 1 0 38z%22 fill=%22%23ddd8c4%22/%3E%3C/g%3E%3C/svg%3E">
 <meta name="description" content="Tesi di laurea magistrale: analisi data-driven per l'adozione di veicoli elettrici. Risultati delle analisi e dashboard di predizione.">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
-/* Pagina iniziale: copertina a tutta larghezza (come in risultati.html) e due aree, risultati e dashboard. */
+/* Pagina iniziale: stesso impianto di risultati.html (copertina a schermo intero, barra, carta con grana), con le due aree e i documenti. */
 :root{
-  --bg:#fbfaf7; --surface:#ffffff; --ink:#111111; --ink-2:#45484c; --ink-3:#74777b; --line:#e4e0d6;
-  --teal:#3f93aa; --teal-ink:#2a7a90; --arancio:#e2462a; --arancio-ink:#c8361c; --accent-soft:#e6f1f4; --arancio-soft:#fbe8e3;
-  --copertina:#efe9dc;
-  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --barra:60px; --cover:#ddd8c4;
+  --g1:#fff7e6; --g2:#e6dfcb; --g3:#e9e4d3; --bg:#f4f0e6; --surface:#fbf9f3; --ink:#111111; --ink-2:#45484c; --ink-3:#74777b; --line:#e4e0d6;
+  --teal:#3f93aa; --teal-ink:#2a7a90; --navy:#263a5a; --rosso:#b0272c; --arancio:#e2462a; --arancio-ink:#c8361c; --sabbia:#ddd4c1;
+  --accent:var(--teal-ink); --accent-soft:#e6f1f4; --arancio-soft:#fbe8e3;
+  --s1:#3f93aa; --s2:#e2462a; --s3:#263a5a; --s4:#a2a39e;
+  --ok:#1f7a4d; --ok-soft:#e1f2e8; --no:#b0272c; --no-soft:#f8e3e1; --nd:#6b6e72; --nd-soft:#eeece7;
+  --grigio:#6b6e72; --grigio-linea:#a2a39e;
+  --f-display:Georgia,"Times New Roman",serif;
+  --f-body:"Inter",system-ui,sans-serif;
+  --f-data:ui-monospace,Consolas,monospace;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
-  --teal:#4fa6bd; --teal-ink:#6dbbd0; --arancio:#ee6141; --arancio-ink:#f07a5e; --accent-soft:#18292e; --arancio-soft:#33201a;
-  --copertina:#1f2123; color-scheme:dark; } }
 :root[data-theme="dark"]{
-  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
-  --teal:#4fa6bd; --teal-ink:#6dbbd0; --arancio:#ee6141; --arancio-ink:#f07a5e; --accent-soft:#18292e; --arancio-soft:#33201a;
-  --copertina:#1f2123; color-scheme:dark; }
+  --g1:#17222a; --g2:#0c1518; --g3:#08090a; --bg:#0f1011; --surface:#17191b; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --navy:#3d5680; --rosso:#d6474b; --arancio:#ee6141; --arancio-ink:#f07a5e; --sabbia:#5d574b;
+  --accent:var(--teal-ink); --accent-soft:#18292e; --arancio-soft:#33201a;
+  --s1:#4fa6bd; --s2:#ee6141; --s3:#8ea6d0; --s4:#6f716d;
+  --ok:#5cc28d; --ok-soft:#173326; --no:#ef7a7c; --no-soft:#3a1d1e; --nd:#a3a39d; --nd-soft:#26282a;
+  --grigio:#a3a39d; --grigio-linea:#6f716d;
+  color-scheme:dark; }
 
 *{box-sizing:border-box}
-body{background:var(--bg); color:var(--ink); font:16.5px/1.6 var(--f-body); margin:0}
-h1,h2{font-family:var(--f-display); line-height:1.08; text-wrap:balance; margin:0; letter-spacing:-.01em}
-a:focus-visible,button:focus-visible{outline:2px solid var(--teal-ink); outline-offset:2px}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{margin:0; color:var(--ink); font:16.5px/1.65 var(--f-body); min-height:100vh;
+  background:radial-gradient(900px 600px at 10% 0%,var(--g1),transparent 70%),radial-gradient(900px 700px at 100% 100%,var(--g2),transparent 70%),var(--g3); background-attachment:fixed}
+body::before{content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; opacity:.55;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .45 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+h1,h2{font-family:var(--f-display); line-height:1.08; text-wrap:balance; margin:0; letter-spacing:-.03em}
+h1{font-weight:800}
+a:focus-visible,button:focus-visible{outline:2px solid var(--arancio); outline-offset:2px}
 .margine{--margine:max(20px, calc(50vw - 640px))}
 
-.tema{position:absolute; z-index:2; top:calc(16px + env(safe-area-inset-top,0px)); right:20px; font:600 .8rem/1 var(--f-body); color:var(--ink);
-  background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:8px 13px; cursor:pointer}
+/* Barra in alto */
+.barra{position:fixed; z-index:20; inset:0 0 auto; height:calc(var(--barra) + env(safe-area-inset-top,0px)); padding:env(safe-area-inset-top,0px) 20px 0;
+  display:flex; align-items:center; justify-content:flex-end; gap:8px; transition:background .25s, box-shadow .25s}
+.barra.compatta{background:color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 1px 0 var(--line)}
+.bottone-barra{font:600 .8rem/1 var(--f-data); letter-spacing:.08em; text-transform:uppercase; color:var(--ink); background:none; border:1px solid var(--ink); border-radius:999px;
+  padding:8px 12px; cursor:pointer; text-decoration:none; white-space:nowrap; display:inline-flex; align-items:center; gap:8px}
+.bottone-barra:hover{background:var(--ink); color:var(--bg)}
+.barra:not(.compatta) .bottone-barra{color:#0d0d0d; border-color:#0d0d0d}
+.barra:not(.compatta) .bottone-barra:hover{background:#0d0d0d; color:var(--cover)}
+@media (prefers-reduced-motion: reduce){ .barra{transition:none} }
 
-/* Copertina */
-.copertina{background:var(--copertina)}
-.testa{padding:clamp(64px,9vw,120px) var(--margine) clamp(32px,5vw,64px)}
-.testa h1{font-size:clamp(2.3rem,6vw,4.6rem); font-weight:900; letter-spacing:-.02em; max-width:20ch}
-.sottotitolo{font-size:clamp(1.05rem,1.8vw,1.4rem); margin:16px 0 0}
-.banda{position:relative; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; min-height:clamp(220px,24vw,320px);
-  background:linear-gradient(90deg, #0d0d0d 50%, #5aa4bb 50%)}
-.banda > div{position:relative; z-index:1; padding:clamp(22px,3.4vw,40px) var(--margine) 28px; min-width:0}
-.banda .sx{color:#f4f2ec; font-size:.9rem; line-height:1.45}
-.banda .dx{color:#0d0d0d; text-align:right; font-size:1rem; padding-left:20px}
-.banda b{font-family:var(--f-display); font-weight:800; font-size:1.2rem}
-.banda .sx hr{border:0; border-top:1px solid #ffffff59; margin:14px 0; width:min(60%,260px)}
-.banda .semicerchio{position:absolute; z-index:0; left:25%; bottom:0; width:50%; aspect-ratio:1; border-radius:50%;
-  background:linear-gradient(90deg, #e2462a 50%, #ddd8c4 50%); transform:translateY(80%); pointer-events:none}
-@media (max-width:700px){ .banda{grid-template-columns:1fr; background:none} .banda .sx{background:#0d0d0d}
-  .banda .dx{background:#5aa4bb; text-align:left; padding-left:var(--margine)} .banda .semicerchio{display:none} }
+/* Copertina a schermo intero: illustrazione (beige, banda nera e azzurra, semicerchio rosso e beige) senza scritte; titolo in alto.
+   Scorrendo, il titolo si rimpicciolisce e sfuma (--p va da 0 a 1) mentre compare la barra. */
+.copertina{position:relative; height:100svh; min-height:560px; overflow:hidden; background:var(--cover); color:#0d0d0d;
+  --margine:max(20px, calc(50vw - 640px)); border-bottom:3px solid var(--ink)}
+.bauhaus{position:absolute; inset:0; width:100%; height:100%; z-index:0}
+.slide-testa{position:relative; z-index:1; padding:calc(var(--barra) + clamp(16px,3vw,48px)) var(--margine) 0;
+  opacity:calc(1 - 1.3 * var(--p,0)); transform:translateY(calc(var(--p,0) * 40px))}
+.slide-testa h1{max-width:20ch; line-height:.95; letter-spacing:-.04em; font-size:clamp(2.4rem,7vw,5.2rem);
+  transform-origin:left bottom; transform:scale(calc(1 - .3 * var(--p,0)))}
+.copertina h1 em{color:#c8361c; font-style:italic}
+.copertina .sottotitolo{font-size:clamp(1.05rem,1.8vw,1.4rem); margin:20px 0 0; color:#2b2b28}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:20px}
+.tags span{font:600 .7rem/1 var(--f-data); border:1px solid #0d0d0d77; padding:5px 8px; border-radius:999px; color:#0d0d0d}
+.logo-cover{position:absolute; z-index:1; right:var(--margine); bottom:0; padding:0 0 26px; opacity:calc(1 - 1.3 * var(--p,0))}
+.logo-cover svg{display:block}
+/* Diciture: sulla banda nera (sinistra) e azzurra (destra) dell'illustrazione, che è ancorata in basso e alta il 47,8% dello schermo */
+.diciture{position:absolute; z-index:1; left:0; right:0; bottom:0; height:calc(max(100svh, 56.25vw) * .478); display:grid; grid-template-columns:1fr 1fr; font-size:.9rem; line-height:1.45}
+.diciture > div{padding:clamp(22px,3vw,36px) var(--margine) 0; min-width:0}
+.diciture .sx{color:#f4f2ec; max-width:calc(50vw - 40px)}
+.diciture .dx{color:#0d0d0d; text-align:right; font-size:1rem}
+.diciture b{font-family:var(--f-display); font-weight:800; font-size:1.15rem}
+.diciture hr{border:0; border-top:1px solid #ffffff59; margin:14px 0; width:min(60%,260px)}
+@media (max-width:1000px){
+  .copertina{height:auto; min-height:100svh; display:flex; flex-direction:column}
+  .slide-testa{padding-bottom:28px}
+  .diciture{position:relative; height:auto; margin-top:auto; grid-template-columns:1fr; padding-bottom:26px; background:#0d0d0d}
+  .diciture > div{padding:22px var(--margine) 0}
+  .diciture .sx{max-width:none}
+  .diciture .dx{text-align:left; background:#5aa4bb; padding-bottom:22px; margin-bottom:-26px}
+}
+.firma{display:flex; align-items:center; gap:12px; color:var(--ink); text-decoration:none; font:600 .9rem/1 var(--f-data); letter-spacing:.06em}
+.firma:hover{color:var(--arancio)}
+
 
 /* Le due aree */
 .aree{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; padding:clamp(36px,5vw,64px) var(--margine) 24px}
 @media (max-width:760px){ .aree{grid-template-columns:1fr} }
 .area{display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-top:5px solid var(--colore);
-  border-radius:6px; padding:clamp(22px,3vw,34px); min-width:0; --colore:var(--teal); --colore-ink:var(--teal-ink); --morbido:var(--accent-soft)}
-.area.predittiva{--colore:var(--arancio); --colore-ink:var(--arancio-ink); --morbido:var(--arancio-soft)}
-.area .etichetta{font:600 .78rem/1 var(--f-body); letter-spacing:.1em; text-transform:uppercase; color:var(--colore-ink)}
-.area h2{font-size:clamp(1.7rem,3.2vw,2.3rem); font-weight:900; margin-top:12px; position:relative; padding-left:34px}
-.area h2::before{content:""; position:absolute; left:0; top:.06em; border-style:solid; border-width:.5em 0 .5em .62em;
-  border-color:transparent transparent transparent var(--colore)}
+  border-radius:6px; padding:clamp(22px,3vw,34px); min-width:0; --colore:var(--teal); --colore-ink:var(--teal-ink)}
+.area.predittiva{--colore:var(--arancio); --colore-ink:var(--arancio-ink)}
+.area .etichetta{font:600 .72rem/1 var(--f-data); letter-spacing:.08em; text-transform:uppercase; color:var(--colore-ink)}
+.area h2{font-size:clamp(1.7rem,3.2vw,2.3rem); margin-top:12px}
 .area p{color:var(--ink-2); margin:14px 0 0}
 .area ul{margin:14px 0 0; padding-left:18px; color:var(--ink-2); font-size:.94rem}
-.area .vai{align-self:flex-start; margin-top:auto; display:inline-flex; align-items:center; gap:10px; font:800 1rem/1 var(--f-display);
-  color:#fff; background:var(--colore-ink); text-decoration:none; padding:14px 22px; border-radius:999px; transition:transform .15s}
 .area .spazio{flex:1; min-height:24px}
-.area .vai:hover{transform:translateX(3px)}
+.area .vai{align-self:flex-start; display:inline-flex; align-items:center; gap:10px; font:600 .8rem/1 var(--f-data); letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink); border:1px solid var(--ink); text-decoration:none; padding:12px 18px; border-radius:999px}
+.area .vai:hover{background:var(--ink); color:var(--bg)}
 .area .vai::after{content:"→"}
-@media (prefers-reduced-motion: reduce){ .area .vai{transition:none} .area .vai:hover{transform:none} }
 
-/* Documenti */
-.documenti{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; padding:8px var(--margine) 56px; font-size:.9rem; color:var(--ink-3)}
-.documenti a{color:var(--ink); text-decoration:none; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:8px 14px; font-weight:600; font-size:.85rem}
+/* Documenti e footer */
+.documenti{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; padding:8px var(--margine) 24px; font:600 .78rem/1.6 var(--f-data); text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3)}
+.documenti a{color:var(--ink); text-decoration:none; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:8px 14px}
 .documenti a:hover{border-color:var(--ink-3)}
+footer{margin:0 var(--margine); padding:18px 0 56px; border-top:3px solid var(--ink)}
 </style>
-</head>
-<body>
-<button class="tema" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+<script>try{document.documentElement.dataset.theme=localStorage.theme||"dark"}catch{document.documentElement.dataset.theme="dark"}</script>
 
-<header class="copertina margine">
-  <div class="testa">
-    <h1>Analisi data-driven per l'adozione di veicoli elettrici</h1>
+<header class="barra" id="barra">
+  <a class="bottone-barra" href="https://progetti.federicogamberini.it/"><svg viewBox="0 0 341.61 344.35" width="16" height="16" aria-hidden="true"><path fill="var(--arancio)" d="M305.77,314.84c-1.08-1.67-1.77-2.62-2.34-3.65c-3.02-5.39-5.94-10.83-9.02-16.18c-17.29-30.05-43.07-48.09-77.1-54.5 c-17.79-3.35-35.74-5.17-53.8-6.14c-21.84-1.18-43.73-1.99-65.32-6c-9.5-1.76-18.94-3.73-27.98-7.29 c-8.04-3.16-15.26-7.61-21.27-13.87c-13.08-13.63-15.82-29.73-10.89-47.44c2.89-10.41,8.84-18.71,17.92-24.85 c10.62-7.18,21.95-12.65,34.39-15.81c2.06-0.52,4.09-1.18,6.13-1.81c0.3-0.09,0.56-0.34,1.29-0.81 c-9.36-6.59-18.86-12.66-27.69-21.06c10.9-3.7,21.14-6.76,31.45-9.97c0.99,1.14,1.81,2.04,2.59,2.97 c13.91,16.46,31.6,23.71,53.08,22.12c16.35-1.21,30.14-7.47,40.84-20.05c6.12-7.19,10.46-15.41,13.36-24.36 c1.45-4.47,2.43-9.1,3.59-13.66c0.36-1.4,0.63-2.83,1-4.55c18.56-6.79,37.16-13.59,56.5-20.67c-0.23,2.67-0.22,4.76-0.61,6.76 c-8.53,44.01-33.56,73.26-77.08,85.81c-16.26,4.69-32.94,6.71-49.81,7.55c-15.23,0.76-30.52,1.1-45.49,4.59 c-7.02,1.64-13.98,3.55-20.22,7.22c-3.33,1.96-6.64,4.34-9.17,7.23c-7.64,8.72-5.53,19.97,4.64,25.58 c6.25,3.45,13.13,5.38,20.15,6.33c10.45,1.41,20.95,2.44,31.45,3.35c14.2,1.23,28.42,2.13,42.62,3.29 c13.31,1.09,26.63,2.08,39.89,3.6c15.86,1.82,31.55,4.74,46.46,10.71c32.06,12.85,49.3,37.31,54.57,70.78 c2.14,13.57,1.06,27.09-2.51,40.38C307.06,311.7,306.51,312.88,305.77,314.84z"/></svg><span>← Progetti</span></a>
+  <button class="bottone-barra" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+</header>
+
+<section class="copertina margine" id="copertina">
+  <div class="slide-testa">
+    <h1>Analisi <em>data-driven</em> per l'adozione di veicoli elettrici</h1>
     <p class="sottotitolo">Analisi statistiche e predittive sugli acquirenti di auto elettriche</p>
+    <div class="tags"><span>Statistica</span><span>Machine Learning</span><span>Deep Learning</span><span>Veicoli elettrici</span></div>
   </div>
-  <div class="banda">
+  <svg xmlns="http://www.w3.org/2000/svg" class="bauhaus" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+<rect width="1600" height="900" fill="#ddd8c4"/>
+<rect y="470" width="800" height="430" fill="#0d0d0d"/>
+<rect x="800" y="470" width="800" height="430" fill="#5aa4bb"/>
+<circle cx="800" cy="1180" r="440" fill="#ddd8c4" clip-path="url(#t)"/>
+<path d="M800 740A440 440 0 0 0 800 1620Z" fill="#e2462a" clip-path="url(#t)"/>
+<clipPath id="t"><rect y="470" width="1600" height="430"/></clipPath>
+</svg>
+  <div class="diciture">
     <div class="sx"><div>Laureando<br><b>Gamberini Federico</b><br><i>mat. 178147</i></div><hr>
       <div><b style="font-size:.95rem">Università degli Studi di Modena e Reggio Emilia</b><br><i>Dipartimento di Comunicazione ed Economia</i></div><hr>
       <div>Corso di Laurea Magistrale in Management<br>e Comunicazione d'Impresa<br>A.A. 2023/2024</div></div>
     <div class="dx"><div>Relatore:<br>Prof. <b>Cavicchioli Roberto</b></div></div>
-    <div class="semicerchio" aria-hidden="true"></div>
   </div>
-</header>
+  <a class="logo-cover" href="https://progetti.federicogamberini.it/" aria-label="Federico Gamberini, progetti"><svg viewBox="0 0 341.61 344.35" width="44" height="44" aria-hidden="true"><path fill="#0d0d0d" d="M305.77,314.84c-1.08-1.67-1.77-2.62-2.34-3.65c-3.02-5.39-5.94-10.83-9.02-16.18c-17.29-30.05-43.07-48.09-77.1-54.5 c-17.79-3.35-35.74-5.17-53.8-6.14c-21.84-1.18-43.73-1.99-65.32-6c-9.5-1.76-18.94-3.73-27.98-7.29 c-8.04-3.16-15.26-7.61-21.27-13.87c-13.08-13.63-15.82-29.73-10.89-47.44c2.89-10.41,8.84-18.71,17.92-24.85 c10.62-7.18,21.95-12.65,34.39-15.81c2.06-0.52,4.09-1.18,6.13-1.81c0.3-0.09,0.56-0.34,1.29-0.81 c-9.36-6.59-18.86-12.66-27.69-21.06c10.9-3.7,21.14-6.76,31.45-9.97c0.99,1.14,1.81,2.04,2.59,2.97 c13.91,16.46,31.6,23.71,53.08,22.12c16.35-1.21,30.14-7.47,40.84-20.05c6.12-7.19,10.46-15.41,13.36-24.36 c1.45-4.47,2.43-9.1,3.59-13.66c0.36-1.4,0.63-2.83,1-4.55c18.56-6.79,37.16-13.59,56.5-20.67c-0.23,2.67-0.22,4.76-0.61,6.76 c-8.53,44.01-33.56,73.26-77.08,85.81c-16.26,4.69-32.94,6.71-49.81,7.55c-15.23,0.76-30.52,1.1-45.49,4.59 c-7.02,1.64-13.98,3.55-20.22,7.22c-3.33,1.96-6.64,4.34-9.17,7.23c-7.64,8.72-5.53,19.97,4.64,25.58 c6.25,3.45,13.13,5.38,20.15,6.33c10.45,1.41,20.95,2.44,31.45,3.35c14.2,1.23,28.42,2.13,42.62,3.29 c13.31,1.09,26.63,2.08,39.89,3.6c15.86,1.82,31.55,4.74,46.46,10.71c32.06,12.85,49.3,37.31,54.57,70.78 c2.14,13.57,1.06,27.09-2.51,40.38C307.06,311.7,306.51,312.88,305.77,314.84z"/></svg></a>
+</section>
 
 <main class="margine">
   <div class="aree">
@@ -128,13 +170,24 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal-ink); outline-
     <a href="MCI_178147.pdf">Presentazione (PDF)</a>
     <a href="https://github.com/FedeGambe/Master_s_thesis_Data_science">Codice su GitHub</a>
   </nav>
+  <footer><a class="firma" href="https://progetti.federicogamberini.it/"><svg viewBox="0 0 341.61 344.35" width="28" height="28" aria-hidden="true"><path fill="var(--arancio)" d="M305.77,314.84c-1.08-1.67-1.77-2.62-2.34-3.65c-3.02-5.39-5.94-10.83-9.02-16.18c-17.29-30.05-43.07-48.09-77.1-54.5 c-17.79-3.35-35.74-5.17-53.8-6.14c-21.84-1.18-43.73-1.99-65.32-6c-9.5-1.76-18.94-3.73-27.98-7.29 c-8.04-3.16-15.26-7.61-21.27-13.87c-13.08-13.63-15.82-29.73-10.89-47.44c2.89-10.41,8.84-18.71,17.92-24.85 c10.62-7.18,21.95-12.65,34.39-15.81c2.06-0.52,4.09-1.18,6.13-1.81c0.3-0.09,0.56-0.34,1.29-0.81 c-9.36-6.59-18.86-12.66-27.69-21.06c10.9-3.7,21.14-6.76,31.45-9.97c0.99,1.14,1.81,2.04,2.59,2.97 c13.91,16.46,31.6,23.71,53.08,22.12c16.35-1.21,30.14-7.47,40.84-20.05c6.12-7.19,10.46-15.41,13.36-24.36 c1.45-4.47,2.43-9.1,3.59-13.66c0.36-1.4,0.63-2.83,1-4.55c18.56-6.79,37.16-13.59,56.5-20.67c-0.23,2.67-0.22,4.76-0.61,6.76 c-8.53,44.01-33.56,73.26-77.08,85.81c-16.26,4.69-32.94,6.71-49.81,7.55c-15.23,0.76-30.52,1.1-45.49,4.59 c-7.02,1.64-13.98,3.55-20.22,7.22c-3.33,1.96-6.64,4.34-9.17,7.23c-7.64,8.72-5.53,19.97,4.64,25.58 c6.25,3.45,13.13,5.38,20.15,6.33c10.45,1.41,20.95,2.44,31.45,3.35c14.2,1.23,28.42,2.13,42.62,3.29 c13.31,1.09,26.63,2.08,39.89,3.6c15.86,1.82,31.55,4.74,46.46,10.71c32.06,12.85,49.3,37.31,54.57,70.78 c2.14,13.57,1.06,27.09-2.51,40.38C307.06,311.7,306.51,312.88,305.77,314.84z"/></svg><span>Federico Gamberini</span></a></footer>
 </main>
 
 <script>
+const barra = document.getElementById("barra"), copertina = document.getElementById("copertina");
+const riduciMovimento = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function aggiorna() {
+  const y = scrollY, hc = copertina.offsetHeight;
+  if (!riduciMovimento) copertina.style.setProperty("--p", Math.min(1, y / hc).toFixed(3));
+  barra.classList.toggle("compatta", y > hc - barra.offsetHeight * 2);
+}
+addEventListener("scroll", () => requestAnimationFrame(aggiorna), {passive: true});
+addEventListener("resize", aggiorna);
+aggiorna();
 document.getElementById("tema").addEventListener("click", () => {
-  const r = document.documentElement, scuro = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const r = document.documentElement, scuro = r.dataset.theme === "dark";
   r.dataset.theme = scuro ? "light" : "dark";
+  try { localStorage.theme = r.dataset.theme } catch {}
 });
 </script>
-</body>
 </html>

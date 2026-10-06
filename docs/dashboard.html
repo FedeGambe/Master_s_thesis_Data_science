@@ -7,38 +7,32 @@
 <title>Predizione BEV</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3CclipPath id=%22q%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path=%22url%28%23q%29%22%3E%3Crect width=%2232%22 height=%2264%22 fill=%22%230d0d0d%22/%3E%3Crect x=%2232%22 width=%2232%22 height=%2264%22 fill=%22%235aa4bb%22/%3E%3Cpath d=%22M32 13a19 19 0 0 0 0 38z%22 fill=%22%23e2462a%22/%3E%3Cpath d=%22M32 13a19 19 0 0 1 0 38z%22 fill=%22%23ddd8c4%22/%3E%3C/g%3E%3C/svg%3E">
 <meta name="description" content="Probabilità che il veicolo a basse emissioni di un cliente sia un'auto 100% elettrica (BEV), con il contributo di ogni caratteristica.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Public+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 /* Stessa identità di docs/risultati.html: parte predittiva in arancio; verso BEV in teal, verso altro veicolo in arancio. */
 :root{
-  --bg:#fbfaf7; --surface:#ffffff; --surface-2:#f4f1ea; --ink:#111111; --ink-2:#45484c; --ink-3:#6b6e72; --line:#e4e0d6; --track:#ece8df;
+  --barra:60px; --g1:#fff7e6; --g2:#e6dfcb; --g3:#e9e4d3; --bg:#f4f0e6; --surface:#fbf9f3; --surface-2:#efe9db; --ink:#111111; --ink-2:#45484c; --ink-3:#6b6e72; --line:#e4e0d6; --track:#ece8df;
   --teal:#3f93aa; --teal-ink:#2a7a90; --teal-soft:#e6f1f4; --arancio:#e2462a; --arancio-ink:#c8361c; --arancio-soft:#fbe8e3; --sabbia:#ddd4c1;
   --scelto-bg:#263a5a; --scelto-ink:#ffffff;
   --ombra:0 1px 2px rgba(17,17,17,.04), 0 8px 24px -12px rgba(17,17,17,.12);
-  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
-  --f-data:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --f-display:Georgia,"Times New Roman",serif;
+  --f-body:"Inter",system-ui,sans-serif;
+  --f-data:ui-monospace,Consolas,monospace;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#121314; --surface:#1a1c1e; --surface-2:#222427; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#97968f; --line:#2e3032; --track:#2a2c2e;
-  --teal:#4fa6bd; --teal-ink:#6dbbd0; --teal-soft:#18292e; --arancio:#ee6141; --arancio-ink:#f07a5e; --arancio-soft:#33201a; --sabbia:#5d574b;
-  --scelto-bg:#8ea6d0; --scelto-ink:#0f1216; --ombra:none;
-  color-scheme:dark; } }
 :root[data-theme="dark"]{
-  --bg:#121314; --surface:#1a1c1e; --surface-2:#222427; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#97968f; --line:#2e3032; --track:#2a2c2e;
+  --g1:#17222a; --g2:#0c1518; --g3:#08090a; --bg:#0f1011; --surface:#17191b; --surface-2:#202326; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#97968f; --line:#2e3032; --track:#2a2c2e;
   --teal:#4fa6bd; --teal-ink:#6dbbd0; --teal-soft:#18292e; --arancio:#ee6141; --arancio-ink:#f07a5e; --arancio-soft:#33201a; --sabbia:#5d574b;
   --scelto-bg:#8ea6d0; --scelto-ink:#0f1216; --ombra:none;
   color-scheme:dark; }
 
 *{box-sizing:border-box}
-body{background:var(--bg); color:var(--ink); font:16px/1.55 var(--f-body); margin:0; -webkit-font-smoothing:antialiased}
-.pagina{max-width:1200px; margin:0 auto; padding:24px 16px 96px}
-h1,h2,legend{font-family:var(--f-display); letter-spacing:-.01em}
-h1{font-size:clamp(1.9rem,4.4vw,2.9rem); font-weight:900; line-height:1.05; margin:10px 0 0; position:relative; padding-left:.8em; text-wrap:balance}
-h1::before{content:""; position:absolute; left:0; top:.1em; border-style:solid; border-width:.4em 0 .4em .5em;
-  border-color:transparent transparent transparent var(--arancio)}
+body{margin:0; color:var(--ink); font:16px/1.55 var(--f-body); min-height:100vh; -webkit-font-smoothing:antialiased;
+  background:radial-gradient(900px 600px at 10% 0%,var(--g1),transparent 70%),radial-gradient(900px 700px at 100% 100%,var(--g2),transparent 70%),var(--g3); background-attachment:fixed}
+body::before{content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; opacity:.55;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .45 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+.pagina{max-width:1200px; margin:0 auto; padding:calc(var(--barra) + 28px) 16px 96px}
+h1,h2,legend{font-family:var(--f-display); letter-spacing:-.03em}
+h1{font-size:clamp(2rem,5vw,3.4rem); font-weight:800; line-height:1.05; margin:10px 0 0; padding-bottom:14px; border-bottom:3px solid var(--ink); text-wrap:balance}
+h1 em{color:var(--arancio-ink); font-style:italic}
 h2{font-size:1.05rem; font-weight:800; margin:0; line-height:1.2}
 .num{font-family:var(--f-data); font-variant-numeric:tabular-nums}
 a{color:var(--teal-ink)}
@@ -47,8 +41,15 @@ button{font:inherit; color:inherit; cursor:pointer}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
 
 /* Testata */
-.ritorno{display:inline-flex; align-items:center; gap:6px; font-size:.9rem; text-decoration:none; min-height:44px}
-.ritorno:hover{text-decoration:underline}
+.barra{position:fixed; z-index:20; inset:0 0 auto; height:calc(var(--barra) + env(safe-area-inset-top,0px)); padding:env(safe-area-inset-top,0px) 20px 0;
+  display:flex; align-items:center; justify-content:flex-end; gap:8px; background:color-mix(in srgb, var(--bg) 60%, transparent);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 1px 0 var(--line)}
+.bottone-barra{font:600 .8rem/1 var(--f-data); letter-spacing:.08em; text-transform:uppercase; color:var(--ink); background:none; border:1px solid var(--ink); border-radius:999px;
+  padding:8px 12px; cursor:pointer; text-decoration:none; white-space:nowrap; display:inline-flex; align-items:center; gap:8px}
+.bottone-barra:hover{background:var(--ink); color:var(--bg)}
+@media (max-width:560px){ .solo-largo{display:none} }
+.firma{display:flex; align-items:center; gap:12px; color:var(--ink); text-decoration:none; font:600 .9rem/1 var(--f-data); letter-spacing:.06em}
+.firma:hover{color:var(--arancio)}
 .intro{color:var(--ink-2); max-width:68ch; margin:12px 0 14px; font-size:1.02rem}
 .dati-modello{display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none}
 .dati-modello li{font-size:.82rem; color:var(--ink-2); background:var(--surface-2); border-radius:999px; padding:4px 12px}
@@ -186,15 +187,23 @@ details.metodo p{margin:6px 0}
   min-height:44px; display:inline-flex; align-items:center; text-decoration:none; font-weight:600; font-size:.88rem}
 @media (min-width:980px){ .barra-mobile{display:none} }
 
-footer{margin-top:32px; color:var(--ink-3); font-size:.85rem; max-width:80ch}
+footer{margin-top:48px; padding-top:18px; border-top:3px solid var(--ink); color:var(--ink-3); font:600 .78rem/1.6 var(--f-data); text-transform:uppercase; letter-spacing:.06em}
+footer a{color:inherit} footer a:hover{color:var(--arancio)}
+footer .firma{margin-top:14px}
 .solo-lettori{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 </style>
+<script>try{document.documentElement.dataset.theme=localStorage.theme||"dark"}catch{document.documentElement.dataset.theme="dark"}</script>
 </head>
 <body>
+<header class="barra">
+  <a class="bottone-barra" href="https://progetti.federicogamberini.it/"><svg viewBox="0 0 341.61 344.35" width="16" height="16" aria-hidden="true"><path fill="var(--arancio)" d="M305.77,314.84c-1.08-1.67-1.77-2.62-2.34-3.65c-3.02-5.39-5.94-10.83-9.02-16.18c-17.29-30.05-43.07-48.09-77.1-54.5 c-17.79-3.35-35.74-5.17-53.8-6.14c-21.84-1.18-43.73-1.99-65.32-6c-9.5-1.76-18.94-3.73-27.98-7.29 c-8.04-3.16-15.26-7.61-21.27-13.87c-13.08-13.63-15.82-29.73-10.89-47.44c2.89-10.41,8.84-18.71,17.92-24.85 c10.62-7.18,21.95-12.65,34.39-15.81c2.06-0.52,4.09-1.18,6.13-1.81c0.3-0.09,0.56-0.34,1.29-0.81 c-9.36-6.59-18.86-12.66-27.69-21.06c10.9-3.7,21.14-6.76,31.45-9.97c0.99,1.14,1.81,2.04,2.59,2.97 c13.91,16.46,31.6,23.71,53.08,22.12c16.35-1.21,30.14-7.47,40.84-20.05c6.12-7.19,10.46-15.41,13.36-24.36 c1.45-4.47,2.43-9.1,3.59-13.66c0.36-1.4,0.63-2.83,1-4.55c18.56-6.79,37.16-13.59,56.5-20.67c-0.23,2.67-0.22,4.76-0.61,6.76 c-8.53,44.01-33.56,73.26-77.08,85.81c-16.26,4.69-32.94,6.71-49.81,7.55c-15.23,0.76-30.52,1.1-45.49,4.59 c-7.02,1.64-13.98,3.55-20.22,7.22c-3.33,1.96-6.64,4.34-9.17,7.23c-7.64,8.72-5.53,19.97,4.64,25.58 c6.25,3.45,13.13,5.38,20.15,6.33c10.45,1.41,20.95,2.44,31.45,3.35c14.2,1.23,28.42,2.13,42.62,3.29 c13.31,1.09,26.63,2.08,39.89,3.6c15.86,1.82,31.55,4.74,46.46,10.71c32.06,12.85,49.3,37.31,54.57,70.78 c2.14,13.57,1.06,27.09-2.51,40.38C307.06,311.7,306.51,312.88,305.77,314.84z"/></svg><span>← Progetti</span></a>
+  <a class="bottone-barra solo-largo" href="index.html">Home</a>
+  <a class="bottone-barra solo-largo" href="risultati.html">Risultati</a>
+  <button class="bottone-barra" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+</header>
 <div class="pagina">
   <header>
-    <a class="ritorno" href="risultati.html">← Risultati dell'analisi</a>
-    <h1>Chi sceglie un'auto elettrica?</h1>
+    <h1>Chi sceglie un'auto <em>elettrica</em>?</h1>
     <p class="intro">Descrivi un cliente: il modello stima la probabilità che il suo veicolo a basse emissioni sia un'auto
       <strong>100% elettrica (BEV)</strong> anziché un ibrido (PHEV, HEV) o a idrogeno (FCEV), e mostra quali caratteristiche pesano di più.</p>
     <ul class="dati-modello" id="dati-modello"></ul>
@@ -288,7 +297,7 @@ footer{margin-top:32px; color:var(--ink-3); font-size:.85rem; max-width:80ch}
     </aside>
   </div>
 
-  <footer id="piede"></footer>
+  <footer><span id="piede"></span><p><a class="firma" href="https://progetti.federicogamberini.it/"><svg viewBox="0 0 341.61 344.35" width="28" height="28" aria-hidden="true"><path fill="var(--arancio)" d="M305.77,314.84c-1.08-1.67-1.77-2.62-2.34-3.65c-3.02-5.39-5.94-10.83-9.02-16.18c-17.29-30.05-43.07-48.09-77.1-54.5 c-17.79-3.35-35.74-5.17-53.8-6.14c-21.84-1.18-43.73-1.99-65.32-6c-9.5-1.76-18.94-3.73-27.98-7.29 c-8.04-3.16-15.26-7.61-21.27-13.87c-13.08-13.63-15.82-29.73-10.89-47.44c2.89-10.41,8.84-18.71,17.92-24.85 c10.62-7.18,21.95-12.65,34.39-15.81c2.06-0.52,4.09-1.18,6.13-1.81c0.3-0.09,0.56-0.34,1.29-0.81 c-9.36-6.59-18.86-12.66-27.69-21.06c10.9-3.7,21.14-6.76,31.45-9.97c0.99,1.14,1.81,2.04,2.59,2.97 c13.91,16.46,31.6,23.71,53.08,22.12c16.35-1.21,30.14-7.47,40.84-20.05c6.12-7.19,10.46-15.41,13.36-24.36 c1.45-4.47,2.43-9.1,3.59-13.66c0.36-1.4,0.63-2.83,1-4.55c18.56-6.79,37.16-13.59,56.5-20.67c-0.23,2.67-0.22,4.76-0.61,6.76 c-8.53,44.01-33.56,73.26-77.08,85.81c-16.26,4.69-32.94,6.71-49.81,7.55c-15.23,0.76-30.52,1.1-45.49,4.59 c-7.02,1.64-13.98,3.55-20.22,7.22c-3.33,1.96-6.64,4.34-9.17,7.23c-7.64,8.72-5.53,19.97,4.64,25.58 c6.25,3.45,13.13,5.38,20.15,6.33c10.45,1.41,20.95,2.44,31.45,3.35c14.2,1.23,28.42,2.13,42.62,3.29 c13.31,1.09,26.63,2.08,39.89,3.6c15.86,1.82,31.55,4.74,46.46,10.71c32.06,12.85,49.3,37.31,54.57,70.78 c2.14,13.57,1.06,27.09-2.51,40.38C307.06,311.7,306.51,312.88,305.77,314.84z"/></svg><span>Federico Gamberini</span></a></p></footer>
 </div>
 
 <div class="barra-mobile" id="barra-mobile">
@@ -714,6 +723,13 @@ footer{margin-top:32px; color:var(--ink-3); font-size:.85rem; max-width:80ch}
   caricaProfilo(leggiDalLink() || PREDEFINITI);
   aggiorna();
 })();
+</script>
+<script>
+document.getElementById("tema").addEventListener("click", () => {
+  const r = document.documentElement;
+  r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark";
+  try { localStorage.theme = r.dataset.theme } catch {}
+});
 </script>
 </body>
 </html>
