@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adozione dei veicoli elettrici</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3CclipPath id=%22q%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path=%22url%28%23q%29%22%3E%3Crect width=%2232%22 height=%2264%22 fill=%22%230d0d0d%22/%3E%3Crect x=%2232%22 width=%2232%22 height=%2264%22 fill=%22%235aa4bb%22/%3E%3Cpath d=%22M32 13a19 19 0 0 0 0 38z%22 fill=%22%23e2462a%22/%3E%3Cpath d=%22M32 13a19 19 0 0 1 0 38z%22 fill=%22%23ddd8c4%22/%3E%3C/g%3E%3C/svg%3E">
 <meta name="description" content="Analisi data-driven per l'adozione di veicoli elettrici: analisi statistiche, esplorative, cluster, machine learning e deep learning.">
@@ -6,9 +10,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: identità della presentazione di laurea (titoli neri pesanti, triangolo davanti ai titoli,
-   parte I statistica in teal / parte II predittiva in arancio); indice fisso a sinistra sopra i 1180px,
-   altrimenti in testa; testo, note e figure occupano tutta la larghezza della colonna. */
+   parte I statistica in teal / parte II predittiva in arancio). Copertina a tutta larghezza; scorrendo resta
+   in alto una barra con titolo, capitolo e sottocapitolo, e lo scorrimento si ferma a ogni sottocapitolo.
+   Indice fisso a sinistra sopra i 1180px, altrimenti a tendina dalla barra. */
 :root{
+  --barra:60px;
   --bg:#fbfaf7; --surface:#ffffff; --ink:#111111; --ink-2:#45484c; --ink-3:#74777b; --line:#e4e0d6;
   --teal:#3f93aa; --teal-ink:#2a7a90; --navy:#263a5a; --rosso:#b0272c; --arancio:#e2462a; --arancio-ink:#c8361c; --sabbia:#ddd4c1;
   --accent:var(--teal-ink); --accent-soft:#e6f1f4; --arancio-soft:#fbe8e3;
@@ -37,10 +43,16 @@
   color-scheme:dark; }
 
 *{box-sizing:border-box}
-html{scroll-behavior:smooth; scroll-padding-top:16px}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--barra) + 20px)}
 @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+/* Scorrimento a scatti: si ferma all'inizio di ogni capitolo e sottocapitolo; i blocchi più alti dello schermo
+   si leggono liberamente. Su touch l'aggancio è solo "di prossimità", per non frenare lo scorrimento. */
+@media (min-width:900px) and (pointer:fine) and (prefers-reduced-motion: no-preference){ html{scroll-snap-type:y mandatory} }
+@media (pointer:coarse) and (prefers-reduced-motion: no-preference){ html{scroll-snap-type:y proximity} }
+.copertina,.capitolo,.blocco{scroll-snap-align:start}
+footer{scroll-snap-align:end}
 body{background:var(--bg); color:var(--ink); font:16.5px/1.65 var(--f-body); margin:0}
-.impianto{max-width:1320px; margin:0 auto; padding-inline:20px; padding-block:28px 80px;
+.impianto{max-width:1320px; margin:0 auto; padding-inline:20px; padding-block:40px 80px;
   display:grid; grid-template-columns:minmax(0,1fr); gap:0 48px}
 @media (min-width:1180px){ .impianto{grid-template-columns:230px minmax(0,1fr)} }
 main{min-width:0; max-width:1020px}
@@ -53,6 +65,7 @@ h2::before{content:""; position:absolute; left:0; top:.06em; border-style:solid;
 .statistica h2::before{border-left-color:var(--teal)}
 .predittiva h2::before{border-left-color:var(--arancio)}
 .capitolo{margin-top:88px}
+.capitolo.introduzione{margin-top:0}
 .blocco{margin-top:56px}
 h3{font-size:1.3rem; font-weight:800; margin:0 0 6px}
 h3 .nr{color:var(--teal-ink); margin-right:8px; font-variant-numeric:tabular-nums}
@@ -84,35 +97,68 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-of
 .indice ol ol a{font-size:.84rem; color:var(--ink-2)}
 .indice .sez{display:block; font:600 .72rem/1 var(--f-body); color:var(--ink-3); text-transform:uppercase; letter-spacing:.1em; margin:18px 0 8px 12px}
 @media (min-width:1180px){
-  .indice{position:sticky; top:calc(20px + env(safe-area-inset-top,0px)); align-self:start; max-height:calc(100vh - 40px); overflow:auto; padding-top:8px}
+  .indice{position:sticky; top:calc(var(--barra) + 20px); align-self:start; max-height:calc(100vh - var(--barra) - 40px); overflow:auto; padding-top:8px}
 }
 @media (max-width:1179px){
-  .indice{order:2; margin-top:32px; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 20px}
-  main{display:contents}
-  .indice ol ol{display:none}
-  .indice > ol{columns:2; column-gap:24px}
-  .indice .sez{display:none}
+  .indice{position:fixed; z-index:19; top:var(--barra); left:0; right:0; max-height:calc(100dvh - var(--barra)); overflow:auto;
+    background:var(--surface); border-bottom:1px solid var(--line); box-shadow:0 14px 28px #0003; padding:18px 20px 24px; display:none}
+  .indice.aperto{display:block}
+  .indice > ol{columns:2; column-gap:28px}
+  .indice > ol > li{break-inside:avoid}
+  .indice .sez{margin-top:6px}
 }
 @media (max-width:560px){ .indice > ol{columns:1} }
 
-/* Copertina, come la prima slide: riquadro con titolo, banda nera e azzurra, semicerchio rosso e sabbia al centro */
-.slide{border:1px solid var(--line); border-radius:6px; overflow:hidden}
-.slide-testa{background:var(--copertina); padding:clamp(28px,5vw,64px) clamp(20px,5.5vw,72px) clamp(28px,5vw,60px)}
-.slide-testa h1{max-width:22ch; letter-spacing:-.02em}
-.copertina .sottotitolo{font-size:clamp(1.05rem,1.8vw,1.35rem); color:var(--ink); margin:12px 0 0}
-.banda{position:relative; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; min-height:clamp(230px,30vw,330px);
+/* Barra in alto: trasparente sulla copertina, poi mostra titolo, capitolo e sottocapitolo correnti */
+.barra{position:fixed; z-index:20; inset:0 0 auto; height:calc(var(--barra) + env(safe-area-inset-top,0px)); padding:env(safe-area-inset-top,0px) 20px 0;
+  display:flex; align-items:center; gap:16px; transition:background .25s, box-shadow .25s; --colore-parte:var(--grigio-linea)}
+.barra[data-parte="statistica"]{--colore-parte:var(--teal)} .barra[data-parte="predittiva"]{--colore-parte:var(--arancio)}
+.barra.compatta{background:color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 1px 0 var(--line)}
+.dove{flex:1; min-width:0; opacity:0; transform:translateY(-6px); transition:opacity .25s, transform .25s; pointer-events:none}
+.barra.compatta .dove{opacity:1; transform:none; pointer-events:auto}
+.dove .progetto{display:block; width:max-content; max-width:100%; font:800 .7rem/1.3 var(--f-display); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.dove .progetto:hover{color:var(--ink)}
+.posizione{display:flex; align-items:baseline; min-width:0; font:800 1.02rem/1.3 var(--f-display); white-space:nowrap}
+.posizione .cap{flex:none; position:relative; padding-left:16px}
+.posizione .cap::before{content:""; position:absolute; left:0; top:.28em; border-style:solid; border-width:.32em 0 .32em .42em;
+  border-color:transparent transparent transparent var(--colore-parte)}
+.posizione .sotto{min-width:0; overflow:hidden; text-overflow:ellipsis; color:var(--ink-2); font-weight:600}
+.posizione .sotto::before{content:"›"; margin:0 9px; color:var(--ink-3)}
+.posizione .sotto:empty{display:none}
+.azioni{display:flex; gap:8px; flex:none; margin-left:auto}
+.bottone-barra{font:600 .8rem/1 var(--f-body); color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:999px;
+  padding:8px 13px; cursor:pointer; text-decoration:none; white-space:nowrap}
+.bottone-barra:hover{border-color:var(--ink-3)}
+#apri-indice{display:none}
+@media (max-width:1179px){ #apri-indice{display:inline-block} }
+@media (max-width:700px){ .solo-largo{display:none} .posizione{font-size:.92rem} }
+.avanzamento{position:absolute; left:0; bottom:0; width:100%; height:3px; background:var(--colore-parte);
+  transform-origin:left; transform:scaleX(var(--avanzamento,0)); opacity:0; transition:opacity .25s}
+.barra.compatta .avanzamento{opacity:1}
+@media (prefers-reduced-motion: reduce){ .barra,.dove,.avanzamento{transition:none} }
+
+/* Copertina a tutta larghezza, come la prima slide: titolo, banda nera e azzurra, semicerchio rosso e sabbia al centro.
+   Scorrendo, il titolo si rimpicciolisce e sfuma (--p va da 0 a 1) mentre compare la barra. */
+.copertina{background:var(--copertina); --margine:max(20px, calc(50vw - 640px))}
+.slide-testa{padding:calc(var(--barra) + clamp(28px,6vw,80px)) var(--margine) clamp(32px,5vw,64px);
+  opacity:calc(1 - 1.3 * var(--p,0)); transform:translateY(calc(var(--p,0) * 40px))}
+.slide-testa h1{max-width:20ch; letter-spacing:-.02em; font-size:clamp(2.3rem,6vw,4.6rem);
+  transform-origin:left bottom; transform:scale(calc(1 - .3 * var(--p,0)))}
+.copertina .sottotitolo{font-size:clamp(1.05rem,1.8vw,1.4rem); color:var(--ink); margin:16px 0 0}
+.banda{position:relative; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; min-height:clamp(240px,28vw,360px);
   background:linear-gradient(90deg, #0d0d0d 50%, #5aa4bb 50%)}
-.banda > div{position:relative; z-index:1; padding:clamp(22px,3.4vw,40px) clamp(20px,5.5vw,72px) 28px; min-width:0}
+.banda > div{position:relative; z-index:1; padding:clamp(22px,3.4vw,40px) var(--margine) 28px; min-width:0}
 .banda .sx{color:#f4f2ec; font-size:.9rem; line-height:1.45}
 .banda .dx{color:#0d0d0d; text-align:right; font-size:1rem; padding-left:20px}
 .banda b{font-family:var(--f-display); font-weight:800; font-size:1.2rem}
 .banda .sx hr{border:0; border-top:1px solid #ffffff59; margin:14px 0; width:min(60%,260px)}
 .banda .semicerchio{position:absolute; z-index:0; left:25%; bottom:0; width:50%; aspect-ratio:1; border-radius:50%;
   background:linear-gradient(90deg, #e2462a 50%, #ddd8c4 50%); transform:translateY(80%); pointer-events:none}
-@media (max-width:700px){ .banda{grid-template-columns:1fr; background:none} .banda .sx{background:#0d0d0d} .banda .dx{background:#5aa4bb; text-align:left; padding-left:clamp(20px,5.5vw,72px)} .banda .semicerchio{display:none} }
+@media (max-width:700px){ .banda{grid-template-columns:1fr; background:none} .banda .sx{background:#0d0d0d} .banda .dx{background:#5aa4bb; text-align:left; padding-left:var(--margine)} .banda .semicerchio{display:none} }
 
 .cifre{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--line);
-  border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-top:28px}
+  border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-top:0}
 .cifra{background:var(--surface); padding:18px 18px 16px; min-width:0}
 .cifra b{display:block; font:900 2rem/1 var(--f-display); font-variant-numeric:tabular-nums}
 .cifra span{display:block; font-size:.85rem; line-height:1.4; color:var(--ink-2); margin-top:8px}
@@ -202,18 +248,8 @@ tr.evidenza td{background:var(--accent-soft)}
 
 #suggerimento{position:fixed; pointer-events:none; background:var(--ink); color:var(--bg); font-size:.8rem; line-height:1.4;
   padding:6px 9px; border-radius:4px; max-width:300px; z-index:10}
-.tema{position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; font-size:.8rem; background:var(--surface);
-  color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer}
-.vai-indice{position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:5; display:none;
-  font:700 .85rem/1 var(--f-display); color:var(--bg); background:var(--ink); text-decoration:none; padding:11px 16px; border-radius:999px;
-  box-shadow:0 4px 14px #0004; opacity:0; transform:translateY(8px); transition:opacity .2s, transform .2s; pointer-events:none}
-.vai-indice.visibile{opacity:1; transform:none; pointer-events:auto}
-@media (max-width:1179px){ .vai-indice{display:block} }
-@media (prefers-reduced-motion: reduce){ .vai-indice{transition:none} }
 footer{margin-top:80px; padding-top:18px; border-top:1px solid var(--line); font-size:.82rem; line-height:1.6; color:var(--ink-3)}
-@media (max-width:1179px){ .copertina{order:1} .contenuto{order:3} }
-.copertina,.contenuto,.indice{min-width:0}
-@media (max-width:700px){ .copertina{padding-top:30px} }
+.contenuto,.indice{min-width:0}
 
 /* Pannello delle distribuzioni (1.1) */
 .pulsante{display:inline-flex; align-items:center; gap:8px; font:700 .9rem/1 var(--f-display); color:var(--teal-ink);
@@ -231,9 +267,34 @@ footer{margin-top:80px; padding-top:18px; border-top:1px solid var(--line); font
 .mediane{font-size:.86rem; color:var(--ink-2); margin:2px 0 0}
 </style>
 
-<button class="tema" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+<header class="barra" id="barra">
+  <div class="dove">
+    <a class="progetto" href="#copertina">Adozione dei veicoli elettrici</a>
+    <div class="posizione" aria-live="polite"><span class="cap" id="barra-capitolo"></span><span class="sotto" id="barra-sotto"></span></div>
+  </div>
+  <nav class="azioni" aria-label="Navigazione">
+    <button class="bottone-barra" id="apri-indice" type="button" aria-controls="indice" aria-expanded="false">Indice</button>
+    <a class="bottone-barra solo-largo" href="index.html">Home</a>
+    <a class="bottone-barra solo-largo" href="dashboard.html">Dashboard</a>
+    <button class="bottone-barra" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+  </nav>
+  <div class="avanzamento" aria-hidden="true"></div>
+</header>
 <div id="suggerimento" hidden></div>
-<a class="vai-indice" id="vai-indice" href="#indice">Indice</a>
+
+<section class="copertina" id="copertina">
+  <div class="slide-testa">
+    <h1>Analisi data-driven per l'adozione di veicoli elettrici</h1>
+    <p class="sottotitolo">Analisi statistiche e predittive sugli acquirenti di auto elettriche</p>
+  </div>
+  <div class="banda">
+    <div class="sx"><div>Laureando<br><b>Gamberini Federico</b><br><i>mat. 178147</i></div><hr>
+      <div><b style="font-size:.95rem">Università degli Studi di Modena e Reggio Emilia</b><br><i>Dipartimento di Comunicazione ed Economia</i></div><hr>
+      <div>Corso di Laurea Magistrale in Management<br>e Comunicazione d'Impresa<br>A.A. 2023/2024</div></div>
+    <div class="dx"><div>Relatore:<br>Prof. <b>Cavicchioli Roberto</b></div></div>
+    <div class="semicerchio" aria-hidden="true"></div>
+  </div>
+</section>
 
 <div class="impianto">
 <nav class="indice" id="indice" aria-label="Indice">
@@ -256,24 +317,11 @@ footer{margin-top:80px; padding-top:18px; border-top:1px solid var(--line); font
 </nav>
 
 <main>
-  <header class="copertina" id="introduzione">
-    <div class="slide">
-      <div class="slide-testa">
-        <h1>Analisi data-driven per l'adozione di veicoli elettrici</h1>
-        <p class="sottotitolo">Analisi statistiche e predittive sugli acquirenti di auto elettriche</p>
-      </div>
-      <div class="banda">
-        <div class="sx"><div>Laureando<br><b>Gamberini Federico</b><br><i>mat. 178147</i></div><hr>
-          <div><b style="font-size:.95rem">Università degli Studi di Modena e Reggio Emilia</b><br><i>Dipartimento di Comunicazione ed Economia</i></div><hr>
-          <div>Corso di Laurea Magistrale in Management<br>e Comunicazione d'Impresa<br>A.A. 2023/2024</div></div>
-        <div class="dx"><div>Relatore:<br>Prof. <b>Cavicchioli Roberto</b></div></div>
-        <div class="semicerchio" aria-hidden="true"></div>
-      </div>
-    </div>
-    <div class="cifre" id="cifre"></div>
-  </header>
 
   <div class="contenuto">
+  <section class="capitolo introduzione" id="introduzione" data-titolo="Introduzione">
+  <div class="cifre" id="cifre"></div>
+
   <section class="blocco" id="contesto">
     <h2>Motivazione e contesto</h2>
     <div class="tre">
@@ -305,6 +353,7 @@ footer{margin-top:80px; padding-top:18px; border-top:1px solid var(--line); font
       <div><h4>I. Analisi statistiche</h4><ul><li>Statistiche descrittive e analisi bivariata</li><li>Regressione logistica e ipotesi di ricerca</li><li>Analisi esplorative: PCA, MCA, FAMD</li><li>Cluster: K-Mode, verificato con K-Means e gerarchico</li></ul></div>
       <div><h4>II. Analisi predittive</h4><ul><li>Machine learning: 15 algoritmi, ottimizzazione degli iperparametri</li><li>Interpretabilità con SHAP</li><li>Deep learning: reti neurali artificiali</li><li>Dashboard di predizione</li></ul></div>
     </div>
+  </section>
   </section>
 
   <!-- ===================================================== 1. STATISTICA -->
@@ -555,6 +604,7 @@ footer{margin-top:80px; padding-top:18px; border-top:1px solid var(--line); font
 
   <footer>
     Codice, notebook (eseguibili anche su Google Colab), dashboard e dati: <a href="https://github.com/FedeGambe/Master_s_thesis_Data_science">github.com/FedeGambe/Master_s_thesis_Data_science</a>.
+    · <a href="index.html">Home</a> · <a href="dashboard.html">Dashboard di predizione</a>
   </footer>
   </div>
 </main>
@@ -911,22 +961,46 @@ linee("g-roc-dl", nomiDl.map((n, i) => ({nome: n, x: DL.roc[n].x, y: DL.roc[n].y
 tabella("t-dl", [{t: "Modello", k: "nome"}, {t: "Accuracy", n: 1, f: r => fmt(r.accuracy)}, {t: "F1", n: 1, f: r => fmt(r.f1)}, {t: "ROC-AUC", n: 1, f: r => fmt(r.roc_auc)},
   {t: "IC 95%", n: 1, f: r => `${fmt(r.roc_auc_ic_basso)}–${fmt(r.roc_auc_ic_alto)}`}], [ML.test[0], ...DL.test], {evidenzia: r => r.nome === ML.migliore});
 
-// --- Indice: voce attiva durante lo scorrimento ----------------------------------------------
-const voci = [...document.querySelectorAll(".indice a")];
-const osservatore = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) voci.forEach(a => a.classList.toggle("attivo", a.getAttribute("href") === "#" + e.target.id)); });
-}, {rootMargin: "0px 0px -75% 0px"});
-voci.map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean).forEach(b => osservatore.observe(b));
-
 // Ridisegno dei grafici quando cambia la larghezza (rotazione del telefono, finestra ridimensionata)
 let ultimaLarghezza = innerWidth, attesa;
 addEventListener("resize", () => { clearTimeout(attesa); attesa = setTimeout(() => {
   if (innerWidth === ultimaLarghezza) return; ultimaLarghezza = innerWidth; registro.forEach(f => f()); }, 150); });
 
-// Pulsante "Indice" sugli schermi stretti: compare dopo la copertina
-const vaiIndice = $("vai-indice");
-new IntersectionObserver(([e]) => vaiIndice.classList.toggle("visibile", !e.isIntersecting && e.boundingClientRect.top < 0))
-  .observe($("indice"));
+// --- Barra in alto e indice: titolo, capitolo e sottocapitolo correnti, avanzamento della lettura
+const barra = $("barra"), copertina = $("copertina");
+const riduciMovimento = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const capitoli = [...document.querySelectorAll(".capitolo")], voci = [...document.querySelectorAll(".indice a")];
+const testoTitolo = h => h ? [...h.childNodes].map(n => n.textContent.trim()).filter(Boolean).join(" ") : "";
+const parteDi = c => c.classList.contains("statistica") ? "statistica" : c.classList.contains("predittiva") ? "predittiva" : "";
+let inCoda = false;
+function aggiornaBarra() {
+  inCoda = false;
+  const y = scrollY, hc = copertina.offsetHeight, hb = barra.offsetHeight, soglia = hb + 40;
+  if (!riduciMovimento) copertina.style.setProperty("--p", Math.min(1, y / hc).toFixed(3));
+  barra.classList.toggle("compatta", y > hc - hb * 2);
+  const max = document.documentElement.scrollHeight - innerHeight;
+  let cap = null, sotto = null;
+  for (const c of capitoli) if (c.getBoundingClientRect().top <= soglia) cap = c;
+  if (cap) for (const b of cap.querySelectorAll(".blocco")) if (b.getBoundingClientRect().top <= soglia) sotto = b;
+  // In fondo alla pagina l'ultimo capitolo non arriva in cima: conta comunque come attivo
+  if (y >= max - 2 && cap !== capitoli.at(-1)) { cap = capitoli.at(-1); sotto = null; }
+  const attivo = "#" + (sotto || cap || {}).id;
+  voci.forEach(a => a.classList.toggle("attivo", a.getAttribute("href") === attivo));
+  $("barra-capitolo").textContent = cap ? cap.dataset.titolo || testoTitolo(cap.querySelector("h2")) : "";
+  $("barra-sotto").textContent = sotto ? testoTitolo(sotto.querySelector("h2, h3")) : "";
+  barra.dataset.parte = cap ? parteDi(cap) : "";
+  barra.style.setProperty("--avanzamento", max > 0 ? Math.min(1, y / max).toFixed(4) : 0);
+}
+addEventListener("scroll", () => { if (!inCoda) { inCoda = true; requestAnimationFrame(aggiornaBarra); } }, {passive: true});
+addEventListener("resize", aggiornaBarra);
+aggiornaBarra();
+
+// Indice a tendina sugli schermi stretti
+const indice = $("indice"), apriIndice = $("apri-indice");
+const mostraIndice = aperto => { indice.classList.toggle("aperto", aperto); apriIndice.setAttribute("aria-expanded", aperto); };
+apriIndice.addEventListener("click", () => mostraIndice(!indice.classList.contains("aperto")));
+indice.addEventListener("click", e => { if (e.target.closest("a")) mostraIndice(false); });
+addEventListener("keydown", e => { if (e.key === "Escape") mostraIndice(false); });
 
 // Tema
 $("tema").addEventListener("click", () => {

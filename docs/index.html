@@ -4,11 +4,137 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adozione dei veicoli elettrici</title>
-<meta http-equiv="refresh" content="0; url=risultati.html">
-<link rel="canonical" href="risultati.html">
+<meta name="description" content="Tesi di laurea magistrale: analisi data-driven per l'adozione di veicoli elettrici. Risultati delle analisi e dashboard di predizione.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Pagina iniziale: copertina a tutta larghezza (come in risultati.html) e due aree, risultati e dashboard. */
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#111111; --ink-2:#45484c; --ink-3:#74777b; --line:#e4e0d6;
+  --teal:#3f93aa; --teal-ink:#2a7a90; --arancio:#e2462a; --arancio-ink:#c8361c; --accent-soft:#e6f1f4; --arancio-soft:#fbe8e3;
+  --copertina:#efe9dc;
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --arancio:#ee6141; --arancio-ink:#f07a5e; --accent-soft:#18292e; --arancio-soft:#33201a;
+  --copertina:#1f2123; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#121314; --surface:#1a1c1e; --ink:#f2f1ed; --ink-2:#bdbcb6; --ink-3:#8d8c87; --line:#2e3032;
+  --teal:#4fa6bd; --teal-ink:#6dbbd0; --arancio:#ee6141; --arancio-ink:#f07a5e; --accent-soft:#18292e; --arancio-soft:#33201a;
+  --copertina:#1f2123; color-scheme:dark; }
+
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font:16.5px/1.6 var(--f-body); margin:0}
+h1,h2{font-family:var(--f-display); line-height:1.08; text-wrap:balance; margin:0; letter-spacing:-.01em}
+a:focus-visible,button:focus-visible{outline:2px solid var(--teal-ink); outline-offset:2px}
+.margine{--margine:max(20px, calc(50vw - 640px))}
+
+.tema{position:absolute; z-index:2; top:calc(16px + env(safe-area-inset-top,0px)); right:20px; font:600 .8rem/1 var(--f-body); color:var(--ink);
+  background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:8px 13px; cursor:pointer}
+
+/* Copertina */
+.copertina{background:var(--copertina)}
+.testa{padding:clamp(64px,9vw,120px) var(--margine) clamp(32px,5vw,64px)}
+.testa h1{font-size:clamp(2.3rem,6vw,4.6rem); font-weight:900; letter-spacing:-.02em; max-width:20ch}
+.sottotitolo{font-size:clamp(1.05rem,1.8vw,1.4rem); margin:16px 0 0}
+.banda{position:relative; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; min-height:clamp(220px,24vw,320px);
+  background:linear-gradient(90deg, #0d0d0d 50%, #5aa4bb 50%)}
+.banda > div{position:relative; z-index:1; padding:clamp(22px,3.4vw,40px) var(--margine) 28px; min-width:0}
+.banda .sx{color:#f4f2ec; font-size:.9rem; line-height:1.45}
+.banda .dx{color:#0d0d0d; text-align:right; font-size:1rem; padding-left:20px}
+.banda b{font-family:var(--f-display); font-weight:800; font-size:1.2rem}
+.banda .sx hr{border:0; border-top:1px solid #ffffff59; margin:14px 0; width:min(60%,260px)}
+.banda .semicerchio{position:absolute; z-index:0; left:25%; bottom:0; width:50%; aspect-ratio:1; border-radius:50%;
+  background:linear-gradient(90deg, #e2462a 50%, #ddd8c4 50%); transform:translateY(80%); pointer-events:none}
+@media (max-width:700px){ .banda{grid-template-columns:1fr; background:none} .banda .sx{background:#0d0d0d}
+  .banda .dx{background:#5aa4bb; text-align:left; padding-left:var(--margine)} .banda .semicerchio{display:none} }
+
+/* Le due aree */
+.aree{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; padding:clamp(36px,5vw,64px) var(--margine) 24px}
+@media (max-width:760px){ .aree{grid-template-columns:1fr} }
+.area{display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-top:5px solid var(--colore);
+  border-radius:6px; padding:clamp(22px,3vw,34px); min-width:0; --colore:var(--teal); --colore-ink:var(--teal-ink); --morbido:var(--accent-soft)}
+.area.predittiva{--colore:var(--arancio); --colore-ink:var(--arancio-ink); --morbido:var(--arancio-soft)}
+.area .etichetta{font:600 .78rem/1 var(--f-body); letter-spacing:.1em; text-transform:uppercase; color:var(--colore-ink)}
+.area h2{font-size:clamp(1.7rem,3.2vw,2.3rem); font-weight:900; margin-top:12px; position:relative; padding-left:34px}
+.area h2::before{content:""; position:absolute; left:0; top:.06em; border-style:solid; border-width:.5em 0 .5em .62em;
+  border-color:transparent transparent transparent var(--colore)}
+.area p{color:var(--ink-2); margin:14px 0 0}
+.area ul{margin:14px 0 0; padding-left:18px; color:var(--ink-2); font-size:.94rem}
+.area .vai{align-self:flex-start; margin-top:auto; display:inline-flex; align-items:center; gap:10px; font:800 1rem/1 var(--f-display);
+  color:#fff; background:var(--colore-ink); text-decoration:none; padding:14px 22px; border-radius:999px; transition:transform .15s}
+.area .spazio{flex:1; min-height:24px}
+.area .vai:hover{transform:translateX(3px)}
+.area .vai::after{content:"→"}
+@media (prefers-reduced-motion: reduce){ .area .vai{transition:none} .area .vai:hover{transform:none} }
+
+/* Documenti */
+.documenti{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; padding:8px var(--margine) 56px; font-size:.9rem; color:var(--ink-3)}
+.documenti a{color:var(--ink); text-decoration:none; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:8px 14px; font-weight:600; font-size:.85rem}
+.documenti a:hover{border-color:var(--ink-3)}
+</style>
 </head>
 <body>
-<p><a href="risultati.html">Vai ai risultati</a></p>
+<button class="tema" id="tema" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+
+<header class="copertina margine">
+  <div class="testa">
+    <h1>Analisi data-driven per l'adozione di veicoli elettrici</h1>
+    <p class="sottotitolo">Analisi statistiche e predittive sugli acquirenti di auto elettriche</p>
+  </div>
+  <div class="banda">
+    <div class="sx"><div>Laureando<br><b>Gamberini Federico</b><br><i>mat. 178147</i></div><hr>
+      <div><b style="font-size:.95rem">Università degli Studi di Modena e Reggio Emilia</b><br><i>Dipartimento di Comunicazione ed Economia</i></div><hr>
+      <div>Corso di Laurea Magistrale in Management<br>e Comunicazione d'Impresa<br>A.A. 2023/2024</div></div>
+    <div class="dx"><div>Relatore:<br>Prof. <b>Cavicchioli Roberto</b></div></div>
+    <div class="semicerchio" aria-hidden="true"></div>
+  </div>
+</header>
+
+<main class="margine">
+  <div class="aree">
+    <section class="area">
+      <span class="etichetta">Analisi</span>
+      <h2>Risultati</h2>
+      <p>Tutte le analisi della tesi, capitolo per capitolo, con grafici interattivi.</p>
+      <ul>
+        <li>Analisi statistiche: descrittive, bivariata, regressione logistica e ipotesi di ricerca</li>
+        <li>Analisi esplorative (PCA, MCA, FAMD) e cluster</li>
+        <li>Analisi predittive: machine learning e deep learning</li>
+      </ul>
+      <div class="spazio"></div>
+      <a class="vai" href="risultati.html">Apri i risultati</a>
+    </section>
+    <section class="area predittiva">
+      <span class="etichetta">Strumento</span>
+      <h2>Dashboard</h2>
+      <p>Stima la probabilità che un cliente scelga un'auto 100% elettrica (BEV) a partire dal suo profilo.</p>
+      <ul>
+        <li>Profilo socio-demografico, abitativo e di mobilità</li>
+        <li>Contributo di ogni caratteristica alla predizione (SHAP)</li>
+        <li>Modello LightGBM della tesi, calcolato direttamente nel browser</li>
+      </ul>
+      <div class="spazio"></div>
+      <a class="vai" href="dashboard.html">Apri la dashboard</a>
+    </section>
+  </div>
+  <nav class="documenti" aria-label="Documenti">
+    <span>Documenti:</span>
+    <a href="Tesi_Gamberini_v_digitale.pdf">Tesi (PDF)</a>
+    <a href="MCI_178147.pdf">Presentazione (PDF)</a>
+    <a href="https://github.com/FedeGambe/Master_s_thesis_Data_science">Codice su GitHub</a>
+  </nav>
+</main>
+
+<script>
+document.getElementById("tema").addEventListener("click", () => {
+  const r = document.documentElement, scuro = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = scuro ? "light" : "dark";
+});
+</script>
 </body>
 </html>
