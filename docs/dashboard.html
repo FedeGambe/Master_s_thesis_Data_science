@@ -191,6 +191,15 @@ footer{margin-top:48px; padding-top:18px; border-top:3px solid var(--ink); color
 footer a{color:inherit} footer a:hover{color:var(--arancio)}
 footer .firma{margin-top:14px}
 .solo-lettori{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+/* FONT MOBILE (telefono, fino a 700px): gerarchia titolo > titoli di sezione > testo > etichette > note */
+@media (max-width:700px){
+  h1, .banner h1{font-size:clamp(1.9rem,8.5vw,2.25rem)}
+  h2, .sezione > legend, .gtitolo, .risultati h2{font-size:1.25rem}
+  h3{font-size:1.05rem}
+  .intro{font-size:1rem}
+  .etichetta, .campo > legend{font-size:.9rem}
+}
+/* /FONT MOBILE */
 </style>
 <script>try{document.documentElement.dataset.theme=localStorage.theme||"dark"}catch{document.documentElement.dataset.theme="dark"}</script>
 </head>
