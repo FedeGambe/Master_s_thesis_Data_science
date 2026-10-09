@@ -19,7 +19,7 @@ DIR_APP = C.RADICE / "app"
 FILE_LOGICA = DIR_APP / "modello_bev.js"
 FILE_MODELLO_HTML = DIR_APP / "modello_dashboard.html"
 FILE_PAGINA = C.DIR_DOCS / "dashboard.html"
-FILE_FAVICON = C.DIR_DOCS / "favicon.svg"
+FILE_FAVICON = C.DIR_DOCS / "img" / "favicon.svg"
 
 CAMPI = {  # id del campo nella pagina -> colonna del dataset originale (come in app/dashboard.py)
     "genere": C.GENERE, "eta": C.CLASSE_ETA, "reddito": C.REDDITO, "istruzione": C.ISTRUZIONE,

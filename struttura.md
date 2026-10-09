@@ -197,7 +197,9 @@ Una sottocartella per fase, scritta tramite `tesi_bev.archivio`. I file sono ver
 | `RISULTATI.md` | risultati completi, capitolo per capitolo (generato dalla fase 07) |
 | `risultati.html` | stessi contenuti in una pagina autonoma con indice e grafici interattivi (generata dalla fase 07) |
 | `dashboard.html` | dashboard di predizione in un unico file, si apre con un doppio clic senza Python né server (generata dalla fase 08) |
-| `favicon.svg` | icona delle pagine |
+| `index.html` | home del sito (tesi.federicogamberini.it) con i link a risultati e dashboard |
+| `progetto.json` | scheda del progetto per la card del sito progetti.federicogamberini.it |
+| `img/` | `cover_orizzontale.svg` e `cover_verticale.svg` (copertina delle pagine su schermo orizzontale e verticale; la verticale è anche l'immagine della card), `favicon.svg` (icona delle pagine) |
 | `Tesi_Gamberini_v_digitale.pdf` | testo completo della tesi |
 | `MCI_178147.pdf` | presentazione di laurea, riferimento per lo stile della pagina dei risultati |
 
